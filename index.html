@@ -1050,63 +1050,74 @@
       });
     }
 
-    async function compressImageFile(file, { maxDim = 1280, quality = 0.82 } = {}){
-      if (!file || !file.type?.startsWith("image/")) {
+    function loadImage(src){
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    }
+
+    async function blobToDataUrl(blob){
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function compressImageFile(file, maxSide = 1400, quality = 0.82){
+      if (!file || !String(file.type || "").startsWith("image/")) {
         return fileToDataUrl(file);
       }
 
-      const loadImage = () => new Promise((resolve, reject) => {
-        const img = new Image();
-        const url = URL.createObjectURL(file);
-        img.onload = () => {
-          URL.revokeObjectURL(url);
-          resolve(img);
-        };
-        img.onerror = (err) => {
-          URL.revokeObjectURL(url);
-          reject(err);
-        };
-        img.src = url;
-      });
-
+      const sourceUrl = URL.createObjectURL(file);
       try{
-        const img = await loadImage();
-        const w = img.naturalWidth || img.width || 1;
-        const h = img.naturalHeight || img.height || 1;
-        const scale = Math.min(1, maxDim / Math.max(w, h));
-        const targetW = Math.max(1, Math.round(w * scale));
-        const targetH = Math.max(1, Math.round(h * scale));
+        const img = await loadImage(sourceUrl);
+        const scale = Math.min(1, maxSide / Math.max(img.naturalWidth || img.width || 1, img.naturalHeight || img.height || 1));
+        const width = Math.max(1, Math.round((img.naturalWidth || img.width || 1) * scale));
+        const height = Math.max(1, Math.round((img.naturalHeight || img.height || 1) * scale));
 
         const canvas = document.createElement("canvas");
-        canvas.width = targetW;
-        canvas.height = targetH;
-        const ctx = canvas.getContext("2d");
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = "high";
-        ctx.drawImage(img, 0, 0, targetW, targetH);
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d", { alpha: true });
+        ctx.drawImage(img, 0, 0, width, height);
 
-        const mime = "image/jpeg";
-        const dataUrl = canvas.toDataURL(mime, quality);
-
-        // Firestore document size limitine takılmaması için ekstra güvenlik.
-        // Çok büyük görsellerde daha da küçült.
-        if (dataUrl.length > 850_000 && scale < 1) {
-          const smallerCanvas = document.createElement("canvas");
-          const smallerScale = Math.min(scale, 0.8);
-          smallerCanvas.width = Math.max(1, Math.round(w * smallerScale));
-          smallerCanvas.height = Math.max(1, Math.round(h * smallerScale));
-          const sctx = smallerCanvas.getContext("2d");
-          sctx.imageSmoothingEnabled = true;
-          sctx.imageSmoothingQuality = "high";
-          sctx.drawImage(img, 0, 0, smallerCanvas.width, smallerCanvas.height);
-          return smallerCanvas.toDataURL(mime, Math.max(0.65, quality - 0.12));
+        const candidates = [quality, 0.72, 0.62, 0.52, 0.45];
+        for (const q of candidates){
+          const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", q));
+          if (!blob) continue;
+          const dataUrl = await blobToDataUrl(blob);
+          if (dataUrl.length <= 950000 || q === candidates[candidates.length - 1]) {
+            return dataUrl;
+          }
         }
 
-        return dataUrl;
-      }catch{
-        // Resim küçültme başarısız olursa en azından orijinal dosyayı kaydetmeyi dene.
-        return fileToDataUrl(file);
+        // Fallback: even if canvas compression somehow fails, try the original file.
+        return await fileToDataUrl(file);
+      }finally{
+        URL.revokeObjectURL(sourceUrl);
       }
+    }
+
+    function firebaseErrorMessage(err){
+      const code = String(err?.code || err?.name || "unknown");
+      const message = String(err?.message || "Bilinmeyen hata");
+      const lower = `${code} ${message}`.toLowerCase();
+
+      if (lower.includes("permission-denied")) {
+        return "Kayıt izni yok. Firestore kuralları bu yazmayı engelliyor.";
+      }
+      if (lower.includes("document too large") || lower.includes("1 mib") || lower.includes("1,048,576")) {
+        return "İlan görseli veya ilan verisi Firestore belge sınırını aşıyor.";
+      }
+      if (lower.includes("invalid-argument")) {
+        return "Gönderilen veride geçersiz bir alan var.";
+      }
+      return `${code}: ${message}`;
     }
 
     async function cleanupExpired(){
@@ -1326,6 +1337,12 @@
       else if (imageUrl) imageData = imageUrl;
       if (!imageData) return alert("Görüntü zorunlu.");
 
+      // Firestore belge boyutu aşıldığında yazma başarısız olur. Bunu daha önce yakalayıp net mesaj gösteriyoruz.
+      if (String(imageData).length > 950000) {
+        alert("Görsel hâlâ çok büyük. Lütfen daha küçük bir fotoğraf kullan.");
+        return;
+      }
+
       const now = Date.now();
       const payload = {
         ownerId: state.user.uid,
@@ -1365,7 +1382,8 @@
         refs.modalTitle.textContent = "İlan ekle";
         setView(state.lastViewBeforeModal || "shop");
       }catch(err){
-        alert("İlan kaydedilemedi.");
+        console.error("İlan kaydetme hatası:", err);
+        alert("İlan kaydedilemedi: " + firebaseErrorMessage(err));
       }
     }
 
