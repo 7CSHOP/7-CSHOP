@@ -130,6 +130,7 @@
     .badge.no{background:#fee2e2;color:#991b1b}
     .badge.mine{background:#dbeafe;color:#1d4ed8}
     .badge.closed{background:#e5e7eb;color:#4b5563}
+    .badge.notify{background:#dc2626;color:#fff;min-width:24px;height:24px;padding:0 8px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font-size:12px;font-weight:900;line-height:1}
     .card h4{margin:0;font-size:18px}
     .card p{margin:0;color:#4b5563;line-height:1.55;font-size:14px}
     .row{display:flex;gap:8px;flex-wrap:wrap}
@@ -311,7 +312,7 @@
               <div class="menu">
                 <button data-view="shop" class="active">Dükkan</button>
                 <button data-view="myads">İlanlarım</button>
-                <button data-view="messages">Mesajlar</button>
+                <button data-view="messages">Mesajlar <span id="messagesBadge" class="badge notify hidden" style="margin-left:8px">0</span></button>
                 <button data-view="profile">Profil</button>
                 <button data-view="admin" id="adminMenu" class="hidden">Yönetim</button>
               </div>
@@ -623,6 +624,7 @@
       viewDesc: $("viewDesc"),
       countBadge: $("countBadge"),
       onlineBadge: $("onlineBadge"),
+      messagesBadge: $("messagesBadge"),
       searchInput: $("searchInput"),
       filterType: $("filterType"),
       filterCategory: $("filterCategory"),
@@ -807,6 +809,26 @@
       return [...arr].sort((a,b) => tsValue(b[field]) - tsValue(a[field]));
     }
 
+    function getUnreadCount(conv){
+      const map = conv?.unreadBy || {};
+      return Math.max(0, Number(map?.[state.user?.uid] || 0));
+    }
+
+    function totalUnreadCount(){
+      return state.conversations.reduce((sum, conv) => sum + getUnreadCount(conv), 0);
+    }
+
+    async function markConversationRead(convId){
+      if (!convId || !state.user) return;
+      const conv = state.conversations.find(c => c.id === convId);
+      if (!conv) return;
+      const current = Number(conv.unreadBy?.[state.user.uid] || 0);
+      if (current <= 0) return;
+      const unreadBy = { ...(conv.unreadBy || {}) };
+      unreadBy[state.user.uid] = 0;
+      await updateDoc(doc(db, "conversations", convId), { unreadBy, updatedAt: serverTimestamp() });
+    }
+
     function filterListings(list){
       const q = refs.searchInput.value.trim().toLowerCase();
       const type = refs.filterType.value;
@@ -841,6 +863,7 @@
 
     function renderListingCard(item, forMine=false){
       const owner = escapeHtml(item.ownerName || "Bilinmeyen");
+      const isMine = state.user?.uid === item.ownerId;
       const statusBadge =
         item.status === "published" ? `<span class="badge ok">Yayında</span>` :
         item.status === "closed" ? `<span class="badge closed">Kapalı</span>` :
@@ -864,7 +887,7 @@
                 <strong>
                   <button class="profile-link" onclick="window.__openSeller('${item.ownerId}','${item.id}')">${owner}</button>
                 </strong>
-                <small>Profiline tıkla, mesajlaş.</small>
+                <small>${isMine ? "Bu ilan sana ait." : "Profiline tıkla, mesajlaş."}</small>
               </div>
               <button class="btn secondary" onclick="window.__openSeller('${item.ownerId}','${item.id}')">Profil</button>
             </div>
@@ -873,6 +896,7 @@
               ${statusBadge}
               ${typeBadge}
               ${categoryBadge}
+              ${isMine ? `<span class="badge mine">Senin ilan</span>` : ""}
             </div>
 
             <h4>${escapeHtml(item.name)}</h4>
@@ -880,8 +904,8 @@
             <div class="row">${tags}</div>
             <div class="row"><span class="price-tag">${escapeHtml(item.priceLabel || "İstenen yok")}</span></div>
             <div class="row">
-              ${isPublished(item) ? `<button class="btn" onclick="window.__openConversation('${item.id}')">Mesaj</button>` : `<button class="btn secondary" disabled>Kapalı</button>`}
-              ${isPublished(item) ? `<button class="btn good" onclick="window.__buyListing('${item.id}')">Satın al</button>` : ""}
+              ${isPublished(item) && !isMine ? `<button class="btn" onclick="window.__openConversation('${item.id}')">Mesaj</button>` : `<button class="btn secondary" disabled>${isPublished(item) ? (isMine ? "Kendi ilanım" : "Kapalı") : "Kapalı"}</button>`}
+              ${isPublished(item) && !isMine ? `<button class="btn good" onclick="window.__buyListing('${item.id}')">Satın al</button>` : ""}
               ${forMine ? `<button class="btn secondary" onclick="window.__editListing('${item.id}')">Düzenle</button>` : ""}
               ${forMine ? `<button class="btn warn" onclick="window.__toggleListing('${item.id}')">${item.status === "published" ? "Kapat" : "Aç"}</button>` : ""}
               ${forMine ? `<button class="btn bad" onclick="window.__removeListing('${item.id}')">Sil</button>` : ""}
@@ -895,13 +919,17 @@
     function renderConversationItem(conv){
       const listing = state.listings.find(x => x.id === conv.listingId);
       const otherName = (conv.memberNames || []).find(n => n !== state.profile?.displayName) || "Sohbet";
+      const unread = getUnreadCount(conv);
       return `
         <div class="item" style="cursor:pointer" onclick="window.__selectConversation('${conv.id}')">
           <div class="item-head">
             <strong>${escapeHtml(listing?.name || "İlan")} • ${escapeHtml(otherName)}</strong>
             <span>${escapeHtml(conv.lastMessage || "Yeni konuşma")}</span>
           </div>
-          <div class="tiny">Mesajları açmak için dokun.</div>
+          <div class="item-actions" style="justify-content:space-between;align-items:center">
+            <div class="tiny">Mesajları açmak için dokun.</div>
+            ${unread > 0 ? `<span class="badge notify">${unread}</span>` : ""}
+          </div>
         </div>
       `;
     }
@@ -996,6 +1024,11 @@
 
     function renderAll(){
       if (!state.user) return;
+      const unreadTotal = totalUnreadCount();
+      if (refs.messagesBadge){
+        refs.messagesBadge.textContent = unreadTotal > 99 ? "99+" : String(unreadTotal);
+        refs.messagesBadge.classList.toggle("hidden", unreadTotal <= 0);
+      }
       if (state.view === "shop") renderShop();
       if (state.view === "myads") renderMyAds();
       if (state.view === "messages") renderConversations();
@@ -1103,6 +1136,7 @@
           memberNames: Array.from(new Set([state.profile.displayName, item.ownerName].filter(Boolean))),
           messages: [],
           lastMessage: "",
+          unreadBy: {},
           createdAtMs: Date.now(),
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
@@ -1114,11 +1148,13 @@
       state.currentConversationId = conv.id;
       state.currentListingId = listingId;
       setView("messages");
+      await markConversationRead(conv.id);
       renderAll();
     }
 
     async function sendMessage(payloadText){
-      const text = String(payloadText ?? refs.messageInput.value).trim();
+      const isEvent = payloadText && typeof payloadText === "object" && typeof payloadText.type === "string";
+      const text = String(isEvent ? refs.messageInput.value : (payloadText ?? refs.messageInput.value)).trim();
       if (!text || !state.currentConversationId) return;
 
       const convRef = doc(db, "conversations", state.currentConversationId);
@@ -1134,9 +1170,15 @@
         createdAt: new Date().toISOString()
       };
 
+      const unreadBy = { ...(data.unreadBy || {}) };
+      for (const member of (data.members || [])) {
+        if (member !== state.user.uid) unreadBy[member] = (Number(unreadBy[member]) || 0) + 1;
+      }
+
       await updateDoc(convRef, {
         messages: [...messages, next],
         lastMessage: text,
+        unreadBy,
         updatedAt: serverTimestamp()
       });
 
@@ -1165,6 +1207,7 @@
             createdAt: new Date().toISOString()
           }],
           lastMessage: buyText,
+          unreadBy: { [item.ownerId]: 1 },
           createdAtMs: Date.now(),
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
@@ -1175,6 +1218,8 @@
         const snap = await getDoc(convRef);
         const data = snap.data();
         const messages = Array.isArray(data.messages) ? data.messages : [];
+        const unreadBy = { ...(data.unreadBy || {}) };
+        unreadBy[item.ownerId] = (Number(unreadBy[item.ownerId]) || 0) + 1;
         await updateDoc(convRef, {
           messages: [...messages, {
             uid: "system",
@@ -1184,6 +1229,7 @@
             createdAt: new Date().toISOString()
           }],
           lastMessage: buyText,
+          unreadBy,
           updatedAt: serverTimestamp()
         });
       }
@@ -1192,6 +1238,7 @@
       state.currentConversationId = conv.id;
       state.currentListingId = listingId;
       setView("messages");
+      await markConversationRead(conv.id);
       renderAll();
     }
 
@@ -1314,6 +1361,7 @@
     async function selectConversation(id){
       state.currentConversationId = id;
       setView("messages");
+      await markConversationRead(id);
       renderAll();
     }
 
@@ -1455,7 +1503,7 @@
     refs.btnCloseModal.onclick = () => refs.modalListing.classList.remove("show");
     refs.btnLogout.onclick = async () => { await signOut(auth); };
     refs.btnRefresh.onclick = async () => { await cleanupExpired(); renderAll(); };
-    refs.btnSendMessage.onclick = sendMessage;
+    refs.btnSendMessage.onclick = () => sendMessage();
     refs.btnDeleteConversation.onclick = deleteConversation;
     refs.searchInput.oninput = renderAll;
     refs.filterType.onchange = renderAll;
