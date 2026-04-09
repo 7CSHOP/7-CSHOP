@@ -1050,6 +1050,65 @@
       });
     }
 
+    async function compressImageFile(file, { maxDim = 1280, quality = 0.82 } = {}){
+      if (!file || !file.type?.startsWith("image/")) {
+        return fileToDataUrl(file);
+      }
+
+      const loadImage = () => new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          resolve(img);
+        };
+        img.onerror = (err) => {
+          URL.revokeObjectURL(url);
+          reject(err);
+        };
+        img.src = url;
+      });
+
+      try{
+        const img = await loadImage();
+        const w = img.naturalWidth || img.width || 1;
+        const h = img.naturalHeight || img.height || 1;
+        const scale = Math.min(1, maxDim / Math.max(w, h));
+        const targetW = Math.max(1, Math.round(w * scale));
+        const targetH = Math.max(1, Math.round(h * scale));
+
+        const canvas = document.createElement("canvas");
+        canvas.width = targetW;
+        canvas.height = targetH;
+        const ctx = canvas.getContext("2d");
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, 0, 0, targetW, targetH);
+
+        const mime = "image/jpeg";
+        const dataUrl = canvas.toDataURL(mime, quality);
+
+        // Firestore document size limitine takılmaması için ekstra güvenlik.
+        // Çok büyük görsellerde daha da küçült.
+        if (dataUrl.length > 850_000 && scale < 1) {
+          const smallerCanvas = document.createElement("canvas");
+          const smallerScale = Math.min(scale, 0.8);
+          smallerCanvas.width = Math.max(1, Math.round(w * smallerScale));
+          smallerCanvas.height = Math.max(1, Math.round(h * smallerScale));
+          const sctx = smallerCanvas.getContext("2d");
+          sctx.imageSmoothingEnabled = true;
+          sctx.imageSmoothingQuality = "high";
+          sctx.drawImage(img, 0, 0, smallerCanvas.width, smallerCanvas.height);
+          return smallerCanvas.toDataURL(mime, Math.max(0.65, quality - 0.12));
+        }
+
+        return dataUrl;
+      }catch{
+        // Resim küçültme başarısız olursa en azından orijinal dosyayı kaydetmeyi dene.
+        return fileToDataUrl(file);
+      }
+    }
+
     async function cleanupExpired(){
       const now = Date.now();
 
@@ -1263,7 +1322,7 @@
       }
 
       let imageData = "";
-      if (file) imageData = await fileToDataUrl(file);
+      if (file) imageData = await compressImageFile(file);
       else if (imageUrl) imageData = imageUrl;
       if (!imageData) return alert("Görüntü zorunlu.");
 
