@@ -2,7 +2,6 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>7/C Shop</title>
   <style>
@@ -67,10 +66,7 @@
     .chip.bad{background:var(--bad);border-color:var(--bad);color:#fff}
     .chip.warn{background:var(--warn);border-color:var(--warn);color:#fff}
     .container{max-width:1440px;margin:0 auto;padding:20px;width:100%}
-    .hero{
-      min-height:calc(100vh - 110px);
-      display:grid;align-items:center;
-    }
+    .hero{min-height:calc(100vh - 110px);display:grid;align-items:center}
     .grid{display:grid;gap:18px}
     .auth-grid{grid-template-columns:1.05fr .95fr}
     .panel{
@@ -100,7 +96,6 @@
     textarea{min-height:110px;resize:vertical}
     .input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
     .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
     .hint{font-size:12px;color:var(--muted);line-height:1.5}
     .hr{height:1px;background:var(--line);margin:16px 0}
     .btn{
@@ -151,6 +146,7 @@
     .messages{padding:16px;display:grid;gap:10px;max-height:470px;overflow:auto;background:#f9fafb}
     .msg{max-width:78%;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:#fff}
     .msg.me{margin-left:auto;background:#dbeafe;border-color:#bfdbfe}
+    .msg.system{margin:0 auto;background:#f3f4f6;border-style:dashed}
     .msg .small{display:block;margin-top:6px;font-size:11px;color:var(--muted)}
     .chat-head{padding:16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center}
     .chat-foot{padding:14px;border-top:1px solid var(--line);display:grid;gap:10px}
@@ -175,10 +171,7 @@
     }
     .tiny{font-size:11px;color:var(--muted)}
     .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .list{
-      display:grid;
-      gap:12px;
-    }
+    .list{display:grid;gap:12px}
     .item{
       background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;
       display:grid;gap:10px;box-shadow:0 8px 16px rgba(17,24,39,.03);
@@ -188,60 +181,32 @@
     .item-head span{color:var(--muted);font-size:12px}
     .item-actions{display:flex;gap:8px;flex-wrap:wrap}
     .profile-link{
-      background:none;
-      border:none;
-      padding:0;
-      color:var(--accent);
-      cursor:pointer;
-      font-weight:800;
-      text-align:left;
+      background:none;border:none;padding:0;color:var(--accent);cursor:pointer;font-weight:800;text-align:left
     }
     .profile-link:hover{text-decoration:underline}
     .price-tag{
-      font-size:12px;
-      color:#111827;
-      background:#f8fafc;
-      border:1px solid var(--line);
-      padding:8px 10px;
-      border-radius:999px;
-      display:inline-flex;
-      align-items:center;
-      width:fit-content;
+      font-size:12px;color:#111827;background:#f8fafc;border:1px solid var(--line);
+      padding:8px 10px;border-radius:999px;display:inline-flex;align-items:center;width:fit-content
     }
     .seller-box{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-      background:#f8fafc;
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:12px 14px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:12px 14px;
     }
     .seller-box strong{display:block}
     .seller-box small{color:var(--muted)}
-    .split{
-      display:grid;
-      grid-template-columns:1fr 340px;
-      gap:16px;
-      align-items:start;
-    }
-    .seller-panel{
-      position:sticky;
-      top:96px;
-    }
+    .split{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start}
+    .seller-panel{position:sticky;top:96px}
     @media (max-width:1200px){
       .split{grid-template-columns:1fr}
       .seller-panel{position:static}
     }
     @media (max-width:1100px){
       .layout,.auth-grid,.admin-grid{grid-template-columns:1fr}
-      .cards,.three,.two,.stats{grid-template-columns:1fr 1fr}
+      .cards,.two,.stats{grid-template-columns:1fr 1fr}
       .sidebar{position:static}
     }
     @media (max-width:760px){
-      .cards,.three,.two,.stats{grid-template-columns:1fr}
+      .cards,.two,.stats{grid-template-columns:1fr}
       .hero-copy h2{font-size:32px}
       .topbar-inner{padding:14px}
       .container{padding:14px}
@@ -277,7 +242,7 @@
               <div class="tiny">Giriş sistemi</div>
               <h2>7/C Shop</h2>
               <p>
-                Herkes kendi hesabıyla girer. İlan eklemek serbesttir. Mesajlaşma ve pazarlık tek yerde çalışır.
+                Herkes kendi hesabıyla girer. İlan eklemek serbesttir. Mesajlaşma, pazarlık ve ilan yönetimi tek yerde toplanır.
               </p>
               <div class="stats">
                 <div class="stat"><b>Hızlı</b><span>Tek dosya arayüz</span></div>
@@ -286,7 +251,7 @@
               </div>
               <div class="hr"></div>
               <div class="notice">
-                Görsel zorunludur. URL ile ya da küçük dosya yükleyerek ekleyebilirsin. Storage kullanılmaz.
+                Görsel zorunludur. URL ile ya da küçük dosya yükleyerek ekleyebilirsin.
               </div>
             </div>
           </div>
@@ -302,7 +267,7 @@
               <form id="loginForm" class="form">
                 <div class="field">
                   <label>Kullanıcı adı</label>
-                  <input id="loginName" class="input" placeholder="Örn: Ali" autocomplete="username" />
+                  <input id="loginName" class="input" placeholder="Örn: Ece" autocomplete="username" />
                 </div>
                 <div class="field">
                   <label>Şifre</label>
@@ -314,7 +279,7 @@
               <form id="registerForm" class="form hidden">
                 <div class="field">
                   <label>İsim / kullanıcı adı</label>
-                  <input id="regName" class="input" placeholder="Örn: Ali " autocomplete="username" />
+                  <input id="regName" class="input" placeholder="Örn: Ece" autocomplete="username" />
                 </div>
                 <div class="two">
                   <div class="field">
@@ -430,7 +395,7 @@
                     </div>
                     <div id="messagesBox" class="messages"></div>
                     <div class="chat-foot">
-                      <textarea id="messageInput" class="input" placeholder="Pazarlık mesajı yaz..."></textarea>
+                      <textarea id="messageInput" class="input" placeholder="Mesaj yaz..."></textarea>
                       <button id="btnSendMessage" class="btn" type="button">Gönder</button>
                     </div>
                   </div>
@@ -585,9 +550,7 @@
           </div>
           <div class="panel seller-panel" style="box-shadow:none">
             <div class="panel-inner">
-              <div class="notice">
-                Satıcıyla konuşmak için mesaja bas.
-              </div>
+              <div class="notice">Satıcıyla konuşmak için mesaja bas.</div>
               <div class="hr"></div>
               <div class="list" id="sellerRecentAds"></div>
             </div>
@@ -620,10 +583,7 @@
       onSnapshot,
       serverTimestamp,
       updateDoc,
-      deleteDoc,
-      query,
-      orderBy,
-      where
+      deleteDoc
     } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -707,13 +667,15 @@
       profile: null,
       isAdmin: false,
       view: "shop",
+      lastViewBeforeModal: "shop",
       listings: [],
       conversations: [],
       logs: [],
       currentConversationId: null,
       currentListingId: null,
       currentSellerId: null,
-      currentSeller: null
+      currentSeller: null,
+      unsubscribers: []
     };
 
     const DAY = 24 * 60 * 60 * 1000;
@@ -725,6 +687,10 @@
         .replace(/[^a-z0-9ğüşöçıİı\s-]/gi,"")
         .replace(/\s+/g,"-")
         .slice(0,32) || "user";
+    }
+
+    function normalizeName(name){
+      return String(name || "").trim().toLowerCase().replace(/\s+/g, " ");
     }
 
     function escapeHtml(str){
@@ -775,7 +741,6 @@
     function setView(view){
       state.view = view;
       document.querySelectorAll(".menu button").forEach(b => b.classList.toggle("active", b.dataset.view === view));
-
       const map = {
         shop:["Dükkan","Yayınlanan ilanları görüntüle."],
         myads:["İlanlarım","Kendi ilanlarını düzenle, kapat, aç veya sil."],
@@ -783,16 +748,13 @@
         profile:["Profil","Hesap özetin."],
         admin:["Yönetim","Tüm ilanlar ve son kayıtlar."]
       };
-
       refs.viewTitle.textContent = map[view][0];
       refs.viewDesc.textContent = map[view][1];
-
       document.getElementById("viewShop").classList.toggle("hidden", view !== "shop");
       document.getElementById("viewMyAds").classList.toggle("hidden", view !== "myads");
       document.getElementById("viewMessages").classList.toggle("hidden", view !== "messages");
       document.getElementById("viewProfile").classList.toggle("hidden", view !== "profile");
       document.getElementById("viewAdmin").classList.toggle("hidden", view !== "admin");
-
       renderAll();
     }
 
@@ -855,18 +817,26 @@
         if (type !== "all" && item.type !== type) return false;
         if (cat !== "all" && item.category !== cat) return false;
         if (!q) return true;
-
-        const hay = [
-          item.name, item.description, item.priceLabel, item.ownerName,
-          item.category, item.type, ...(item.tags || [])
-        ].join(" ").toLowerCase();
-
+        const hay = [item.name, item.description, item.priceLabel, item.ownerName, item.category, item.type, ...(item.tags || [])].join(" ").toLowerCase();
         return hay.includes(q);
       });
     }
 
     function myListings(){
       return sortDescByDate(state.listings.filter(x => x.ownerId === state.user?.uid));
+    }
+
+    function findConversation(listingId){
+      return state.conversations.find(c => c.listingId === listingId && (c.members || []).includes(state.user?.uid));
+    }
+
+    function isDuplicateListingName(name, editingId = ""){
+      const target = normalizeName(name);
+      return state.listings.some(x =>
+        x.ownerId === state.user?.uid &&
+        x.id !== editingId &&
+        normalizeName(x.name) === target
+      );
     }
 
     function renderListingCard(item, forMine=false){
@@ -878,7 +848,7 @@
 
       const typeBadge = `<span class="badge mine">${escapeHtml(normalizeType(item.type))}</span>`;
       const categoryBadge = `<span class="badge wait">${escapeHtml(item.category || "diger")}</span>`;
-      const tags = (item.tags || []).map(t => `<span class="pill">#${escapeHtml(t)}</span>`).join(" ");
+      const tags = (item.tags || []).map(t => `<span class="pill">#${escapeHtml(t)}</span>`).join("");
 
       return `
         <div class="card">
@@ -892,11 +862,11 @@
             <div class="seller-box">
               <div>
                 <strong>
-                  <button class="profile-link" onclick="window.__openSeller('${item.ownerId}')">${owner}</button>
+                  <button class="profile-link" onclick="window.__openSeller('${item.ownerId}','${item.id}')">${owner}</button>
                 </strong>
                 <small>Profiline tıkla, mesajlaş.</small>
               </div>
-              <button class="btn secondary" onclick="window.__openSeller('${item.ownerId}')">Profil</button>
+              <button class="btn secondary" onclick="window.__openSeller('${item.ownerId}','${item.id}')">Profil</button>
             </div>
 
             <div class="row">
@@ -911,6 +881,7 @@
             <div class="row"><span class="price-tag">${escapeHtml(item.priceLabel || "İstenen yok")}</span></div>
             <div class="row">
               ${isPublished(item) ? `<button class="btn" onclick="window.__openConversation('${item.id}')">Mesaj</button>` : `<button class="btn secondary" disabled>Kapalı</button>`}
+              ${isPublished(item) ? `<button class="btn good" onclick="window.__buyListing('${item.id}')">Satın al</button>` : ""}
               ${forMine ? `<button class="btn secondary" onclick="window.__editListing('${item.id}')">Düzenle</button>` : ""}
               ${forMine ? `<button class="btn warn" onclick="window.__toggleListing('${item.id}')">${item.status === "published" ? "Kapat" : "Aç"}</button>` : ""}
               ${forMine ? `<button class="btn bad" onclick="window.__removeListing('${item.id}')">Sil</button>` : ""}
@@ -952,7 +923,8 @@
 
       const html = (conv.messages || []).map(m => {
         const mine = m.uid === state.user.uid;
-        return `<div class="msg ${mine ? "me" : ""}"><b>${escapeHtml(m.name || "Anonim")}</b><div>${escapeHtml(m.text || "")}</div><span class="small">${formatDate(m.createdAt)}</span></div>`;
+        const system = m.type === "system";
+        return `<div class="msg ${system ? "system" : mine ? "me" : ""}"><b>${escapeHtml(m.name || (system ? "Sistem" : "Anonim"))}</b><div>${escapeHtml(m.text || "")}</div><span class="small">${formatDate(m.createdAt)}</span></div>`;
       }).join("");
 
       refs.messagesBox.innerHTML = html || `<div class="feed-item">Henüz mesaj yok.</div>`;
@@ -1051,8 +1023,13 @@
       const listingsSnap = await getDocs(collection(db, "listings"));
       for (const d of listingsSnap.docs){
         const data = d.data();
-        const created = tsValue(data.createdAt);
-        if (created && now - created > LISTING_LIFETIME){
+        const created =
+          typeof data.createdAtMs === "number"
+            ? data.createdAtMs
+            : tsValue(data.createdAt);
+
+        if (!created) continue;
+        if (now - created > LISTING_LIFETIME){
           await deleteDoc(doc(db, "listings", d.id));
           await logAction("İlan süre doldu", data.name || d.id);
         }
@@ -1061,26 +1038,40 @@
       const convSnap = await getDocs(collection(db, "conversations"));
       for (const d of convSnap.docs){
         const data = d.data();
-        const created = tsValue(data.createdAt);
-        if (created && now - created > CHAT_LIFETIME){
+        const created =
+          typeof data.createdAtMs === "number"
+            ? data.createdAtMs
+            : tsValue(data.createdAt);
+
+        if (!created) continue;
+        if (now - created > CHAT_LIFETIME){
           await deleteDoc(doc(db, "conversations", d.id));
           await logAction("Sohbet süre doldu", d.id);
         }
       }
     }
 
+    function clearListeners(){
+      for (const u of state.unsubscribers) {
+        try{ u && u(); }catch{}
+      }
+      state.unsubscribers = [];
+    }
+
     async function loadLiveData(){
-      onSnapshot(collection(db, "listings"), snap => {
+      clearListeners();
+
+      const u1 = onSnapshot(collection(db, "listings"), snap => {
         state.listings = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         renderAll();
       });
 
-      onSnapshot(collection(db, "logs"), snap => {
+      const u2 = onSnapshot(collection(db, "logs"), snap => {
         state.logs = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         if (state.view === "admin") renderAdminLog();
       });
 
-      onSnapshot(doc(db, "users", state.user.uid), snap => {
+      const u3 = onSnapshot(doc(db, "users", state.user.uid), snap => {
         if (snap.exists()){
           state.profile = { uid: state.user.uid, ...snap.data() };
           state.isAdmin = !!snap.data().isAdmin;
@@ -1090,10 +1081,13 @@
         }
       });
 
-      onSnapshot(query(collection(db, "conversations"), where("members", "array-contains", state.user.uid)), snap => {
-        state.conversations = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      const u4 = onSnapshot(collection(db, "conversations"), snap => {
+        state.conversations = snap.docs.map(d => ({ id:d.id, ...d.data() }))
+          .filter(c => (c.members || []).includes(state.user.uid));
         renderAll();
       });
+
+      state.unsubscribers.push(u1,u2,u3,u4);
     }
 
     async function openConversation(listingId){
@@ -1101,7 +1095,7 @@
       const item = state.listings.find(x => x.id === listingId);
       if (!item || !isPublished(item)) return;
 
-      let conv = state.conversations.find(c => c.listingId === listingId && (c.members || []).includes(state.user.uid));
+      let conv = findConversation(listingId);
       if (!conv){
         const ref = await addDoc(collection(db, "conversations"), {
           listingId,
@@ -1109,6 +1103,7 @@
           memberNames: Array.from(new Set([state.profile.displayName, item.ownerName].filter(Boolean))),
           messages: [],
           lastMessage: "",
+          createdAtMs: Date.now(),
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
@@ -1122,8 +1117,8 @@
       renderAll();
     }
 
-    async function sendMessage(){
-      const text = refs.messageInput.value.trim();
+    async function sendMessage(payloadText){
+      const text = String(payloadText ?? refs.messageInput.value).trim();
       if (!text || !state.currentConversationId) return;
 
       const convRef = doc(db, "conversations", state.currentConversationId);
@@ -1149,6 +1144,57 @@
       await logAction("Mesaj", `${state.profile.displayName}: ${text}`);
     }
 
+    async function buyListing(listingId){
+      if (!state.user) return;
+      const item = state.listings.find(x => x.id === listingId);
+      if (!item || !isPublished(item)) return;
+
+      const buyText = `Ben ${state.profile.displayName}, "${item.name}" ürününü almak istiyorum.`;
+
+      let conv = findConversation(listingId);
+      if (!conv){
+        const ref = await addDoc(collection(db, "conversations"), {
+          listingId,
+          members: [state.user.uid, item.ownerId],
+          memberNames: Array.from(new Set([state.profile.displayName, item.ownerName].filter(Boolean))),
+          messages: [{
+            uid: "system",
+            name: "Sistem",
+            text: buyText,
+            type: "system",
+            createdAt: new Date().toISOString()
+          }],
+          lastMessage: buyText,
+          createdAtMs: Date.now(),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+        conv = { id: ref.id, listingId };
+      }else{
+        const convRef = doc(db, "conversations", conv.id);
+        const snap = await getDoc(convRef);
+        const data = snap.data();
+        const messages = Array.isArray(data.messages) ? data.messages : [];
+        await updateDoc(convRef, {
+          messages: [...messages, {
+            uid: "system",
+            name: "Sistem",
+            text: buyText,
+            type: "system",
+            createdAt: new Date().toISOString()
+          }],
+          lastMessage: buyText,
+          updatedAt: serverTimestamp()
+        });
+      }
+
+      await logAction("Satın al isteği", `${state.profile.displayName} → ${item.name}`);
+      state.currentConversationId = conv.id;
+      state.currentListingId = listingId;
+      setView("messages");
+      renderAll();
+    }
+
     async function addListing(e){
       e.preventDefault();
 
@@ -1163,11 +1209,18 @@
       const file = refs.adImageFile.files?.[0];
 
       if (!name || !description || !priceLabel) return alert("Ürün adı, açıklama ve istenen alanı zorunlu.");
+
+      if (isDuplicateListingName(name, editId)) {
+        alert("Bu hesapta aynı isimli ilan zaten var.");
+        return;
+      }
+
       let imageData = "";
       if (file) imageData = await fileToDataUrl(file);
       else if (imageUrl) imageData = imageUrl;
       if (!imageData) return alert("Görüntü zorunlu.");
 
+      const now = Date.now();
       const payload = {
         ownerId: state.user.uid,
         ownerName: state.profile.displayName,
@@ -1180,24 +1233,34 @@
         imageData,
         imageUrl: file ? null : imageUrl,
         status: "published",
+        createdAtMs: editId ? (state.listings.find(x => x.id === editId)?.createdAtMs || now) : now,
+        updatedAtMs: now,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
 
-      if (editId){
-        await updateDoc(doc(db, "listings", editId), { ...payload, updatedAt: serverTimestamp() });
-        await logAction("İlan düzenlendi", `${state.profile.displayName} → ${name}`);
-      }else{
-        await addDoc(collection(db, "listings"), payload);
-        await logAction("İlan eklendi", `${state.profile.displayName} → ${name}`);
-      }
+      try{
+        if (editId){
+          await updateDoc(doc(db, "listings", editId), {
+            ...payload,
+            updatedAt: serverTimestamp(),
+            updatedAtMs: Date.now()
+          });
+          await logAction("İlan düzenlendi", `${state.profile.displayName} → ${name}`);
+        }else{
+          await addDoc(collection(db, "listings"), payload);
+          await logAction("İlan eklendi", `${state.profile.displayName} → ${name}`);
+        }
 
-      refs.listingForm.reset();
-      refs.imagePreview.classList.add("hidden");
-      refs.listingForm.dataset.editId = "";
-      refs.modalListing.classList.remove("show");
-      refs.modalTitle.textContent = "İlan ekle";
-      setView("myads");
+        refs.listingForm.reset();
+        refs.imagePreview.classList.add("hidden");
+        refs.listingForm.dataset.editId = "";
+        refs.modalListing.classList.remove("show");
+        refs.modalTitle.textContent = "İlan ekle";
+        setView(state.lastViewBeforeModal || "shop");
+      }catch(err){
+        alert("İlan kaydedilemedi.");
+      }
     }
 
     async function removeListing(id){
@@ -1219,7 +1282,8 @@
       const next = item.status === "published" ? "closed" : "published";
       await updateDoc(doc(db, "listings", id), {
         status: next,
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
+        updatedAtMs: Date.now()
       });
       await logAction("İlan durumu", `${state.profile.displayName} → ${item.name} → ${next}`);
     }
@@ -1228,6 +1292,7 @@
       const item = state.listings.find(x => x.id === id);
       if (!item || item.ownerId !== state.user.uid) return;
 
+      state.lastViewBeforeModal = state.view;
       refs.modalTitle.textContent = "İlan düzenle";
       refs.listingForm.dataset.editId = id;
       refs.adType.value = item.type || "swap";
@@ -1265,6 +1330,7 @@
     }
 
     async function openModalForNew(){
+      state.lastViewBeforeModal = state.view;
       refs.modalTitle.textContent = "İlan ekle";
       refs.listingForm.dataset.editId = "";
       refs.listingForm.reset();
@@ -1282,13 +1348,14 @@
       renderAll();
     }
 
-    async function openSellerProfile(userId){
+    async function openSellerProfile(userId, listingId){
       const userSnap = await getDoc(doc(db, "users", userId));
       if (!userSnap.exists()) return;
 
       const seller = { uid: userId, ...userSnap.data() };
       state.currentSellerId = userId;
       state.currentSeller = seller;
+      state.currentListingId = listingId || null;
 
       const sellerAds = state.listings.filter(x => x.ownerId === userId);
       const openCount = sellerAds.filter(x => x.status === "published").length;
@@ -1318,11 +1385,11 @@
 
     async function messageSeller(){
       if (!state.currentSellerId) return;
-      const sellerId = state.currentSellerId;
-      const item = state.listings.find(x => x.ownerId === sellerId);
-      if (!item) return;
+      const sellerListings = state.listings.filter(x => x.ownerId === state.currentSellerId && isPublished(x));
+      const listing = sellerListings.find(x => x.id === state.currentListingId) || sellerListings[0];
+      if (!listing) return;
       refs.modalSeller.classList.remove("show");
-      await openConversation(item.id);
+      await openConversation(listing.id);
     }
 
     refs.tabLogin.onclick = () => {
@@ -1352,7 +1419,7 @@
         state.profile = await ensureUserDoc(cred.user, name, false);
         state.isAdmin = !!state.profile.isAdmin;
         setAppScreen();
-        listenAll();
+        await loadLiveData();
         setView("shop");
         await cleanupExpired();
       }catch(err){
@@ -1376,7 +1443,7 @@
         state.profile = await ensureUserDoc(cred.user, name, false);
         state.isAdmin = false;
         setAppScreen();
-        listenAll();
+        await loadLiveData();
         setView("shop");
         await cleanupExpired();
       }catch(err){
@@ -1436,6 +1503,7 @@
     window.__editListing = editListing;
     window.__selectForAdmin = selectForAdmin;
     window.__openSeller = openSellerProfile;
+    window.__buyListing = buyListing;
 
     onAuthStateChanged(auth, async (user) => {
       state.user = user || null;
@@ -1450,7 +1518,7 @@
       state.profile = await ensureUserDoc(user, dn, false);
       state.isAdmin = !!state.profile.isAdmin;
       setAppScreen();
-      listenAll();
+      await loadLiveData();
       setView("shop");
       await cleanupExpired();
     });
