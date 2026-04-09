@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>7/C Shop</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --accent:#2563eb;
+      --accent2:#1d4ed8;
+      --good:#16a34a;
+      --bad:#dc2626;
+      --warn:#d97706;
+      --soft:#eff6ff;
+      --shadow:0 14px 34px rgba(17,24,39,.08);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,.08), transparent 30%),
+        radial-gradient(circle at top right, rgba(22,163,74,.08), transparent 28%),
+        var(--bg);
+      color:var(--text);
+    }
+    button,input,textarea,select{font:inherit}
+    .hidden{display:none !important}
+    .wrap{min-height:100%;display:flex;flex-direction:column}
+    .topbar{
+      position:sticky;top:0;z-index:30;
+      background:rgba(255,255,255,.88);
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid rgba(229,231,235,.9);
+    }
+    .topbar-inner{
+      max-width:1440px;margin:0 auto;padding:16px 20px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:46px;height:46px;border-radius:16px;
+      background:linear-gradient(135deg,var(--accent),#7c3aed);
+      color:#fff;display:grid;place-items:center;font-weight:900;
+      box-shadow:var(--shadow)
+    }
+    .brand h1{margin:0;font-size:18px;line-height:1.1}
+    .brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+    .actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .chip{
+      border:1px solid var(--line);background:#fff;color:var(--text);
+      padding:10px 14px;border-radius:999px;cursor:pointer;transition:.2s;
+      box-shadow:0 8px 18px rgba(17,24,39,.03);
+    }
+    .chip:hover{transform:translateY(-1px)}
+    .chip.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+    .chip.primary:hover{background:var(--accent2)}
+    .chip.good{background:var(--good);border-color:var(--good);color:#fff}
+    .chip.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+    .chip.warn{background:var(--warn);border-color:var(--warn);color:#fff}
+    .container{max-width:1440px;margin:0 auto;padding:20px;width:100%}
+    .hero{
+      min-height:calc(100vh - 110px);
+      display:grid;align-items:center;
+    }
+    .grid{display:grid;gap:18px}
+    .auth-grid{grid-template-columns:1.05fr .95fr}
+    .panel{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .panel-inner{padding:22px}
+    .hero-copy h2{font-size:42px;margin:0 0 10px;letter-spacing:-.03em}
+    .hero-copy p{color:var(--muted);font-size:16px;line-height:1.7;margin:0 0 18px}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+    .stat{background:#f8fafc;border:1px solid var(--line);border-radius:18px;padding:14px}
+    .stat b{display:block;font-size:20px}
+    .stat span{color:var(--muted);font-size:12px}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tab{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer}
+    .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .form{display:grid;gap:12px}
+    .field{display:grid;gap:6px}
+    .field label{font-size:13px;color:#374151}
+    .input, textarea, select{
+      width:100%;border:1px solid var(--line);border-radius:16px;background:#fff;color:var(--text);
+      padding:14px 14px;outline:none;transition:.15s;
+    }
+    textarea{min-height:110px;resize:vertical}
+    .input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .hint{font-size:12px;color:var(--muted);line-height:1.5}
+    .hr{height:1px;background:var(--line);margin:16px 0}
+    .btn{
+      border:none;border-radius:16px;padding:13px 16px;cursor:pointer;font-weight:800;
+      background:var(--accent);color:#fff;transition:.2s;
+    }
+    .btn:hover{transform:translateY(-1px);background:var(--accent2)}
+    .btn.secondary{background:#fff;color:var(--text);border:1px solid var(--line)}
+    .btn.good{background:var(--good)}
+    .btn.bad{background:var(--bad)}
+    .btn.warn{background:var(--warn)}
+    .layout{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}
+    .sidebar{position:sticky;top:92px}
+    .menu{display:grid;gap:10px}
+    .menu button{
+      width:100%;text-align:left;padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:#fff;cursor:pointer
+    }
+    .menu button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+    .section-title h3{margin:0;font-size:20px}
+    .section-title p{margin:0;color:var(--muted);font-size:13px}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .card{
+      border:1px solid var(--line);border-radius:22px;background:#fff;overflow:hidden;box-shadow:var(--shadow)
+    }
+    .card img{width:100%;height:220px;object-fit:cover;background:#f3f4f6}
+    .card-body{padding:16px;display:grid;gap:10px}
+    .meta{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px;color:var(--muted)}
+    .badge{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800}
+    .badge.ok{background:#dcfce7;color:#166534}
+    .badge.wait{background:#fef3c7;color:#92400e}
+    .badge.no{background:#fee2e2;color:#991b1b}
+    .badge.mine{background:#dbeafe;color:#1d4ed8}
+    .badge.closed{background:#e5e7eb;color:#4b5563}
+    .card h4{margin:0;font-size:18px}
+    .card p{margin:0;color:#4b5563;line-height:1.55;font-size:14px}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    .row .btn{padding:10px 12px;border-radius:14px;font-size:13px}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;background:#f8fafc;border:1px solid var(--line);
+      padding:8px 12px;border-radius:999px;font-size:12px;color:#374151
+    }
+    .feed{display:grid;gap:12px}
+    .feed-item{border:1px solid var(--line);border-radius:18px;padding:14px;background:#fff}
+    .feed-item strong{display:block;margin-bottom:4px}
+    .feed-item span{color:var(--muted);font-size:13px}
+    .chat-box{display:grid;grid-template-rows:auto 1fr auto;min-height:560px}
+    .messages{padding:16px;display:grid;gap:10px;max-height:470px;overflow:auto;background:#f9fafb}
+    .msg{max-width:78%;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:#fff}
+    .msg.me{margin-left:auto;background:#dbeafe;border-color:#bfdbfe}
+    .msg .small{display:block;margin-top:6px;font-size:11px;color:var(--muted)}
+    .chat-head{padding:16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .chat-foot{padding:14px;border-top:1px solid var(--line);display:grid;gap:10px}
+    .admin-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+    .notice{padding:14px 16px;border-radius:18px;background:var(--soft);border:1px solid #bfdbfe;color:#1d4ed8;font-size:14px;line-height:1.55}
+    .dangerbox{padding:14px 16px;border-radius:18px;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;font-size:13px;line-height:1.55}
+    .modal{
+      position:fixed;inset:0;background:rgba(17,24,39,.52);display:none;align-items:center;justify-content:center;padding:20px;z-index:50
+    }
+    .modal.show{display:flex}
+    .modal-card{
+      width:min(920px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:26px;border:1px solid var(--line);box-shadow:var(--shadow)
+    }
+    .modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:18px 20px;border-bottom:1px solid var(--line)}
+    .modal-body{padding:20px}
+    .footer{padding:18px 20px;text-align:center;color:var(--muted);font-size:12px}
+    .searchbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .searchbar input{flex:1;min-width:220px}
+    .preview{
+      margin-top:8px;width:100%;max-height:180px;border-radius:16px;border:1px dashed var(--line);
+      object-fit:cover;background:#f8fafc
+    }
+    .tiny{font-size:11px;color:var(--muted)}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .list{
+      display:grid;
+      gap:12px;
+    }
+    .item{
+      background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;
+      display:grid;gap:10px;box-shadow:0 8px 16px rgba(17,24,39,.03);
+    }
+    .item-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+    .item-head strong{font-size:16px}
+    .item-head span{color:var(--muted);font-size:12px}
+    .item-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .profile-link{
+      background:none;
+      border:none;
+      padding:0;
+      color:var(--accent);
+      cursor:pointer;
+      font-weight:800;
+      text-align:left;
+    }
+    .profile-link:hover{text-decoration:underline}
+    .price-tag{
+      font-size:12px;
+      color:#111827;
+      background:#f8fafc;
+      border:1px solid var(--line);
+      padding:8px 10px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      width:fit-content;
+    }
+    .seller-box{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      background:#f8fafc;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px 14px;
+    }
+    .seller-box strong{display:block}
+    .seller-box small{color:var(--muted)}
+    .split{
+      display:grid;
+      grid-template-columns:1fr 340px;
+      gap:16px;
+      align-items:start;
+    }
+    .seller-panel{
+      position:sticky;
+      top:96px;
+    }
+    @media (max-width:1200px){
+      .split{grid-template-columns:1fr}
+      .seller-panel{position:static}
+    }
+    @media (max-width:1100px){
+      .layout,.auth-grid,.admin-grid{grid-template-columns:1fr}
+      .cards,.three,.two,.stats{grid-template-columns:1fr 1fr}
+      .sidebar{position:static}
+    }
+    @media (max-width:760px){
+      .cards,.three,.two,.stats{grid-template-columns:1fr}
+      .hero-copy h2{font-size:32px}
+      .topbar-inner{padding:14px}
+      .container{padding:14px}
+      .msg{max-width:92%}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="logo">7/C</div>
+          <div>
+            <h1>7/C Shop</h1>
+            <p>Takas, ilan ve mesajlaşma</p>
+          </div>
+        </div>
+        <div class="actions">
+          <span id="whoami" class="pill hidden"></span>
+          <button id="btnRefresh" class="chip">Yenile</button>
+          <button id="btnOpenAdd" class="chip primary hidden">İlan ekle</button>
+          <button id="btnLogout" class="chip bad hidden">Çıkış</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div id="authScreen" class="hero">
+        <div class="grid auth-grid">
+          <div class="panel">
+            <div class="panel-inner hero-copy">
+              <div class="tiny">Giriş sistemi</div>
+              <h2>7/C Shop</h2>
+              <p>
+                Herkes kendi hesabıyla girer. İlan eklemek serbesttir. Mesajlaşma ve pazarlık tek yerde çalışır.
+              </p>
+              <div class="stats">
+                <div class="stat"><b>Hızlı</b><span>Tek dosya arayüz</span></div>
+                <div class="stat"><b>Temiz</b><span>Düzenli panel</span></div>
+                <div class="stat"><b>Güçlü</b><span>İlan, mesaj, yönetim</span></div>
+              </div>
+              <div class="hr"></div>
+              <div class="notice">
+                Görsel zorunludur. URL ile ya da küçük dosya yükleyerek ekleyebilirsin. Storage kullanılmaz.
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-inner">
+              <div class="tabs">
+                <button id="tabLogin" class="tab active">Giriş</button>
+                <button id="tabRegister" class="tab">Kayıt</button>
+              </div>
+              <div class="hr"></div>
+
+              <form id="loginForm" class="form">
+                <div class="field">
+                  <label>Kullanıcı adı</label>
+                  <input id="loginName" class="input" placeholder="Örn: Ali" autocomplete="username" />
+                </div>
+                <div class="field">
+                  <label>Şifre</label>
+                  <input id="loginPass" class="input" type="password" placeholder="Şifren" autocomplete="current-password" />
+                </div>
+                <button class="btn" type="submit">Giriş yap</button>
+              </form>
+
+              <form id="registerForm" class="form hidden">
+                <div class="field">
+                  <label>İsim / kullanıcı adı</label>
+                  <input id="regName" class="input" placeholder="Örn: Ali " autocomplete="username" />
+                </div>
+                <div class="two">
+                  <div class="field">
+                    <label>Şifre</label>
+                    <input id="regPass" class="input" type="password" placeholder="Şifre belirle" autocomplete="new-password" />
+                  </div>
+                  <div class="field">
+                    <label>Tekrar şifre</label>
+                    <input id="regPass2" class="input" type="password" placeholder="Yeniden yaz" autocomplete="new-password" />
+                  </div>
+                </div>
+                <button class="btn" type="submit">Kayıt ol</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="appScreen" class="hidden">
+        <div class="layout">
+          <div class="sidebar panel">
+            <div class="panel-inner">
+              <div class="section-title">
+                <div>
+                  <h3>Menü</h3>
+                  <p>Hızlı erişim</p>
+                </div>
+              </div>
+              <div class="menu">
+                <button data-view="shop" class="active">Dükkan</button>
+                <button data-view="myads">İlanlarım</button>
+                <button data-view="messages">Mesajlar</button>
+                <button data-view="profile">Profil</button>
+                <button data-view="admin" id="adminMenu" class="hidden">Yönetim</button>
+              </div>
+              <div class="hr"></div>
+              <div class="feed">
+                <div class="feed-item">
+                  <strong>İpucu</strong>
+                  <span>İlanları açık veya kapalı yapabilirsin. Açık olanlar dükkan sayfasında görünür.</span>
+                </div>
+                <div class="feed-item">
+                  <strong>Arama</strong>
+                  <span>Ürün adı, açıklama, etiket ve kullanıcı adına göre arama yapılır.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="main panel">
+            <div class="panel-inner">
+              <div class="section-title">
+                <div>
+                  <h3 id="viewTitle">Dükkan</h3>
+                  <p id="viewDesc">Yayınlanan ilanları görüntüle.</p>
+                </div>
+                <div class="toolbar">
+                  <span id="countBadge" class="pill">0 ilan</span>
+                  <span id="onlineBadge" class="pill">Hazır</span>
+                </div>
+              </div>
+
+              <div id="viewShop">
+                <div class="searchbar">
+                  <input id="searchInput" class="input" placeholder="İlan ara..." />
+                  <select id="filterType" class="input" style="max-width:180px">
+                    <option value="all">Hepsi</option>
+                    <option value="sell">Satış</option>
+                    <option value="swap">Takas</option>
+                    <option value="takas">Takas + TL</option>
+                  </select>
+                  <select id="filterCategory" class="input" style="max-width:180px">
+                    <option value="all">Kategori</option>
+                    <option value="oyuncak">Oyuncak</option>
+                    <option value="oyun">Oyun</option>
+                    <option value="teknoloji">Teknoloji</option>
+                    <option value="kitap">Kitap</option>
+                    <option value="diger">Diğer</option>
+                  </select>
+                </div>
+                <div class="hr"></div>
+                <div id="listingsGrid" class="cards"></div>
+              </div>
+
+              <div id="viewMyAds" class="hidden">
+                <div class="notice">
+                  Burada kendi ilanların görünür. Durumu kapatabilir, tekrar açabilir, düzenleyebilir veya silebilirsin.
+                </div>
+                <div class="hr"></div>
+                <div id="myAdsList" class="cards"></div>
+              </div>
+
+              <div id="viewMessages" class="hidden">
+                <div class="admin-grid">
+                  <div class="panel" style="box-shadow:none">
+                    <div class="panel-inner">
+                      <div class="section-title">
+                        <div>
+                          <h3>Konuşmalar</h3>
+                          <p>İlan bazlı mesajlaşma</p>
+                        </div>
+                      </div>
+                      <div id="conversationList" class="list"></div>
+                    </div>
+                  </div>
+                  <div class="panel chat-box" style="box-shadow:none">
+                    <div class="chat-head">
+                      <div>
+                        <strong id="chatTitle">Sohbet seçilmedi</strong>
+                        <div id="chatSub" class="hint">Bir ilan seçip sohbet başlat</div>
+                      </div>
+                      <button id="btnDeleteConversation" class="btn bad hidden" type="button">Sohbeti sil</button>
+                    </div>
+                    <div id="messagesBox" class="messages"></div>
+                    <div class="chat-foot">
+                      <textarea id="messageInput" class="input" placeholder="Pazarlık mesajı yaz..."></textarea>
+                      <button id="btnSendMessage" class="btn" type="button">Gönder</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="viewProfile" class="hidden">
+                <div class="admin-grid">
+                  <div class="panel" style="box-shadow:none">
+                    <div class="panel-inner">
+                      <div class="section-title">
+                        <div>
+                          <h3>Profil</h3>
+                          <p>Hesap bilgilerin</p>
+                        </div>
+                      </div>
+                      <div id="profileBox" class="list"></div>
+                    </div>
+                  </div>
+                  <div class="panel" style="box-shadow:none">
+                    <div class="panel-inner">
+                      <div class="section-title">
+                        <div>
+                          <h3>Hızlı özet</h3>
+                          <p>İşlem durumun</p>
+                        </div>
+                      </div>
+                      <div class="list" id="profileStatsBox"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="viewAdmin" class="hidden">
+                <div class="admin-grid">
+                  <div class="panel" style="box-shadow:none">
+                    <div class="panel-inner">
+                      <div class="section-title">
+                        <div>
+                          <h3>Tüm ilanlar</h3>
+                          <p>Yönetim işlemleri</p>
+                        </div>
+                      </div>
+                      <div id="adminListings" class="list"></div>
+                    </div>
+                  </div>
+                  <div class="panel" style="box-shadow:none">
+                    <div class="panel-inner">
+                      <div class="section-title">
+                        <div>
+                          <h3>Kayıtlar</h3>
+                          <p>Son işlemler</p>
+                        </div>
+                      </div>
+                      <div id="adminLog" class="list"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">7/C Shop • Tek dosya demo • Firebase Auth + Firestore</div>
+  </div>
+
+  <div id="modalListing" class="modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <strong id="modalTitle">İlan ekle</strong>
+        <button id="btnCloseModal" class="chip">Kapat</button>
+      </div>
+      <div class="modal-body">
+        <form id="listingForm" class="form">
+          <div class="two">
+            <div class="field">
+              <label>İlan türü</label>
+              <select id="adType" class="input">
+                <option value="swap">Takas</option>
+                <option value="takas">Takas + TL</option>
+                <option value="sell">Satış</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Kategori</label>
+              <select id="adCategory" class="input">
+                <option value="oyuncak">Oyuncak</option>
+                <option value="oyun">Oyun</option>
+                <option value="teknoloji">Teknoloji</option>
+                <option value="kitap">Kitap</option>
+                <option value="diger">Diğer</option>
+              </select>
+            </div>
+          </div>
+          <div class="two">
+            <div class="field">
+              <label>Ürün adı</label>
+              <input id="adName" class="input" placeholder="Örn: Lego seti" />
+            </div>
+            <div class="field">
+              <label>Fiyat / istenen</label>
+              <input id="adPrice" class="input" placeholder="Örn: 50 TL / oyuncak" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Açıklama</label>
+            <textarea id="adDesc" class="input" placeholder="Ürün durumu, ne istediğin, pazarlık notu..."></textarea>
+          </div>
+          <div class="two">
+            <div class="field">
+              <label>Görüntü URL</label>
+              <input id="adImageUrl" class="input" placeholder="https://..." />
+            </div>
+            <div class="field">
+              <label>veya dosya yükle</label>
+              <input id="adImageFile" class="input" type="file" accept="image/*" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Etiketler</label>
+            <input id="adTags" class="input" placeholder="örnek: yeni, temiz, acil" />
+          </div>
+          <img id="imagePreview" class="preview hidden" alt="Önizleme">
+          <button class="btn" type="submit">Kaydet</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalSeller" class="modal">
+    <div class="modal-card" style="width:min(720px,100%)">
+      <div class="modal-head">
+        <strong>Satıcı profili</strong>
+        <button id="btnCloseSeller" class="chip">Kapat</button>
+      </div>
+      <div class="modal-body">
+        <div class="split">
+          <div class="panel" style="box-shadow:none">
+            <div class="panel-inner">
+              <div class="seller-box">
+                <div>
+                  <strong id="sellerName">-</strong>
+                  <small id="sellerRole">-</small>
+                </div>
+                <button id="btnMessageSeller" class="btn">Mesajlaş</button>
+              </div>
+              <div class="hr"></div>
+              <div class="list" id="sellerStats"></div>
+            </div>
+          </div>
+          <div class="panel seller-panel" style="box-shadow:none">
+            <div class="panel-inner">
+              <div class="notice">
+                Satıcıyla konuşmak için mesaja bas.
+              </div>
+              <div class="hr"></div>
+              <div class="list" id="sellerRecentAds"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      setPersistence,
+      browserSessionPersistence,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      doc,
+      setDoc,
+      getDoc,
+      getDocs,
+      onSnapshot,
+      serverTimestamp,
+      updateDoc,
+      deleteDoc,
+      query,
+      orderBy,
+      where
+    } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBeIGkhnS59kFgzYLWvrO1rL6oyfqqSF-U",
+      authDomain: "c-shop-3b43a.firebaseapp.com",
+      projectId: "c-shop-3b43a",
+      storageBucket: "c-shop-3b43a.firebasestorage.app",
+      messagingSenderId: "1026954337566",
+      appId: "1:1026954337566:web:ebe164f83133f9a09f7d0f",
+      measurementId: "G-28L0HDBVPD"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    await setPersistence(auth, browserSessionPersistence);
+
+    const $ = (id) => document.getElementById(id);
+
+    const refs = {
+      authScreen: $("authScreen"),
+      appScreen: $("appScreen"),
+      whoami: $("whoami"),
+      btnOpenAdd: $("btnOpenAdd"),
+      btnLogout: $("btnLogout"),
+      btnRefresh: $("btnRefresh"),
+      tabLogin: $("tabLogin"),
+      tabRegister: $("tabRegister"),
+      loginForm: $("loginForm"),
+      registerForm: $("registerForm"),
+      loginName: $("loginName"),
+      loginPass: $("loginPass"),
+      regName: $("regName"),
+      regPass: $("regPass"),
+      regPass2: $("regPass2"),
+      viewTitle: $("viewTitle"),
+      viewDesc: $("viewDesc"),
+      countBadge: $("countBadge"),
+      onlineBadge: $("onlineBadge"),
+      searchInput: $("searchInput"),
+      filterType: $("filterType"),
+      filterCategory: $("filterCategory"),
+      listingsGrid: $("listingsGrid"),
+      myAdsList: $("myAdsList"),
+      conversationList: $("conversationList"),
+      messagesBox: $("messagesBox"),
+      messageInput: $("messageInput"),
+      btnSendMessage: $("btnSendMessage"),
+      chatTitle: $("chatTitle"),
+      chatSub: $("chatSub"),
+      btnDeleteConversation: $("btnDeleteConversation"),
+      profileBox: $("profileBox"),
+      profileStatsBox: $("profileStatsBox"),
+      adminMenu: $("adminMenu"),
+      adminListings: $("adminListings"),
+      adminLog: $("adminLog"),
+      modalListing: $("modalListing"),
+      btnCloseModal: $("btnCloseModal"),
+      listingForm: $("listingForm"),
+      modalTitle: $("modalTitle"),
+      adType: $("adType"),
+      adCategory: $("adCategory"),
+      adName: $("adName"),
+      adPrice: $("adPrice"),
+      adDesc: $("adDesc"),
+      adImageUrl: $("adImageUrl"),
+      adImageFile: $("adImageFile"),
+      adTags: $("adTags"),
+      imagePreview: $("imagePreview"),
+      modalSeller: $("modalSeller"),
+      btnCloseSeller: $("btnCloseSeller"),
+      btnMessageSeller: $("btnMessageSeller"),
+      sellerName: $("sellerName"),
+      sellerRole: $("sellerRole"),
+      sellerStats: $("sellerStats"),
+      sellerRecentAds: $("sellerRecentAds")
+    };
+
+    const state = {
+      user: null,
+      profile: null,
+      isAdmin: false,
+      view: "shop",
+      listings: [],
+      conversations: [],
+      logs: [],
+      currentConversationId: null,
+      currentListingId: null,
+      currentSellerId: null,
+      currentSeller: null
+    };
+
+    const DAY = 24 * 60 * 60 * 1000;
+    const LISTING_LIFETIME = 15 * DAY;
+    const CHAT_LIFETIME = 72 * 60 * 60 * 1000;
+
+    function slugify(name){
+      return String(name).trim().toLowerCase()
+        .replace(/[^a-z0-9ğüşöçıİı\s-]/gi,"")
+        .replace(/\s+/g,"-")
+        .slice(0,32) || "user";
+    }
+
+    function escapeHtml(str){
+      return String(str ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#39;");
+    }
+
+    function tsValue(ts){
+      if (!ts) return 0;
+      try{
+        if (typeof ts?.toMillis === "function") return ts.toMillis();
+        if (typeof ts?.seconds === "number") return ts.seconds * 1000;
+        return new Date(ts).getTime();
+      }catch{
+        return 0;
+      }
+    }
+
+    function formatDate(ts){
+      const v = tsValue(ts);
+      if (!v) return "az önce";
+      return new Date(v).toLocaleString("tr-TR", { dateStyle:"short", timeStyle:"short" });
+    }
+
+    function setAuthScreen(){
+      refs.authScreen.classList.remove("hidden");
+      refs.appScreen.classList.add("hidden");
+      refs.btnOpenAdd.classList.add("hidden");
+      refs.btnLogout.classList.add("hidden");
+      refs.whoami.classList.add("hidden");
+      refs.adminMenu.classList.add("hidden");
+    }
+
+    function setAppScreen(){
+      refs.authScreen.classList.add("hidden");
+      refs.appScreen.classList.remove("hidden");
+      refs.btnOpenAdd.classList.remove("hidden");
+      refs.btnLogout.classList.remove("hidden");
+      refs.whoami.classList.remove("hidden");
+      refs.adminMenu.classList.toggle("hidden", !state.isAdmin);
+      refs.whoami.textContent = `${state.profile?.displayName || "Üye"}${state.isAdmin ? " • Yönetici" : ""}`;
+    }
+
+    function setView(view){
+      state.view = view;
+      document.querySelectorAll(".menu button").forEach(b => b.classList.toggle("active", b.dataset.view === view));
+
+      const map = {
+        shop:["Dükkan","Yayınlanan ilanları görüntüle."],
+        myads:["İlanlarım","Kendi ilanlarını düzenle, kapat, aç veya sil."],
+        messages:["Mesajlar","İlan bazlı konuşmalar."],
+        profile:["Profil","Hesap özetin."],
+        admin:["Yönetim","Tüm ilanlar ve son kayıtlar."]
+      };
+
+      refs.viewTitle.textContent = map[view][0];
+      refs.viewDesc.textContent = map[view][1];
+
+      document.getElementById("viewShop").classList.toggle("hidden", view !== "shop");
+      document.getElementById("viewMyAds").classList.toggle("hidden", view !== "myads");
+      document.getElementById("viewMessages").classList.toggle("hidden", view !== "messages");
+      document.getElementById("viewProfile").classList.toggle("hidden", view !== "profile");
+      document.getElementById("viewAdmin").classList.toggle("hidden", view !== "admin");
+
+      renderAll();
+    }
+
+    function listingImage(item){
+      return item.imageData || item.imageUrl || "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+          <rect width="1200" height="700" fill="#f3f4f6"/>
+          <text x="600" y="350" text-anchor="middle" font-size="40" fill="#9ca3af" font-family="Arial">Görsel yok</text>
+        </svg>`);
+    }
+
+    async function ensureUserDoc(user, displayName, isAdmin=false){
+      const ref = doc(db, "users", user.uid);
+      const snap = await getDoc(ref);
+      const data = {
+        uid: user.uid,
+        displayName,
+        isAdmin: !!isAdmin,
+        email: user.email || null,
+        updatedAt: serverTimestamp()
+      };
+      if (!snap.exists()){
+        await setDoc(ref, { ...data, createdAt: serverTimestamp() });
+      }else{
+        await updateDoc(ref, data);
+      }
+      return { uid:user.uid, displayName, isAdmin: !!isAdmin };
+    }
+
+    async function logAction(action, detail){
+      try{
+        await addDoc(collection(db, "logs"), {
+          action,
+          detail,
+          by: state.profile?.displayName || "system",
+          createdAt: serverTimestamp()
+        });
+      }catch{}
+    }
+
+    function normalizeType(t){
+      return t === "sell" ? "satış" : t === "swap" ? "takas" : "takasTL";
+    }
+
+    function isPublished(item){
+      return item?.status === "published";
+    }
+
+    function sortDescByDate(arr, field="createdAt"){
+      return [...arr].sort((a,b) => tsValue(b[field]) - tsValue(a[field]));
+    }
+
+    function filterListings(list){
+      const q = refs.searchInput.value.trim().toLowerCase();
+      const type = refs.filterType.value;
+      const cat = refs.filterCategory.value;
+
+      return list.filter(item => {
+        if (state.view === "shop" && !isPublished(item)) return false;
+        if (type !== "all" && item.type !== type) return false;
+        if (cat !== "all" && item.category !== cat) return false;
+        if (!q) return true;
+
+        const hay = [
+          item.name, item.description, item.priceLabel, item.ownerName,
+          item.category, item.type, ...(item.tags || [])
+        ].join(" ").toLowerCase();
+
+        return hay.includes(q);
+      });
+    }
+
+    function myListings(){
+      return sortDescByDate(state.listings.filter(x => x.ownerId === state.user?.uid));
+    }
+
+    function renderListingCard(item, forMine=false){
+      const owner = escapeHtml(item.ownerName || "Bilinmeyen");
+      const statusBadge =
+        item.status === "published" ? `<span class="badge ok">Yayında</span>` :
+        item.status === "closed" ? `<span class="badge closed">Kapalı</span>` :
+        `<span class="badge no">Arşiv</span>`;
+
+      const typeBadge = `<span class="badge mine">${escapeHtml(normalizeType(item.type))}</span>`;
+      const categoryBadge = `<span class="badge wait">${escapeHtml(item.category || "diger")}</span>`;
+      const tags = (item.tags || []).map(t => `<span class="pill">#${escapeHtml(t)}</span>`).join(" ");
+
+      return `
+        <div class="card">
+          <img src="${listingImage(item)}" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
+          <div class="card-body">
+            <div class="meta">
+              <span>${owner}</span>
+              <span>${formatDate(item.createdAt)}</span>
+            </div>
+
+            <div class="seller-box">
+              <div>
+                <strong>
+                  <button class="profile-link" onclick="window.__openSeller('${item.ownerId}')">${owner}</button>
+                </strong>
+                <small>Profiline tıkla, mesajlaş.</small>
+              </div>
+              <button class="btn secondary" onclick="window.__openSeller('${item.ownerId}')">Profil</button>
+            </div>
+
+            <div class="row">
+              ${statusBadge}
+              ${typeBadge}
+              ${categoryBadge}
+            </div>
+
+            <h4>${escapeHtml(item.name)}</h4>
+            <p>${escapeHtml(item.description || "")}</p>
+            <div class="row">${tags}</div>
+            <div class="row"><span class="price-tag">${escapeHtml(item.priceLabel || "İstenen yok")}</span></div>
+            <div class="row">
+              ${isPublished(item) ? `<button class="btn" onclick="window.__openConversation('${item.id}')">Mesaj</button>` : `<button class="btn secondary" disabled>Kapalı</button>`}
+              ${forMine ? `<button class="btn secondary" onclick="window.__editListing('${item.id}')">Düzenle</button>` : ""}
+              ${forMine ? `<button class="btn warn" onclick="window.__toggleListing('${item.id}')">${item.status === "published" ? "Kapat" : "Aç"}</button>` : ""}
+              ${forMine ? `<button class="btn bad" onclick="window.__removeListing('${item.id}')">Sil</button>` : ""}
+              ${state.isAdmin && !forMine ? `<button class="btn bad" onclick="window.__removeListing('${item.id}')">Yönetici sil</button>` : ""}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderConversationItem(conv){
+      const listing = state.listings.find(x => x.id === conv.listingId);
+      const otherName = (conv.memberNames || []).find(n => n !== state.profile?.displayName) || "Sohbet";
+      return `
+        <div class="item" style="cursor:pointer" onclick="window.__selectConversation('${conv.id}')">
+          <div class="item-head">
+            <strong>${escapeHtml(listing?.name || "İlan")} • ${escapeHtml(otherName)}</strong>
+            <span>${escapeHtml(conv.lastMessage || "Yeni konuşma")}</span>
+          </div>
+          <div class="tiny">Mesajları açmak için dokun.</div>
+        </div>
+      `;
+    }
+
+    function renderConversation(){
+      const conv = state.conversations.find(c => c.id === state.currentConversationId);
+      if (!conv){
+        refs.messagesBox.innerHTML = `<div class="feed-item">Bir konuşma seç.</div>`;
+        refs.chatTitle.textContent = "Sohbet seçilmedi";
+        refs.chatSub.textContent = "İlan mesajları burada görünür";
+        refs.btnDeleteConversation.classList.add("hidden");
+        return;
+      }
+
+      const listing = state.listings.find(x => x.id === conv.listingId);
+      refs.chatTitle.textContent = listing?.name || "Sohbet";
+      refs.chatSub.textContent = conv.memberNames?.join(" • ") || "";
+      refs.btnDeleteConversation.classList.remove("hidden");
+
+      const html = (conv.messages || []).map(m => {
+        const mine = m.uid === state.user.uid;
+        return `<div class="msg ${mine ? "me" : ""}"><b>${escapeHtml(m.name || "Anonim")}</b><div>${escapeHtml(m.text || "")}</div><span class="small">${formatDate(m.createdAt)}</span></div>`;
+      }).join("");
+
+      refs.messagesBox.innerHTML = html || `<div class="feed-item">Henüz mesaj yok.</div>`;
+      refs.messagesBox.scrollTop = refs.messagesBox.scrollHeight;
+    }
+
+    function renderProfile(){
+      const p = state.profile || {};
+      const mine = myListings();
+      const openCount = mine.filter(x => x.status === "published").length;
+      const closedCount = mine.filter(x => x.status === "closed").length;
+
+      refs.profileBox.innerHTML = `
+        <div class="item"><div class="item-head"><strong>İsim</strong></div><span>${escapeHtml(p.displayName || "")}</span></div>
+        <div class="item"><div class="item-head"><strong>Rol</strong></div><span>${state.isAdmin ? "Yönetici" : "Üye"}</span></div>
+        <div class="item"><div class="item-head"><strong>Kullanıcı ID</strong></div><span>${escapeHtml(p.uid || "")}</span></div>
+      `;
+      refs.profileStatsBox.innerHTML = `
+        <div class="item"><div class="item-head"><strong>Toplam ilan</strong></div><span>${mine.length}</span></div>
+        <div class="item"><div class="item-head"><strong>Açık ilan</strong></div><span>${openCount}</span></div>
+        <div class="item"><div class="item-head"><strong>Kapalı ilan</strong></div><span>${closedCount}</span></div>
+      `;
+    }
+
+    function renderAdminLog(){
+      refs.adminLog.innerHTML = sortDescByDate(state.logs).slice(0, 25).map(x => `
+        <div class="item">
+          <div class="item-head">
+            <strong>${escapeHtml(x.action || "İşlem")}</strong>
+            <span>${escapeHtml(x.by || "")} • ${formatDate(x.createdAt)}</span>
+          </div>
+          <div>${escapeHtml(x.detail || "")}</div>
+        </div>
+      `).join("") || `<div class="feed-item">Kayıt yok.</div>`;
+    }
+
+    function renderAdminListings(){
+      refs.adminListings.innerHTML = sortDescByDate(state.listings).map(item => `
+        <div class="item">
+          <div class="item-head">
+            <strong>${escapeHtml(item.name || "")}</strong>
+            <span>${escapeHtml(item.ownerName || "")} • ${escapeHtml(item.status || "")} • ${escapeHtml(item.category || "")}</span>
+          </div>
+          <div class="tiny">${escapeHtml(item.description || "")}</div>
+          <div class="item-actions">
+            <button class="btn secondary" onclick="window.__selectForAdmin('${item.id}')">Aç</button>
+            <button class="btn bad" onclick="window.__removeListing('${item.id}')">Sil</button>
+          </div>
+        </div>
+      `).join("") || `<div class="feed-item">Kayıt yok.</div>`;
+    }
+
+    function renderMyAds(){
+      const mine = myListings();
+      refs.myAdsList.innerHTML = mine.map(x => renderListingCard(x, true)).join("") || `<div class="feed-item">Henüz ilan yok.</div>`;
+    }
+
+    function renderShop(){
+      const items = filterListings(sortDescByDate(state.listings)).filter(x => x.status === "published");
+      refs.listingsGrid.innerHTML = items.map(x => renderListingCard(x, false)).join("") || `<div class="feed-item">Burada henüz ilan yok.</div>`;
+      refs.countBadge.textContent = `${items.length} ilan`;
+    }
+
+    function renderConversations(){
+      const mine = sortDescByDate(state.conversations).filter(c => (c.members || []).includes(state.user.uid));
+      refs.conversationList.innerHTML = mine.map(renderConversationItem).join("") || `<div class="feed-item">Henüz konuşma yok.</div>`;
+      renderConversation();
+    }
+
+    function renderAll(){
+      if (!state.user) return;
+      if (state.view === "shop") renderShop();
+      if (state.view === "myads") renderMyAds();
+      if (state.view === "messages") renderConversations();
+      if (state.view === "profile") renderProfile();
+      if (state.view === "admin") {
+        renderAdminListings();
+        renderAdminLog();
+      }
+      if (state.view !== "messages") renderConversation();
+      if (state.view !== "profile") renderProfile();
+    }
+
+    async function fileToDataUrl(file){
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function cleanupExpired(){
+      const now = Date.now();
+
+      const listingsSnap = await getDocs(collection(db, "listings"));
+      for (const d of listingsSnap.docs){
+        const data = d.data();
+        const created = tsValue(data.createdAt);
+        if (created && now - created > LISTING_LIFETIME){
+          await deleteDoc(doc(db, "listings", d.id));
+          await logAction("İlan süre doldu", data.name || d.id);
+        }
+      }
+
+      const convSnap = await getDocs(collection(db, "conversations"));
+      for (const d of convSnap.docs){
+        const data = d.data();
+        const created = tsValue(data.createdAt);
+        if (created && now - created > CHAT_LIFETIME){
+          await deleteDoc(doc(db, "conversations", d.id));
+          await logAction("Sohbet süre doldu", d.id);
+        }
+      }
+    }
+
+    async function loadLiveData(){
+      onSnapshot(collection(db, "listings"), snap => {
+        state.listings = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        renderAll();
+      });
+
+      onSnapshot(collection(db, "logs"), snap => {
+        state.logs = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        if (state.view === "admin") renderAdminLog();
+      });
+
+      onSnapshot(doc(db, "users", state.user.uid), snap => {
+        if (snap.exists()){
+          state.profile = { uid: state.user.uid, ...snap.data() };
+          state.isAdmin = !!snap.data().isAdmin;
+          setAppScreen();
+          refs.adminMenu.classList.toggle("hidden", !state.isAdmin);
+          renderAll();
+        }
+      });
+
+      onSnapshot(query(collection(db, "conversations"), where("members", "array-contains", state.user.uid)), snap => {
+        state.conversations = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        renderAll();
+      });
+    }
+
+    async function openConversation(listingId){
+      if (!state.user) return;
+      const item = state.listings.find(x => x.id === listingId);
+      if (!item || !isPublished(item)) return;
+
+      let conv = state.conversations.find(c => c.listingId === listingId && (c.members || []).includes(state.user.uid));
+      if (!conv){
+        const ref = await addDoc(collection(db, "conversations"), {
+          listingId,
+          members: [state.user.uid, item.ownerId],
+          memberNames: Array.from(new Set([state.profile.displayName, item.ownerName].filter(Boolean))),
+          messages: [],
+          lastMessage: "",
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+        conv = { id: ref.id, listingId };
+        await logAction("Konuşma açıldı", `${state.profile.displayName} → ${item.name}`);
+      }
+
+      state.currentConversationId = conv.id;
+      state.currentListingId = listingId;
+      setView("messages");
+      renderAll();
+    }
+
+    async function sendMessage(){
+      const text = refs.messageInput.value.trim();
+      if (!text || !state.currentConversationId) return;
+
+      const convRef = doc(db, "conversations", state.currentConversationId);
+      const snap = await getDoc(convRef);
+      if (!snap.exists()) return;
+
+      const data = snap.data();
+      const messages = Array.isArray(data.messages) ? data.messages : [];
+      const next = {
+        uid: state.user.uid,
+        name: state.profile.displayName,
+        text,
+        createdAt: new Date().toISOString()
+      };
+
+      await updateDoc(convRef, {
+        messages: [...messages, next],
+        lastMessage: text,
+        updatedAt: serverTimestamp()
+      });
+
+      refs.messageInput.value = "";
+      await logAction("Mesaj", `${state.profile.displayName}: ${text}`);
+    }
+
+    async function addListing(e){
+      e.preventDefault();
+
+      const editId = refs.listingForm.dataset.editId || "";
+      const name = refs.adName.value.trim();
+      const description = refs.adDesc.value.trim();
+      const priceLabel = refs.adPrice.value.trim();
+      const type = refs.adType.value;
+      const category = refs.adCategory.value;
+      const imageUrl = refs.adImageUrl.value.trim();
+      const tags = refs.adTags.value.split(",").map(x => x.trim()).filter(Boolean);
+      const file = refs.adImageFile.files?.[0];
+
+      if (!name || !description || !priceLabel) return alert("Ürün adı, açıklama ve istenen alanı zorunlu.");
+      let imageData = "";
+      if (file) imageData = await fileToDataUrl(file);
+      else if (imageUrl) imageData = imageUrl;
+      if (!imageData) return alert("Görüntü zorunlu.");
+
+      const payload = {
+        ownerId: state.user.uid,
+        ownerName: state.profile.displayName,
+        name,
+        description,
+        priceLabel,
+        type,
+        category,
+        tags,
+        imageData,
+        imageUrl: file ? null : imageUrl,
+        status: "published",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+
+      if (editId){
+        await updateDoc(doc(db, "listings", editId), { ...payload, updatedAt: serverTimestamp() });
+        await logAction("İlan düzenlendi", `${state.profile.displayName} → ${name}`);
+      }else{
+        await addDoc(collection(db, "listings"), payload);
+        await logAction("İlan eklendi", `${state.profile.displayName} → ${name}`);
+      }
+
+      refs.listingForm.reset();
+      refs.imagePreview.classList.add("hidden");
+      refs.listingForm.dataset.editId = "";
+      refs.modalListing.classList.remove("show");
+      refs.modalTitle.textContent = "İlan ekle";
+      setView("myads");
+    }
+
+    async function removeListing(id){
+      const item = state.listings.find(x => x.id === id);
+      if (!item) return;
+      const mine = item.ownerId === state.user.uid;
+      if (!mine && !state.isAdmin) return;
+
+      const ok = confirm(`"${item.name}" silinsin mi? Bu işlem geri alınmaz.`);
+      if (!ok) return;
+
+      await deleteDoc(doc(db, "listings", id));
+      await logAction("İlan silindi", `${state.profile?.displayName || "user"} → ${item.name}`);
+    }
+
+    async function toggleListing(id){
+      const item = state.listings.find(x => x.id === id);
+      if (!item || item.ownerId !== state.user.uid) return;
+      const next = item.status === "published" ? "closed" : "published";
+      await updateDoc(doc(db, "listings", id), {
+        status: next,
+        updatedAt: serverTimestamp()
+      });
+      await logAction("İlan durumu", `${state.profile.displayName} → ${item.name} → ${next}`);
+    }
+
+    async function editListing(id){
+      const item = state.listings.find(x => x.id === id);
+      if (!item || item.ownerId !== state.user.uid) return;
+
+      refs.modalTitle.textContent = "İlan düzenle";
+      refs.listingForm.dataset.editId = id;
+      refs.adType.value = item.type || "swap";
+      refs.adCategory.value = item.category || "diger";
+      refs.adName.value = item.name || "";
+      refs.adPrice.value = item.priceLabel || "";
+      refs.adDesc.value = item.description || "";
+      refs.adImageUrl.value = item.imageUrl || (item.imageData?.startsWith("data:") ? "" : item.imageData || "");
+      refs.adTags.value = (item.tags || []).join(", ");
+      if (item.imageData){
+        refs.imagePreview.src = item.imageData;
+        refs.imagePreview.classList.remove("hidden");
+      }else{
+        refs.imagePreview.classList.add("hidden");
+      }
+      refs.modalListing.classList.add("show");
+    }
+
+    async function selectConversation(id){
+      state.currentConversationId = id;
+      setView("messages");
+      renderAll();
+    }
+
+    async function selectForAdmin(id){
+      state.currentListingId = id;
+      const item = state.listings.find(x => x.id === id);
+      if (!item) return;
+      if (isPublished(item)){
+        await openConversation(id);
+      }else{
+        setView("shop");
+        renderAll();
+      }
+    }
+
+    async function openModalForNew(){
+      refs.modalTitle.textContent = "İlan ekle";
+      refs.listingForm.dataset.editId = "";
+      refs.listingForm.reset();
+      refs.imagePreview.classList.add("hidden");
+      refs.modalListing.classList.add("show");
+    }
+
+    async function deleteConversation(){
+      if (!state.currentConversationId) return;
+      const ok = confirm("Bu sohbet silinsin mi?");
+      if (!ok) return;
+      await deleteDoc(doc(db, "conversations", state.currentConversationId));
+      await logAction("Sohbet silindi", state.currentConversationId);
+      state.currentConversationId = null;
+      renderAll();
+    }
+
+    async function openSellerProfile(userId){
+      const userSnap = await getDoc(doc(db, "users", userId));
+      if (!userSnap.exists()) return;
+
+      const seller = { uid: userId, ...userSnap.data() };
+      state.currentSellerId = userId;
+      state.currentSeller = seller;
+
+      const sellerAds = state.listings.filter(x => x.ownerId === userId);
+      const openCount = sellerAds.filter(x => x.status === "published").length;
+      const closedCount = sellerAds.filter(x => x.status === "closed").length;
+
+      refs.sellerName.textContent = seller.displayName || "Bilinmeyen";
+      refs.sellerRole.textContent = seller.isAdmin ? "Yönetici" : "Üye";
+
+      refs.sellerStats.innerHTML = `
+        <div class="item"><div class="item-head"><strong>Toplam ilan</strong></div><span>${sellerAds.length}</span></div>
+        <div class="item"><div class="item-head"><strong>Açık ilan</strong></div><span>${openCount}</span></div>
+        <div class="item"><div class="item-head"><strong>Kapalı ilan</strong></div><span>${closedCount}</span></div>
+      `;
+
+      refs.sellerRecentAds.innerHTML = sortDescByDate(sellerAds).slice(0, 5).map(x => `
+        <div class="item">
+          <div class="item-head">
+            <strong>${escapeHtml(x.name || "")}</strong>
+            <span>${escapeHtml(x.status || "")}</span>
+          </div>
+          <div class="tiny">${escapeHtml(x.priceLabel || "")}</div>
+        </div>
+      `).join("") || `<div class="feed-item">İlan yok.</div>`;
+
+      refs.modalSeller.classList.add("show");
+    }
+
+    async function messageSeller(){
+      if (!state.currentSellerId) return;
+      const sellerId = state.currentSellerId;
+      const item = state.listings.find(x => x.ownerId === sellerId);
+      if (!item) return;
+      refs.modalSeller.classList.remove("show");
+      await openConversation(item.id);
+    }
+
+    refs.tabLogin.onclick = () => {
+      refs.tabLogin.classList.add("active");
+      refs.tabRegister.classList.remove("active");
+      refs.loginForm.classList.remove("hidden");
+      refs.registerForm.classList.add("hidden");
+    };
+    refs.tabRegister.onclick = () => {
+      refs.tabRegister.classList.add("active");
+      refs.tabLogin.classList.remove("active");
+      refs.registerForm.classList.remove("hidden");
+      refs.loginForm.classList.add("hidden");
+    };
+
+    refs.loginForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const name = refs.loginName.value.trim();
+      const pass = refs.loginPass.value.trim();
+      if (!name || !pass) return;
+
+      try{
+        const email = `${slugify(name)}@7cshop.app`;
+        const cred = await signInWithEmailAndPassword(auth, email, pass);
+        await updateProfile(cred.user, { displayName: name });
+        state.user = cred.user;
+        state.profile = await ensureUserDoc(cred.user, name, false);
+        state.isAdmin = !!state.profile.isAdmin;
+        setAppScreen();
+        listenAll();
+        setView("shop");
+        await cleanupExpired();
+      }catch(err){
+        alert("Giriş başarısız.");
+      }
+    };
+
+    refs.registerForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const name = refs.regName.value.trim();
+      const pass = refs.regPass.value.trim();
+      const pass2 = refs.regPass2.value.trim();
+      if (!name || !pass || !pass2) return alert("Tüm alanları doldur.");
+      if (pass !== pass2) return alert("Şifreler aynı olmalı.");
+
+      try{
+        const email = `${slugify(name)}@7cshop.app`;
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+        await updateProfile(cred.user, { displayName: name });
+        state.user = cred.user;
+        state.profile = await ensureUserDoc(cred.user, name, false);
+        state.isAdmin = false;
+        setAppScreen();
+        listenAll();
+        setView("shop");
+        await cleanupExpired();
+      }catch(err){
+        alert("Kayıt başarısız.");
+      }
+    };
+
+    refs.btnOpenAdd.onclick = openModalForNew;
+    refs.btnCloseModal.onclick = () => refs.modalListing.classList.remove("show");
+    refs.btnLogout.onclick = async () => { await signOut(auth); };
+    refs.btnRefresh.onclick = async () => { await cleanupExpired(); renderAll(); };
+    refs.btnSendMessage.onclick = sendMessage;
+    refs.btnDeleteConversation.onclick = deleteConversation;
+    refs.searchInput.oninput = renderAll;
+    refs.filterType.onchange = renderAll;
+    refs.filterCategory.onchange = renderAll;
+
+    refs.modalListing.addEventListener("click", (e) => {
+      if (e.target === refs.modalListing) refs.modalListing.classList.remove("show");
+    });
+    refs.modalSeller.addEventListener("click", (e) => {
+      if (e.target === refs.modalSeller) refs.modalSeller.classList.remove("show");
+    });
+
+    refs.adImageFile.addEventListener("change", async () => {
+      const file = refs.adImageFile.files?.[0];
+      if (!file) return;
+      const data = await fileToDataUrl(file);
+      refs.imagePreview.src = data;
+      refs.imagePreview.classList.remove("hidden");
+      refs.adImageUrl.value = "";
+    });
+
+    refs.adImageUrl.addEventListener("input", () => {
+      const url = refs.adImageUrl.value.trim();
+      if (url){
+        refs.imagePreview.src = url;
+        refs.imagePreview.classList.remove("hidden");
+      }else if (!refs.adImageFile.files?.[0]){
+        refs.imagePreview.classList.add("hidden");
+      }
+    });
+
+    refs.listingForm.onsubmit = addListing;
+
+    refs.btnCloseSeller.onclick = () => refs.modalSeller.classList.remove("show");
+    refs.btnMessageSeller.onclick = messageSeller;
+
+    document.querySelectorAll(".menu button").forEach(btn => {
+      btn.onclick = () => setView(btn.dataset.view);
+    });
+
+    window.__openConversation = openConversation;
+    window.__selectConversation = selectConversation;
+    window.__removeListing = removeListing;
+    window.__toggleListing = toggleListing;
+    window.__editListing = editListing;
+    window.__selectForAdmin = selectForAdmin;
+    window.__openSeller = openSellerProfile;
+
+    onAuthStateChanged(auth, async (user) => {
+      state.user = user || null;
+      if (!user){
+        state.profile = null;
+        state.isAdmin = false;
+        setAuthScreen();
+        return;
+      }
+
+      const dn = user.displayName || user.email?.split("@")[0] || "Üye";
+      state.profile = await ensureUserDoc(user, dn, false);
+      state.isAdmin = !!state.profile.isAdmin;
+      setAppScreen();
+      listenAll();
+      setView("shop");
+      await cleanupExpired();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        refs.modalListing.classList.remove("show");
+        refs.modalSeller.classList.remove("show");
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
+        e.preventDefault();
+        refs.searchInput.focus();
+      }
+    });
+
+    refs.loginName.value = "";
+    refs.loginPass.value = "";
+
+    setInterval(async () => {
+      try{
+        await cleanupExpired();
+      }catch{}
+    }, 10 * 60 * 1000);
+  </script>
+</body>
+</html>
