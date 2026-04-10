@@ -987,6 +987,20 @@
       return String(name || "").trim().toLowerCase().replace(/\s+/g, " ");
     }
 
+    function normalizePriceLabel(value){
+      const raw = String(value ?? "").trim().replace(/\s+/g, " ");
+      if (!raw) return "";
+      const numericOnly = raw.match(/^\d+(?:[.,]\d+)?$/);
+      if (numericOnly) {
+        return `${numericOnly[0].replace(',', '.')} TL`;
+      }
+      const endsWithTl = raw.match(/^(.+?)\s*tl$/i);
+      if (endsWithTl) {
+        return `${endsWithTl[1].trim()} TL`;
+      }
+      return raw;
+    }
+
     function escapeHtml(str){
       return String(str ?? "")
         .replaceAll("&","&amp;")
@@ -1075,16 +1089,21 @@
     }
 
     function renderPriceBlock(item){
+      const price = normalizePriceLabel(item?.priceLabel || item?.newPriceLabel || "İstenen yok");
       if (item?.isDiscounted && item.oldPriceLabel && item.newPriceLabel){
         return `
           <div class="price-wrap">
-            <span class="price-old">${escapeHtml(item.oldPriceLabel)}</span>
-            <span class="price-new">${escapeHtml(item.newPriceLabel)}</span>
+            <span class="price-old">${escapeHtml(normalizePriceLabel(item.oldPriceLabel))}</span>
+            <span class="price-new">${escapeHtml(normalizePriceLabel(item.newPriceLabel))}</span>
             <span class="discount-badge">İndirimli</span>
           </div>
         `;
       }
-      return `<span class="price-tag">${escapeHtml(item?.priceLabel || item?.newPriceLabel || "İstenen yok")}</span>`;
+      return `
+        <div class="price-wrap">
+          <span class="price-new">${escapeHtml(price)}</span>
+        </div>
+      `;
     }
 
     async function ensureUserDoc(user, displayName, isAdmin=false){
@@ -1335,12 +1354,14 @@
 
       if (item.isDiscounted && item.oldPriceLabel && item.newPriceLabel){
         refs.detailPriceBox.innerHTML = `
-          <span class="price-old">${escapeHtml(item.oldPriceLabel)}</span>
-          <span class="price-new">${escapeHtml(item.newPriceLabel)}</span>
+          <span class="price-old">${escapeHtml(normalizePriceLabel(item.oldPriceLabel))}</span>
+          <span class="price-new">${escapeHtml(normalizePriceLabel(item.newPriceLabel))}</span>
           <span class="discount-badge">İndirimli</span>
         `;
       }else{
-        refs.detailPriceBox.innerHTML = `<span class="price-new">${escapeHtml(item.priceLabel || item.newPriceLabel || "İstenen yok")}</span>`;
+        refs.detailPriceBox.innerHTML = `
+          <span class="price-new">${escapeHtml(normalizePriceLabel(item.priceLabel || item.newPriceLabel || "İstenen yok"))}</span>
+        `;
       }
 
       refs.detailDesc.textContent = item.description || "";
@@ -1976,8 +1997,8 @@
       const name = refs.adName.value.trim();
       const description = refs.adDesc.value.trim();
       const isDiscounted = !!refs.adDiscount.checked;
-      const oldPriceLabel = refs.adOldPrice.value.trim();
-      const newPriceLabel = refs.adNewPrice.value.trim();
+      const oldPriceLabel = normalizePriceLabel(refs.adOldPrice.value);
+      const newPriceLabel = normalizePriceLabel(refs.adNewPrice.value);
       const type = refs.adType.value;
       const category = refs.adCategory.value;
       const tags = refs.adTags.value.split(",").map(x => x.trim()).filter(Boolean);
@@ -2236,6 +2257,16 @@
         refs.profileAvatarPreview.classList.add("hidden");
       }
     });
+
+    function autoFormatPriceInput(input){
+      if (!input) return;
+      const formatted = normalizePriceLabel(input.value);
+      if (formatted) input.value = formatted;
+    }
+
+    refs.adOldPrice.addEventListener("blur", () => autoFormatPriceInput(refs.adOldPrice));
+    refs.adNewPrice.addEventListener("blur", () => autoFormatPriceInput(refs.adNewPrice));
+
 
     refs.profileForm.onsubmit = async (e) => {
       e.preventDefault();
