@@ -1166,11 +1166,11 @@
       if (!convId || !state.user) return;
       const conv = state.conversations.find(c => c.id === convId);
       if (!conv) return;
-      const current = Number(conv.unreadBy?.[state.user.uid] || 0);
-      if (current <= 0) return;
       const unreadBy = { ...(conv.unreadBy || {}) };
       unreadBy[state.user.uid] = 0;
-      await updateDoc(doc(db, "conversations", convId), { unreadBy, updatedAt: serverTimestamp() });
+      const readBy = { ...(conv.readBy || {}) };
+      readBy[state.user.uid] = Date.now();
+      await updateDoc(doc(db, "conversations", convId), { unreadBy, readBy, updatedAt: serverTimestamp() });
     }
 
     function filterListings(list){
@@ -1192,8 +1192,21 @@
       return sortDescByDate(state.listings.filter(x => x.ownerId === state.user?.uid));
     }
 
-    function findConversation(listingId){
-      return state.conversations.find(c => c.listingId === listingId && (c.members || []).includes(state.user?.uid));
+    function findConversationByPeer(otherId){
+      const matches = state.conversations.filter(c => {
+        const members = Array.isArray(c?.members) ? c.members : [];
+        return members.includes(state.user?.uid) && members.includes(otherId);
+      });
+      return matches.sort((a, b) => {
+        const ta = tsValue(a.updatedAtMs || a.updatedAt || a.createdAtMs || a.createdAt);
+        const tb = tsValue(b.updatedAtMs || b.updatedAt || b.createdAtMs || b.createdAt);
+        return tb - ta;
+      })[0] || null;
+    }
+
+    function getConversationLatestListingName(conv){
+      const listing = state.listings.find(x => x.id === conv?.listingId);
+      return conv?.latestListingName || listing?.name || listing?.ownerName || "İlan";
     }
 
     function isDuplicateListingName(name, editingId = ""){
@@ -1219,12 +1232,32 @@
     function conversationSearchText(conv){
       const listing = state.listings.find(x => x.id === conv.listingId);
       return [
-        listing?.name,
+        getConversationLatestListingName(conv),
         listing?.ownerName,
         ...(conv?.memberNames || []),
         conv?.lastMessage,
         conv?.messages?.map(m => m.text).join(" ")
       ].filter(Boolean).join(" ").toLowerCase();
+    }
+
+    function getLastMyMessageMeta(conv){
+      const messages = Array.isArray(conv?.messages) ? conv.messages : [];
+      for (let i = messages.length - 1; i >= 0; i--){
+        const msg = messages[i];
+        if (!msg || msg.type === "system") continue;
+        if (msg.uid === state.user?.uid) return { index: i, message: msg };
+      }
+      return null;
+    }
+
+    function isMessageSeenByPeer(conv, message){
+      if (!conv || !message) return false;
+      const peer = getConversationPeer(conv);
+      const peerId = peer.otherId;
+      if (!peerId) return false;
+      const readAt = conv?.readBy?.[peerId];
+      if (!readAt) return false;
+      return tsValue(readAt) >= tsValue(message.createdAt);
     }
 
     function renderListingCard(item, forMine=false){
@@ -1360,7 +1393,6 @@
     }
 
     function renderConversationItem(conv){
-      const listing = state.listings.find(x => x.id === conv.listingId);
       const peer = getConversationPeer(conv);
       const unread = getUnreadCount(conv);
       const avatar = escapeHtml(String(peer.name || "?").trim().slice(0,2).toUpperCase());
@@ -1374,7 +1406,7 @@
                 <strong class="conversation-title">${escapeHtml(peer.name)}</strong>
                 ${unread > 0 ? `<span class="badge notify">${unread}</span>` : ""}
               </div>
-              <div class="conversation-sub">${escapeHtml(listing?.name || "İlan")}</div>
+              <div class="conversation-sub">${escapeHtml(getConversationLatestListingName(conv))}</div>
               <div class="conversation-sub" style="margin-top:6px">${escapeHtml(lastSeen)}</div>
               <div class="conversation-sub" style="margin-top:4px">${escapeHtml(conv.lastMessage || "Yeni konuşma")}</div>
             </div>
@@ -1393,16 +1425,17 @@
         return;
       }
 
-      const listing = state.listings.find(x => x.id === conv.listingId);
       const peer = getConversationPeer(conv);
-      refs.chatTitle.textContent = listing?.name || "Sohbet";
-      refs.chatSub.textContent = `${peer.name} • ${peer.user?.lastSeenAt ? formatLastSeen(peer.user.lastSeenAt) : "Son aktif: bilinmiyor"}`;
+      refs.chatTitle.textContent = peer.name || "Sohbet";
+      refs.chatSub.textContent = `${getConversationLatestListingName(conv)} • ${peer.user?.lastSeenAt ? formatLastSeen(peer.user.lastSeenAt) : "Son aktif: bilinmiyor"}`;
       refs.btnDeleteConversation.classList.remove("hidden");
 
-      const html = (conv.messages || []).map(m => {
+      const lastMy = getLastMyMessageMeta(conv);
+      const html = (conv.messages || []).map((m, idx) => {
         const mine = m.uid === state.user.uid;
         const system = m.type === "system";
-        return `<div class="msg ${system ? "system" : mine ? "me" : ""}"><b>${escapeHtml(m.name || (system ? "Sistem" : "Anonim"))}</b><div>${escapeHtml(m.text || "")}</div><span class="small">${formatDate(m.createdAt)}</span></div>`;
+        const seen = mine && lastMy && lastMy.index === idx && isMessageSeenByPeer(conv, m);
+        return `<div class="msg ${system ? "system" : mine ? "me" : ""}"><b>${escapeHtml(m.name || (system ? "Sistem" : "Anonim"))}</b><div>${escapeHtml(m.text || "")}</div><span class="small">${formatDate(m.createdAt)}</span>${seen ? `<span class="small">görüldü</span>` : ""}</div>`;
       }).join("");
 
       refs.messagesBox.innerHTML = html || `<div class="feed-item">Henüz mesaj yok.</div>`;
@@ -1734,15 +1767,18 @@
       const item = state.listings.find(x => x.id === listingId);
       if (!item || !isPublished(item)) return;
 
-      let conv = findConversation(listingId);
+      let conv = findConversationByPeer(item.ownerId);
       if (!conv){
         const ref = await addDoc(collection(db, "conversations"), {
           listingId,
+          latestListingId: listingId,
+          latestListingName: item.name || "",
           members: [state.user.uid, item.ownerId],
           memberNames: Array.from(new Set([state.profile.displayName, item.ownerName].filter(Boolean))),
           messages: [],
           lastMessage: "",
           unreadBy: {},
+          readBy: { [state.user.uid]: Date.now() },
           createdAtMs: Date.now(),
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
@@ -1750,15 +1786,26 @@
         conv = {
           id: ref.id,
           listingId,
+          latestListingId: listingId,
+          latestListingName: item.name || "",
           members: [state.user.uid, item.ownerId],
           memberNames: Array.from(new Set([state.profile.displayName, item.ownerName].filter(Boolean))),
           messages: [],
           lastMessage: "",
-          unreadBy: {}
+          unreadBy: {},
+          readBy: { [state.user.uid]: Date.now() }
         };
-        await logAction("Konuşma açıldı", `${state.profile.displayName} → ${item.name}`);
+        await logAction("Konuşma açıldı", `${state.profile.displayName} → ${item.ownerName || item.name}`);
       }else{
-        conv = { ...conv };
+        conv = { ...conv, listingId, latestListingId: listingId, latestListingName: item.name || conv.latestListingName || "" };
+        try{
+          await updateDoc(doc(db, "conversations", conv.id), {
+            listingId,
+            latestListingId: listingId,
+            latestListingName: item.name || conv.latestListingName || "",
+            updatedAt: serverTimestamp()
+          });
+        }catch{}
       }
 
       state.currentConversationId = conv.id;
@@ -1792,11 +1839,14 @@
       for (const member of (data.members || [])) {
         if (member !== state.user.uid) unreadBy[member] = (Number(unreadBy[member]) || 0) + 1;
       }
+      const readBy = { ...(data.readBy || {}) };
+      readBy[state.user.uid] = Date.now();
 
       await updateDoc(convRef, {
         messages: [...messages, next],
         lastMessage: text,
         unreadBy,
+        readBy,
         updatedAt: serverTimestamp()
       });
 
@@ -1806,7 +1856,10 @@
         messages: [...messages, next],
         lastMessage: text,
         unreadBy,
+        readBy,
         listingId: data.listingId,
+        latestListingId: data.latestListingId || data.listingId,
+        latestListingName: data.latestListingName || "",
         members: data.members || [],
         memberNames: data.memberNames || []
       };
@@ -1824,10 +1877,12 @@
 
       const buyText = `Ben ${state.profile.displayName}, "${item.name}" ürününü almak istiyorum.`;
 
-      let conv = findConversation(listingId);
+      let conv = findConversationByPeer(item.ownerId);
       if (!conv){
         const ref = await addDoc(collection(db, "conversations"), {
           listingId,
+          latestListingId: listingId,
+          latestListingName: item.name || "",
           members: [state.user.uid, item.ownerId],
           memberNames: Array.from(new Set([state.profile.displayName, item.ownerName].filter(Boolean))),
           messages: [{
@@ -1839,11 +1894,22 @@
           }],
           lastMessage: buyText,
           unreadBy: { [item.ownerId]: 1 },
+          readBy: { [state.user.uid]: Date.now() },
           createdAtMs: Date.now(),
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
-        conv = { id: ref.id, listingId, memberNames: Array.from(new Set([state.profile.displayName, item.ownerName].filter(Boolean))), messages:[{ uid:"system", name:"Sistem", text: buyText, type:"system", createdAt:new Date().toISOString() }], lastMessage: buyText, unreadBy:{ [item.ownerId]:1 } };
+        conv = {
+          id: ref.id,
+          listingId,
+          latestListingId: listingId,
+          latestListingName: item.name || "",
+          memberNames: Array.from(new Set([state.profile.displayName, item.ownerName].filter(Boolean))),
+          messages:[{ uid:"system", name:"Sistem", text: buyText, type:"system", createdAt:new Date().toISOString() }],
+          lastMessage: buyText,
+          unreadBy:{ [item.ownerId]:1 },
+          readBy:{ [state.user.uid]: Date.now() }
+        };
       }else{
         const convRef = doc(db, "conversations", conv.id);
         const snap = await getDoc(convRef);
@@ -1851,7 +1917,12 @@
         const messages = Array.isArray(data.messages) ? data.messages : [];
         const unreadBy = { ...(data.unreadBy || {}) };
         unreadBy[item.ownerId] = (Number(unreadBy[item.ownerId]) || 0) + 1;
+        const readBy = { ...(data.readBy || {}) };
+        readBy[state.user.uid] = Date.now();
         await updateDoc(convRef, {
+          listingId,
+          latestListingId: listingId,
+          latestListingName: item.name || data.latestListingName || "",
           messages: [...messages, {
             uid: "system",
             name: "Sistem",
@@ -1861,8 +1932,25 @@
           }],
           lastMessage: buyText,
           unreadBy,
+          readBy,
           updatedAt: serverTimestamp()
         });
+        conv = {
+          ...conv,
+          listingId,
+          latestListingId: listingId,
+          latestListingName: item.name || conv.latestListingName || "",
+          messages: [...messages, {
+            uid: "system",
+            name: "Sistem",
+            text: buyText,
+            type: "system",
+            createdAt: new Date().toISOString()
+          }],
+          lastMessage: buyText,
+          unreadBy,
+          readBy
+        };
       }
 
       await logAction("Satın al isteği", `${state.profile.displayName} → ${item.name}`);
