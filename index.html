@@ -55,11 +55,12 @@
     .brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
     .actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
     .chip{
-      border:1px solid var(--line);background:#fff;color:var(--text);
+      border:1px solid #d1d5db;background:#fff;color:var(--text);
       padding:10px 14px;border-radius:999px;cursor:pointer;transition:.2s;
-      box-shadow:0 8px 18px rgba(17,24,39,.03);
+      box-shadow:0 10px 22px rgba(17,24,39,.08);
+      font-weight:800;
     }
-    .chip:hover{transform:translateY(-1px)}
+    .chip:hover{transform:translateY(-1px);box-shadow:0 14px 26px rgba(17,24,39,.12);border-color:#cbd5e1}
     .chip.primary{background:var(--accent);border-color:var(--accent);color:#fff}
     .chip.primary:hover{background:var(--accent2)}
     .chip.good{background:var(--good);border-color:var(--good);color:#fff}
@@ -101,9 +102,14 @@
     .btn{
       border:none;border-radius:16px;padding:13px 16px;cursor:pointer;font-weight:800;
       background:var(--accent);color:#fff;transition:.2s;
+      box-shadow:0 10px 20px rgba(37,99,235,.15);
     }
     .btn:hover{transform:translateY(-1px);background:var(--accent2)}
-    .btn.secondary{background:#fff;color:var(--text);border:1px solid var(--line)}
+    .btn.secondary{
+      background:#fff;color:var(--text);border:1px solid #d1d5db;
+      box-shadow:0 10px 20px rgba(17,24,39,.08);
+    }
+    .btn.secondary:hover{background:#f8fafc;border-color:#cbd5e1}
     .btn.good{background:var(--good)}
     .btn.bad{background:var(--bad)}
     .btn.warn{background:var(--warn)}
@@ -111,8 +117,10 @@
     .sidebar{position:sticky;top:92px}
     .menu{display:grid;gap:10px}
     .menu button{
-      width:100%;text-align:left;padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:#fff;cursor:pointer
+      width:100%;text-align:left;padding:14px 16px;border-radius:16px;border:1px solid #d1d5db;background:#fff;cursor:pointer;
+      box-shadow:0 10px 20px rgba(17,24,39,.06);font-weight:800;
     }
+    .menu button:hover{border-color:#cbd5e1;background:#f8fafc}
     .menu button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
     .section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
     .section-title h3{margin:0;font-size:20px}
@@ -163,6 +171,56 @@
     }
     .modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:18px 20px;border-bottom:1px solid var(--line)}
     .modal-body{padding:20px}
+
+    #modalDetail .detail-modal-card{
+      width:100vw;
+      height:100vh;
+      max-width:100vw;
+      max-height:100vh;
+      border-radius:0;
+      display:flex;
+      flex-direction:column;
+    }
+    #modalDetail .modal-body{
+      flex:1;
+      overflow:auto;
+    }
+    #modalDetail .modal-head{
+      position:sticky;
+      top:0;
+      z-index:2;
+      background:#fff;
+    }
+    .detail-all{
+      display:grid;
+      gap:12px;
+      margin-top:16px;
+    }
+    .detail-photo-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:12px;
+    }
+    .detail-photo{
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:hidden;
+      background:#fff;
+      box-shadow:0 8px 18px rgba(17,24,39,.05);
+    }
+    .detail-photo img{
+      width:100%;
+      height:180px;
+      object-fit:cover;
+      display:block;
+      background:#f3f4f6;
+    }
+    .detail-photo span{
+      display:block;
+      padding:10px 12px;
+      font-size:12px;
+      color:var(--muted);
+    }
     .footer{padding:18px 20px;text-align:center;color:var(--muted);font-size:12px}
     .searchbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .searchbar input{flex:1;min-width:220px}
@@ -210,6 +268,30 @@
     @media (max-width:900px){
       .detail-top{grid-template-columns:1fr}
     }
+    .message-search{display:grid;gap:10px;margin-bottom:12px}
+    .conversation-title{font-weight:900;font-size:15px;line-height:1.25}
+    .conversation-sub{font-size:12px;color:var(--muted);margin-top:3px}
+    .conversation-row{display:flex;gap:10px;align-items:flex-start}
+    .conversation-avatar{
+      width:42px;height:42px;border-radius:14px;flex:0 0 auto;
+      display:grid;place-items:center;font-weight:900;
+      background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;
+    }
+    .people-list-empty{padding:16px;border:1px dashed var(--line);border-radius:18px;background:#fff;color:var(--muted)}
+    .profile-hero{
+      display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;
+      background:linear-gradient(135deg,#eff6ff,#ffffff);
+      border:1px solid #dbeafe;border-radius:22px;padding:16px;
+    }
+    .avatar{
+      width:84px;height:84px;border-radius:24px;overflow:hidden;
+      border:1px solid #dbeafe;background:#fff;display:grid;place-items:center;
+      box-shadow:var(--shadow);
+    }
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .avatar-fallback{font-size:28px;font-weight:900;color:#2563eb}
+    .profile-grid{display:grid;gap:12px}
+    .profile-actions{display:flex;gap:10px;flex-wrap:wrap}
     .tiny{font-size:11px;color:var(--muted)}
     .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .list{display:grid;gap:12px}
@@ -419,9 +501,13 @@
                     <div class="panel-inner">
                       <div class="section-title">
                         <div>
-                          <h3>Konuşmalar</h3>
-                          <p>İlan bazlı mesajlaşma</p>
+                          <h3>İnsanlar</h3>
+                          <p>Kişi ara, konuşmayı aç</p>
                         </div>
+                      </div>
+                      <div class="message-search">
+                        <input id="messageSearchInput" class="input" placeholder="Kişi veya ilan ara..." />
+                        <div class="hint">Sohbet listesi kişi adına göre filtrelenir.</div>
                       </div>
                       <div id="conversationList" class="list"></div>
                     </div>
@@ -430,7 +516,7 @@
                     <div class="chat-head">
                       <div>
                         <strong id="chatTitle">Sohbet seçilmedi</strong>
-                        <div id="chatSub" class="hint">Bir ilan seçip sohbet başlat</div>
+                        <div id="chatSub" class="hint">Bir kişiye dokunup sohbeti aç</div>
                       </div>
                       <button id="btnDeleteConversation" class="btn bad hidden" type="button">Sohbeti sil</button>
                     </div>
@@ -452,8 +538,24 @@
                           <h3>Profil</h3>
                           <p>Hesap bilgilerin</p>
                         </div>
+                        <button id="btnEditProfile" class="btn secondary" type="button">Profili düzenle</button>
                       </div>
-                      <div id="profileBox" class="list"></div>
+                      <div class="profile-grid">
+                        <div class="profile-hero">
+                          <div class="avatar" id="profileAvatarBox">
+                            <span class="avatar-fallback">?</span>
+                          </div>
+                          <div>
+                            <h4 style="margin:0 0 6px;font-size:22px" id="profileNameText">-</h4>
+                            <div class="tiny" id="profileEmailText">-</div>
+                            <div class="profile-actions" style="margin-top:12px">
+                              <span class="pill" id="profileRolePill">Üye</span>
+                              <span class="pill" id="profilePhotoPill">PP yok</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div id="profileBox" class="list"></div>
+                      </div>
                     </div>
                   </div>
                   <div class="panel" style="box-shadow:none">
@@ -626,8 +728,44 @@
     </div>
   </div>
 
+  <div id="modalProfileEdit" class="modal">
+    <div class="modal-card" style="width:min(760px,100%)">
+      <div class="modal-head">
+        <strong>Profili düzenle</strong>
+        <button id="btnCloseProfileEdit" class="chip">Kapat</button>
+      </div>
+      <div class="modal-body">
+        <form id="profileForm" class="form">
+          <div class="field">
+            <label>Görünür isim</label>
+            <input id="profileNameInput" class="input" placeholder="Adın" />
+          </div>
+          <div class="two">
+            <div class="field">
+              <label>PP yükle</label>
+              <input id="profileAvatarFile" class="input" type="file" accept="image/*" />
+              <div class="hint">Bu fotoğraf profil resmin olur.</div>
+            </div>
+            <div class="field">
+              <label>veya PP URL</label>
+              <input id="profileAvatarUrl" class="input" placeholder="https://..." />
+            </div>
+          </div>
+          <div class="field">
+            <label>Önizleme</label>
+            <img id="profileAvatarPreview" class="preview hidden" alt="Profil önizleme">
+          </div>
+          <div class="row">
+            <button class="btn" type="submit">Kaydet</button>
+            <button id="btnDeleteProfilePhoto" class="btn secondary" type="button">PP sil</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div id="modalDetail" class="modal">
-    <div class="modal-card">
+    <div class="modal-card detail-modal-card">
       <div class="modal-head">
         <strong id="detailTitle">İlan detayı</strong>
         <button id="btnCloseDetail" class="chip">Kapat</button>
@@ -661,6 +799,15 @@
             <div class="detail-actions">
               <button id="btnDetailMessage" class="btn" type="button">Mesajlaş</button>
               <button id="btnDetailBuy" class="btn good" type="button">Satın al</button>
+            </div>
+            <div class="detail-all">
+              <div class="item">
+                <div class="item-head">
+                  <strong>Tüm fotoğraflar</strong>
+                  <span id="detailPhotoCount">0 fotoğraf</span>
+                </div>
+                <div id="detailAllImages" class="detail-photo-grid"></div>
+              </div>
             </div>
             <div class="notice">İlana göz atınca diğer fotoğraflar burada görünür.</div>
           </div>
@@ -734,6 +881,7 @@
       onlineBadge: $("onlineBadge"),
       messagesBadge: $("messagesBadge"),
       searchInput: $("searchInput"),
+      messageSearchInput: $("messageSearchInput"),
       filterType: $("filterType"),
       filterCategory: $("filterCategory"),
       listingsGrid: $("listingsGrid"),
@@ -747,6 +895,11 @@
       btnDeleteConversation: $("btnDeleteConversation"),
       profileBox: $("profileBox"),
       profileStatsBox: $("profileStatsBox"),
+      profileAvatarBox: $("profileAvatarBox"),
+      profileNameText: $("profileNameText"),
+      profileEmailText: $("profileEmailText"),
+      profileRolePill: $("profileRolePill"),
+      profilePhotoPill: $("profilePhotoPill"),
       adminMenu: $("adminMenu"),
       adminListings: $("adminListings"),
       adminLog: $("adminLog"),
@@ -767,6 +920,15 @@
       adTags: $("adTags"),
       imagePreview: $("imagePreview"),
       modalSeller: $("modalSeller"),
+      modalProfileEdit: $("modalProfileEdit"),
+      btnCloseProfileEdit: $("btnCloseProfileEdit"),
+      profileForm: $("profileForm"),
+      profileNameInput: $("profileNameInput"),
+      profileAvatarFile: $("profileAvatarFile"),
+      profileAvatarUrl: $("profileAvatarUrl"),
+      profileAvatarPreview: $("profileAvatarPreview"),
+      btnDeleteProfilePhoto: $("btnDeleteProfilePhoto"),
+      btnEditProfile: $("btnEditProfile"),
       modalDetail: $("modalDetail"),
       btnCloseDetail: $("btnCloseDetail"),
       btnDetailMessage: $("btnDetailMessage"),
@@ -780,6 +942,8 @@
       detailPriceBox: $("detailPriceBox"),
       detailDesc: $("detailDesc"),
       detailTags: $("detailTags"),
+      detailPhotoCount: $("detailPhotoCount"),
+      detailAllImages: $("detailAllImages"),
       btnCloseSeller: $("btnCloseSeller"),
       btnMessageSeller: $("btnMessageSeller"),
       sellerName: $("sellerName"),
@@ -797,10 +961,12 @@
       listings: [],
       conversations: [],
       logs: [],
+      users: [],
       currentConversationId: null,
       currentListingId: null,
       currentSellerId: null,
       currentSeller: null,
+      currentConversationCache: null,
       currentDetailListingId: null,
       currentDetailImageIndex: 0,
       unsubscribers: []
@@ -923,6 +1089,9 @@
         displayName,
         isAdmin: !!isAdmin,
         email: user.email || null,
+        avatarUrl: user.photoURL || null,
+        avatarDataUrl: null,
+        lastSeenAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
       if (!snap.exists()){
@@ -963,6 +1132,34 @@
 
     function totalUnreadCount(){
       return state.conversations.reduce((sum, conv) => sum + getUnreadCount(conv), 0);
+    }
+
+    function getUserById(uid){
+      return state.users.find(u => u.uid === uid) || null;
+    }
+
+    function getConversationPeer(conv){
+      const otherId = (conv?.members || []).find(id => id && id !== state.user?.uid) || null;
+      const user = otherId ? getUserById(otherId) : null;
+      const name = user?.displayName || (conv?.memberNames || []).find(n => n !== state.profile?.displayName) || "Sohbet";
+      return { otherId, user, name };
+    }
+
+    function formatLastSeen(value){
+      const ms = tsValue(value);
+      if (!ms) return "Son aktif: bilinmiyor";
+      const diff = Date.now() - ms;
+      if (diff < 60 * 1000) return "Son aktif: şimdi";
+      if (diff < 60 * 60 * 1000) return `Son aktif: ${Math.max(1, Math.floor(diff / 60000))} dk önce`;
+      if (diff < 24 * 60 * 60 * 1000) return `Son aktif: ${Math.max(1, Math.floor(diff / 3600000))} saat önce`;
+      return `Son aktif: ${new Date(ms).toLocaleString("tr-TR", { dateStyle:"short", timeStyle:"short" })}`;
+    }
+
+    async function touchActivity(){
+      if (!state.user) return;
+      try{
+        await updateDoc(doc(db, "users", state.user.uid), { lastSeenAt: serverTimestamp(), updatedAt: serverTimestamp() });
+      }catch{}
     }
 
     async function markConversationRead(convId){
@@ -1006,6 +1203,28 @@
         x.id !== editingId &&
         normalizeName(x.name) === target
       );
+    }
+
+    function getConversationFallback(id){
+      return state.currentConversationCache && state.currentConversationCache.id === id
+        ? state.currentConversationCache
+        : state.conversations.find(c => c.id === id) || null;
+    }
+
+    function getConversationPeople(conv){
+      const names = Array.from(new Set((conv?.memberNames || []).filter(Boolean)));
+      return names.length ? names : ["Sohbet"];
+    }
+
+    function conversationSearchText(conv){
+      const listing = state.listings.find(x => x.id === conv.listingId);
+      return [
+        listing?.name,
+        listing?.ownerName,
+        ...(conv?.memberNames || []),
+        conv?.lastMessage,
+        conv?.messages?.map(m => m.text).join(" ")
+      ].filter(Boolean).join(" ").toLowerCase();
     }
 
     function renderListingCard(item, forMine=false){
@@ -1092,6 +1311,13 @@
       refs.detailThumbs.innerHTML = images.map((src, idx) => `
         <img class="thumb ${idx === mainIndex ? 'active' : ''}" src="${src}" alt="Fotoğraf ${idx + 1}" onclick="window.__setDetailImage('${item.id}', ${idx})">
       `).join("") || `<div class="feed-item">Fotoğraf yok.</div>`;
+      refs.detailPhotoCount.textContent = `${images.length} fotoğraf`;
+      refs.detailAllImages.innerHTML = images.map((src, idx) => `
+        <div class="detail-photo">
+          <img src="${src}" alt="Fotoğraf ${idx + 1}" onclick="window.__setDetailImage('${item.id}', ${idx})" style="cursor:pointer">
+          <span>Fotoğraf ${idx + 1}${idx === mainIndex ? ' • Seçili' : ''}</span>
+        </div>
+      `).join("") || `<div class="feed-item">Fotoğraf yok.</div>`;
 
       const mine = state.user?.uid === item.ownerId;
       refs.btnDetailMessage.classList.toggle("hidden", !isPublished(item) || mine);
@@ -1099,10 +1325,12 @@
 
       refs.btnDetailMessage.onclick = async () => {
         refs.modalDetail.classList.remove("show");
+        document.body.style.overflow = "";
         await openConversation(item.id);
       };
       refs.btnDetailBuy.onclick = async () => {
         refs.modalDetail.classList.remove("show");
+        document.body.style.overflow = "";
         await buyListing(item.id);
       };
     }
@@ -1114,6 +1342,7 @@
       state.currentDetailImageIndex = 0;
       renderDetailModal(item);
       refs.modalDetail.classList.add("show");
+      document.body.style.overflow = "hidden";
     }
 
     async function setDetailImage(listingId, index){
@@ -1124,37 +1353,50 @@
       renderDetailModal(item);
     }
 
+    async function selectForAdmin(id){
+      const item = state.listings.find(x => x.id === id);
+      if (!item) return;
+      await openListingDetail(id);
+    }
+
     function renderConversationItem(conv){
       const listing = state.listings.find(x => x.id === conv.listingId);
-      const otherName = (conv.memberNames || []).find(n => n !== state.profile?.displayName) || "Sohbet";
+      const peer = getConversationPeer(conv);
       const unread = getUnreadCount(conv);
+      const avatar = escapeHtml(String(peer.name || "?").trim().slice(0,2).toUpperCase());
+      const lastSeen = peer.user?.lastSeenAt ? formatLastSeen(peer.user.lastSeenAt) : "Son aktif: bilinmiyor";
       return `
         <div class="item" style="cursor:pointer" onclick="window.__selectConversation('${conv.id}')">
-          <div class="item-head">
-            <strong>${escapeHtml(listing?.name || "İlan")} • ${escapeHtml(otherName)}</strong>
-            <span>${escapeHtml(conv.lastMessage || "Yeni konuşma")}</span>
-          </div>
-          <div class="item-actions" style="justify-content:space-between;align-items:center">
-            <div class="tiny">Mesajları açmak için dokun.</div>
-            ${unread > 0 ? `<span class="badge notify">${unread}</span>` : ""}
+          <div class="conversation-row">
+            <div class="conversation-avatar">${avatar}</div>
+            <div style="flex:1;min-width:0">
+              <div class="item-head" style="margin-bottom:4px">
+                <strong class="conversation-title">${escapeHtml(peer.name)}</strong>
+                ${unread > 0 ? `<span class="badge notify">${unread}</span>` : ""}
+              </div>
+              <div class="conversation-sub">${escapeHtml(listing?.name || "İlan")}</div>
+              <div class="conversation-sub" style="margin-top:6px">${escapeHtml(lastSeen)}</div>
+              <div class="conversation-sub" style="margin-top:4px">${escapeHtml(conv.lastMessage || "Yeni konuşma")}</div>
+            </div>
           </div>
         </div>
       `;
     }
 
     function renderConversation(){
-      const conv = state.conversations.find(c => c.id === state.currentConversationId);
+      const conv = getConversationFallback(state.currentConversationId);
       if (!conv){
-        refs.messagesBox.innerHTML = `<div class="feed-item">Bir konuşma seç.</div>`;
+        refs.messagesBox.innerHTML = `<div class="people-list-empty">Bir kişiye dokunup sohbeti aç.</div>`;
         refs.chatTitle.textContent = "Sohbet seçilmedi";
-        refs.chatSub.textContent = "İlan mesajları burada görünür";
+        refs.chatSub.textContent = "İnsan listesinden birini seç";
         refs.btnDeleteConversation.classList.add("hidden");
         return;
       }
 
       const listing = state.listings.find(x => x.id === conv.listingId);
+      const peer = getConversationPeer(conv);
       refs.chatTitle.textContent = listing?.name || "Sohbet";
-      refs.chatSub.textContent = conv.memberNames?.join(" • ") || "";
+      refs.chatSub.textContent = `${peer.name} • ${peer.user?.lastSeenAt ? formatLastSeen(peer.user.lastSeenAt) : "Son aktif: bilinmiyor"}`;
       refs.btnDeleteConversation.classList.remove("hidden");
 
       const html = (conv.messages || []).map(m => {
@@ -1172,11 +1414,23 @@
       const mine = myListings();
       const openCount = mine.filter(x => x.status === "published").length;
       const closedCount = mine.filter(x => x.status === "closed").length;
+      const avatar = p.avatarDataUrl || p.avatarUrl || p.photoURL || "";
+      const initials = (p.displayName || "?").trim().slice(0,2).toUpperCase();
+
+      refs.profileNameText.textContent = p.displayName || "-";
+      refs.profileEmailText.textContent = p.email || "E-posta görünmüyor";
+      refs.profileRolePill.textContent = state.isAdmin ? "Yönetici" : "Üye";
+      refs.profilePhotoPill.textContent = avatar ? "PP yüklü" : "PP yok";
+      refs.profileAvatarBox.innerHTML = avatar
+        ? `<img src="${escapeHtml(avatar)}" alt="Profil fotoğrafı">`
+        : `<span class="avatar-fallback">${escapeHtml(initials)}</span>`;
 
       refs.profileBox.innerHTML = `
         <div class="item"><div class="item-head"><strong>İsim</strong></div><span>${escapeHtml(p.displayName || "")}</span></div>
         <div class="item"><div class="item-head"><strong>Rol</strong></div><span>${state.isAdmin ? "Yönetici" : "Üye"}</span></div>
         <div class="item"><div class="item-head"><strong>Kullanıcı ID</strong></div><span>${escapeHtml(p.uid || "")}</span></div>
+        <div class="item"><div class="item-head"><strong>PP durumu</strong></div><span>${avatar ? "Yüklü" : "Yok"}</span></div>
+        <div class="item"><div class="item-head"><strong>Son aktif</strong></div><span>${escapeHtml(formatLastSeen(p.lastSeenAt))}</span></div>
       `;
       refs.profileStatsBox.innerHTML = `
         <div class="item"><div class="item-head"><strong>Toplam ilan</strong></div><span>${mine.length}</span></div>
@@ -1225,8 +1479,10 @@
     }
 
     function renderConversations(){
+      const q = (refs.messageSearchInput?.value || "").trim().toLowerCase();
       const mine = sortDescByDate(state.conversations).filter(c => (c.members || []).includes(state.user.uid));
-      refs.conversationList.innerHTML = mine.map(renderConversationItem).join("") || `<div class="feed-item">Henüz konuşma yok.</div>`;
+      const filtered = q ? mine.filter(c => conversationSearchText(c).includes(q)) : mine;
+      refs.conversationList.innerHTML = filtered.map(renderConversationItem).join("") || `<div class="people-list-empty">Henüz konuşma yok.</div>`;
       renderConversation();
     }
 
@@ -1276,7 +1532,25 @@
       });
     }
 
-    async function compressImageFile(file, maxSide = 1400, quality = 0.82){
+    function dataUrlToBlob(dataUrl){
+      const parts = String(dataUrl || "").split(",");
+      if (parts.length < 2) return null;
+      const match = parts[0].match(/data:(.*?);base64/);
+      const mime = match ? match[1] : "image/jpeg";
+      const bin = atob(parts[1]);
+      const len = bin.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+      return new Blob([bytes], { type: mime });
+    }
+
+    async function fileFromDataUrl(dataUrl){
+      const blob = dataUrlToBlob(dataUrl);
+      if (!blob) return null;
+      return blobToDataUrl(blob);
+    }
+
+    async function compressImageFile(file, maxSide = 1400, quality = 0.82, maxBytes = 950000){
       if (!file || !String(file.type || "").startsWith("image/")) {
         return fileToDataUrl(file);
       }
@@ -1284,27 +1558,35 @@
       const sourceUrl = URL.createObjectURL(file);
       try{
         const img = await loadImage(sourceUrl);
-        const scale = Math.min(1, maxSide / Math.max(img.naturalWidth || img.width || 1, img.naturalHeight || img.height || 1));
-        const width = Math.max(1, Math.round((img.naturalWidth || img.width || 1) * scale));
-        const height = Math.max(1, Math.round((img.naturalHeight || img.height || 1) * scale));
+        const naturalWidth = img.naturalWidth || img.width || 1;
+        const naturalHeight = img.naturalHeight || img.height || 1;
+        const safeSides = [maxSide, Math.round(maxSide * 0.85), Math.round(maxSide * 0.7), 1024, 768, 640, 512, 384];
+        const qualitySteps = [quality, 0.72, 0.62, 0.52, 0.42, 0.34, 0.28];
 
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d", { alpha: true });
-        ctx.drawImage(img, 0, 0, width, height);
+        let best = "";
+        for (const side of safeSides){
+          const scale = Math.min(1, side / Math.max(naturalWidth, naturalHeight));
+          const width = Math.max(1, Math.round(naturalWidth * scale));
+          const height = Math.max(1, Math.round(naturalHeight * scale));
 
-        const candidates = [quality, 0.72, 0.62, 0.52, 0.45];
-        for (const q of candidates){
-          const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", q));
-          if (!blob) continue;
-          const dataUrl = await blobToDataUrl(blob);
-          if (dataUrl.length <= 950000 || q === candidates[candidates.length - 1]) {
-            return dataUrl;
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d", { alpha: true });
+          ctx.drawImage(img, 0, 0, width, height);
+
+          for (const q of qualitySteps){
+            const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", q));
+            if (!blob) continue;
+            const dataUrl = await blobToDataUrl(blob);
+            best = dataUrl;
+            if (dataUrl.length <= maxBytes) {
+              return dataUrl;
+            }
           }
         }
 
-        // Fallback: even if canvas compression somehow fails, try the original file.
+        if (best) return best;
         return await fileToDataUrl(file);
       }finally{
         URL.revokeObjectURL(sourceUrl);
@@ -1369,6 +1651,43 @@
       state.unsubscribers = [];
     }
 
+    async function saveProfileUpdates({ displayName, avatarUrl, avatarDataUrl }){
+      if (!state.user) return;
+      const ref = doc(db, "users", state.user.uid);
+      const nextName = String(displayName || state.profile?.displayName || "Üye").trim();
+      const finalPhoto = avatarUrl || avatarDataUrl || null;
+      const payload = {
+        displayName: nextName,
+        avatarUrl: avatarUrl || null,
+        avatarDataUrl: avatarDataUrl || null,
+        email: state.user.email || state.profile?.email || null,
+        isAdmin: !!state.profile?.isAdmin,
+        updatedAt: serverTimestamp()
+      };
+      try{
+        await updateDoc(ref, payload);
+      }catch(err){
+        const message = String(err?.message || err?.code || "").toLowerCase();
+        if ((message.includes("document too large") || message.includes("1 mib") || message.includes("1,048,576"))){
+          const fallbackPayload = {
+            ...payload,
+            avatarDataUrl: state.profile?.avatarDataUrl || null,
+            avatarUrl: state.profile?.avatarUrl || null
+          };
+          await updateDoc(ref, fallbackPayload);
+          await updateProfile(state.user, { displayName: nextName, photoURL: fallbackPayload.avatarUrl || fallbackPayload.avatarDataUrl || null });
+          state.profile = { ...(state.profile || {}), ...fallbackPayload, uid: state.user.uid };
+          state.user.displayName = nextName;
+          return;
+        }
+        throw err;
+      }
+      await updateProfile(state.user, { displayName: nextName, photoURL: finalPhoto });
+      state.profile = { ...(state.profile || {}), ...payload, uid: state.user.uid };
+      state.user.displayName = nextName;
+      await touchActivity();
+    }
+
     async function loadLiveData(){
       clearListeners();
 
@@ -1395,10 +1714,19 @@
       const u4 = onSnapshot(collection(db, "conversations"), snap => {
         state.conversations = snap.docs.map(d => ({ id:d.id, ...d.data() }))
           .filter(c => (c.members || []).includes(state.user.uid));
+        if (state.currentConversationId){
+          const selected = state.conversations.find(c => c.id === state.currentConversationId);
+          if (selected) state.currentConversationCache = selected;
+        }
         renderAll();
       });
 
-      state.unsubscribers.push(u1,u2,u3,u4);
+      const u5 = onSnapshot(collection(db, "users"), snap => {
+        state.users = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        renderAll();
+      });
+
+      state.unsubscribers.push(u1,u2,u3,u4,u5);
     }
 
     async function openConversation(listingId){
@@ -1419,13 +1747,25 @@
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
-        conv = { id: ref.id, listingId };
+        conv = {
+          id: ref.id,
+          listingId,
+          members: [state.user.uid, item.ownerId],
+          memberNames: Array.from(new Set([state.profile.displayName, item.ownerName].filter(Boolean))),
+          messages: [],
+          lastMessage: "",
+          unreadBy: {}
+        };
         await logAction("Konuşma açıldı", `${state.profile.displayName} → ${item.name}`);
+      }else{
+        conv = { ...conv };
       }
 
       state.currentConversationId = conv.id;
+      state.currentConversationCache = conv;
       state.currentListingId = listingId;
       setView("messages");
+      await touchActivity();
       await markConversationRead(conv.id);
       renderAll();
     }
@@ -1460,8 +1800,21 @@
         updatedAt: serverTimestamp()
       });
 
+      state.currentConversationCache = {
+        ...(state.currentConversationCache || data),
+        id: state.currentConversationId,
+        messages: [...messages, next],
+        lastMessage: text,
+        unreadBy,
+        listingId: data.listingId,
+        members: data.members || [],
+        memberNames: data.memberNames || []
+      };
+
       refs.messageInput.value = "";
+      await touchActivity();
       await logAction("Mesaj", `${state.profile.displayName}: ${text}`);
+      renderAll();
     }
 
     async function buyListing(listingId){
@@ -1490,7 +1843,7 @@
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
-        conv = { id: ref.id, listingId };
+        conv = { id: ref.id, listingId, memberNames: Array.from(new Set([state.profile.displayName, item.ownerName].filter(Boolean))), messages:[{ uid:"system", name:"Sistem", text: buyText, type:"system", createdAt:new Date().toISOString() }], lastMessage: buyText, unreadBy:{ [item.ownerId]:1 } };
       }else{
         const convRef = doc(db, "conversations", conv.id);
         const snap = await getDoc(convRef);
@@ -1513,7 +1866,9 @@
       }
 
       await logAction("Satın al isteği", `${state.profile.displayName} → ${item.name}`);
+      await touchActivity();
       state.currentConversationId = conv.id;
+      state.currentConversationCache = conv;
       state.currentListingId = listingId;
       setView("messages");
       await markConversationRead(conv.id);
@@ -1674,6 +2029,14 @@
       refs.modalListing.classList.add("show");
     }
 
+    async function selectConversation(id){
+      state.currentConversationId = id;
+      state.currentConversationCache = state.conversations.find(c => c.id === id) || state.currentConversationCache;
+      setView("messages");
+      await markConversationRead(id);
+      renderAll();
+    }
+
     async function deleteConversation(){
       if (!state.currentConversationId) return;
       const ok = confirm("Bu sohbet silinsin mi?");
@@ -1681,6 +2044,7 @@
       await deleteDoc(doc(db, "conversations", state.currentConversationId));
       await logAction("Sohbet silindi", state.currentConversationId);
       state.currentConversationId = null;
+      state.currentConversationCache = null;
       renderAll();
     }
 
@@ -1727,6 +2091,82 @@
       refs.modalSeller.classList.remove("show");
       await openConversation(listing.id);
     }
+
+    function openProfileEdit(){
+      const p = state.profile || {};
+      refs.profileNameInput.value = p.displayName || state.user?.displayName || "";
+      refs.profileAvatarUrl.value = p.avatarUrl || p.photoURL || p.avatarDataUrl || "";
+      const avatar = p.avatarDataUrl || p.avatarUrl || p.photoURL || "";
+      if (avatar){
+        refs.profileAvatarPreview.src = avatar;
+        refs.profileAvatarPreview.classList.remove("hidden");
+      }else{
+        refs.profileAvatarPreview.classList.add("hidden");
+      }
+      refs.modalProfileEdit.classList.add("show");
+    }
+
+    async function clearProfilePhoto(){
+      if (!state.user) return;
+      refs.profileAvatarFile.value = "";
+      refs.profileAvatarUrl.value = "";
+      refs.profileAvatarPreview.classList.add("hidden");
+      try{
+        await saveProfileUpdates({
+          displayName: refs.profileNameInput.value.trim() || state.profile?.displayName || "Üye",
+          avatarUrl: null,
+          avatarDataUrl: null
+        });
+        await touchActivity();
+        renderAll();
+      }catch(err){
+        alert("PP silinemedi: " + firebaseErrorMessage(err));
+      }
+    }
+
+    refs.profileAvatarFile.addEventListener("change", async () => {
+      const file = refs.profileAvatarFile.files?.[0];
+      if (!file) return;
+      const data = await compressImageFile(file, 384, 0.78, 220000);
+      refs.profileAvatarPreview.src = data;
+      refs.profileAvatarPreview.classList.remove("hidden");
+      refs.profileAvatarUrl.value = "";
+    });
+
+    refs.profileAvatarUrl.addEventListener("input", () => {
+      const url = refs.profileAvatarUrl.value.trim();
+      if (url){
+        refs.profileAvatarPreview.src = url;
+        refs.profileAvatarPreview.classList.remove("hidden");
+      }else if (!refs.profileAvatarFile.files?.[0]){
+        refs.profileAvatarPreview.classList.add("hidden");
+      }
+    });
+
+    refs.profileForm.onsubmit = async (e) => {
+      e.preventDefault();
+      if (!state.user) return;
+      const name = refs.profileNameInput.value.trim() || state.profile?.displayName || "Üye";
+      const file = refs.profileAvatarFile.files?.[0];
+      const url = refs.profileAvatarUrl.value.trim();
+      let avatarDataUrl = state.profile?.avatarDataUrl || null;
+      let avatarUrl = url || state.profile?.avatarUrl || null;
+      if (file){
+        avatarDataUrl = await compressImageFile(file, 384, 0.78, 220000);
+        avatarUrl = null;
+      }else if (url){
+        avatarDataUrl = null;
+      }
+
+      try{
+        await saveProfileUpdates({ displayName: name, avatarUrl, avatarDataUrl });
+        refs.modalProfileEdit.classList.remove("show");
+        await touchActivity();
+        renderAll();
+      }catch(err){
+        alert("Profil kaydedilemedi: " + firebaseErrorMessage(err));
+      }
+    };
 
     refs.tabLogin.onclick = () => {
       refs.tabLogin.classList.add("active");
@@ -1788,12 +2228,16 @@
     };
 
     refs.btnOpenAdd.onclick = openModalForNew;
+    refs.btnEditProfile.onclick = openProfileEdit;
+    refs.btnDeleteProfilePhoto.onclick = clearProfilePhoto;
     refs.btnCloseModal.onclick = () => refs.modalListing.classList.remove("show");
+    refs.btnCloseProfileEdit.onclick = () => refs.modalProfileEdit.classList.remove("show");
     refs.btnLogout.onclick = async () => { await signOut(auth); };
     refs.btnRefresh.onclick = async () => { await cleanupExpired(); renderAll(); };
     refs.btnSendMessage.onclick = () => sendMessage();
     refs.btnDeleteConversation.onclick = deleteConversation;
     refs.searchInput.oninput = renderAll;
+    refs.messageSearchInput.oninput = renderAll;
     refs.filterType.onchange = renderAll;
     refs.filterCategory.onchange = renderAll;
 
@@ -1803,8 +2247,14 @@
     refs.modalSeller.addEventListener("click", (e) => {
       if (e.target === refs.modalSeller) refs.modalSeller.classList.remove("show");
     });
+    refs.modalProfileEdit.addEventListener("click", (e) => {
+      if (e.target === refs.modalProfileEdit) refs.modalProfileEdit.classList.remove("show");
+    });
     refs.modalDetail.addEventListener("click", (e) => {
-      if (e.target === refs.modalDetail) refs.modalDetail.classList.remove("show");
+      if (e.target === refs.modalDetail) {
+        refs.modalDetail.classList.remove("show");
+        document.body.style.overflow = "";
+      }
     });
 
     refs.adImageFile.addEventListener("change", async () => {
@@ -1829,7 +2279,10 @@
     refs.listingForm.onsubmit = addListing;
 
     refs.btnCloseSeller.onclick = () => refs.modalSeller.classList.remove("show");
-    refs.btnCloseDetail.onclick = () => refs.modalDetail.classList.remove("show");
+    refs.btnCloseDetail.onclick = () => {
+      refs.modalDetail.classList.remove("show");
+      document.body.style.overflow = "";
+    };
     refs.btnMessageSeller.onclick = messageSeller;
 
     document.querySelectorAll(".menu button").forEach(btn => {
@@ -1852,6 +2305,8 @@
       if (!user){
         state.profile = null;
         state.isAdmin = false;
+        state.currentConversationCache = null;
+        state.currentConversationId = null;
         setAuthScreen();
         return;
       }
@@ -1860,6 +2315,7 @@
       state.profile = await ensureUserDoc(user, dn, false);
       state.isAdmin = !!state.profile.isAdmin;
       setAppScreen();
+      await touchActivity();
       await loadLiveData();
       setView("shop");
       await cleanupExpired();
@@ -1869,7 +2325,9 @@
       if (e.key === "Escape") {
         refs.modalListing.classList.remove("show");
         refs.modalSeller.classList.remove("show");
+        refs.modalProfileEdit.classList.remove("show");
         refs.modalDetail.classList.remove("show");
+        document.body.style.overflow = "";
       }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
         e.preventDefault();
@@ -1883,8 +2341,16 @@
     setInterval(async () => {
       try{
         await cleanupExpired();
+        await touchActivity();
       }catch{}
     }, 10 * 60 * 1000);
+
+    window.addEventListener("focus", () => { touchActivity().catch(() => {}); });
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        touchActivity().catch(() => {});
+      }
+    });
   </script>
 </body>
 </html>
