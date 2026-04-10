@@ -639,7 +639,7 @@
           <div class="two">
             <div class="field">
               <label>Ürün adı</label>
-              <input id="adName" class="input" placeholder="Örn: Lego seti" />
+              <input id="adName" class="input" placeholder="Örn: Lego seti" maxlength="40" />
             </div>
             <div class="field">
               <label>Etiketler</label>
@@ -996,6 +996,12 @@
         .replaceAll("'","&#39;");
     }
 
+    function truncateText(str, maxLen = 50){
+      const value = String(str ?? "").trim();
+      if (value.length <= maxLen) return value;
+      return value.slice(0, maxLen) + "...";
+    }
+
     function tsValue(ts){
       if (!ts) return 0;
       try{
@@ -1298,8 +1304,8 @@
               ${isMine ? `<span class="badge mine">Senin ilan</span>` : ""}
             </div>
 
-            <h4 style="cursor:pointer" onclick="window.__openListingDetail('${item.id}')">${escapeHtml(item.name)}</h4>
-            <p>${escapeHtml(item.description || "")}</p>
+            <h4 style="cursor:pointer" title="${escapeHtml(item.name)}" onclick="window.__openListingDetail('${item.id}')">${escapeHtml(truncateText(item.name || "", 40))}</h4>
+            <p>${escapeHtml(truncateText(item.description || "", 50))}</p>
             <div class="row">${tags}</div>
             <div class="row">${renderPriceBlock(item)}</div>
             <div class="row">
