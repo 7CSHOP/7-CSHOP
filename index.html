@@ -170,6 +170,46 @@
       margin-top:8px;width:100%;max-height:180px;border-radius:16px;border:1px dashed var(--line);
       object-fit:cover;background:#f8fafc
     }
+    .price-wrap{display:grid;gap:6px;align-items:start}
+    .price-old{
+      color:#9ca3af;
+      text-decoration:line-through;
+      font-size:13px;
+      letter-spacing:.01em;
+      opacity:.82;
+    }
+    .price-new{
+      font-size:18px;
+      font-weight:900;
+      color:var(--text);
+    }
+    .discount-badge{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:6px 10px;border-radius:999px;
+      background:#dcfce7;color:#166534;
+      font-size:12px;font-weight:900;
+    }
+    .gallery{display:grid;gap:12px}
+    .gallery-main{
+      width:100%;height:min(52vh,420px);object-fit:cover;
+      border-radius:20px;border:1px solid var(--line);background:#f3f4f6;
+      box-shadow:var(--shadow);
+    }
+    .thumbs{display:flex;gap:10px;overflow:auto;padding-bottom:4px}
+    .thumb{
+      width:84px;height:84px;flex:0 0 auto;object-fit:cover;cursor:pointer;
+      border-radius:16px;border:2px solid transparent;background:#f3f4f6;
+      opacity:.78;transition:.15s;
+    }
+    .thumb:hover{transform:translateY(-1px);opacity:1}
+    .thumb.active{border-color:var(--accent);opacity:1}
+    .detail-top{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:start}
+    .detail-meta{display:grid;gap:10px}
+    .detail-meta .item{box-shadow:none}
+    .detail-actions{display:flex;gap:10px;flex-wrap:wrap}
+    @media (max-width:900px){
+      .detail-top{grid-template-columns:1fr}
+    }
     .tiny{font-size:11px;color:var(--muted)}
     .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .list{display:grid;gap:12px}
@@ -493,35 +533,60 @@
               </select>
             </div>
           </div>
+
           <div class="two">
             <div class="field">
               <label>Ürün adı</label>
               <input id="adName" class="input" placeholder="Örn: Lego seti" />
             </div>
             <div class="field">
-              <label>Fiyat / istenen</label>
-              <input id="adPrice" class="input" placeholder="Örn: 50 TL / oyuncak" />
+              <label>Etiketler</label>
+              <input id="adTags" class="input" placeholder="örnek: yeni, temiz, acil" />
             </div>
           </div>
+
           <div class="field">
             <label>Açıklama</label>
             <textarea id="adDesc" class="input" placeholder="Ürün durumu, ne istediğin, pazarlık notu..."></textarea>
           </div>
+
+          <div class="notice">
+            İstersen indirimli ilan açabilirsin. Eski fiyat üstte çizili görünür, yeni fiyat normal görünür.
+          </div>
+
           <div class="two">
             <div class="field">
-              <label>Görüntü URL</label>
-              <input id="adImageUrl" class="input" placeholder="https://..." />
+              <label><input id="adDiscount" type="checkbox" /> İndirimli ilan</label>
+              <div class="hint">Açarsan eski fiyat ve yeni fiyat ayrı görünür.</div>
             </div>
             <div class="field">
-              <label>veya dosya yükle</label>
-              <input id="adImageFile" class="input" type="file" accept="image/*" />
+              <label>Eski fiyat</label>
+              <input id="adOldPrice" class="input" placeholder="Örn: 150 TL" />
             </div>
           </div>
+
           <div class="field">
-            <label>Etiketler</label>
-            <input id="adTags" class="input" placeholder="örnek: yeni, temiz, acil" />
+            <label>Yeni fiyat / istenen</label>
+            <input id="adNewPrice" class="input" placeholder="Örn: 99 TL / oyuncak" />
           </div>
-          <img id="imagePreview" class="preview hidden" alt="Önizleme">
+
+          <div class="two">
+            <div class="field">
+              <label>Fotoğraf ekle</label>
+              <input id="adImageFile" class="input" type="file" accept="image/*" multiple />
+              <div class="hint">Birden fazla fotoğraf seçebilirsin. İlk fotoğraf kapakta görünür.</div>
+            </div>
+            <div class="field">
+              <label>Fotoğraf URL'leri</label>
+              <textarea id="adImageUrls" class="input" placeholder="Her satıra bir fotoğraf URL'si yazabilirsin."></textarea>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Kapak önizleme</label>
+            <img id="imagePreview" class="preview hidden" alt="Önizleme">
+          </div>
+
           <button class="btn" type="submit">Kaydet</button>
         </form>
       </div>
@@ -555,6 +620,49 @@
               <div class="hr"></div>
               <div class="list" id="sellerRecentAds"></div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalDetail" class="modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <strong id="detailTitle">İlan detayı</strong>
+        <button id="btnCloseDetail" class="chip">Kapat</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-top">
+          <div class="gallery">
+            <img id="detailMainImage" class="gallery-main" alt="İlan fotoğrafı">
+            <div id="detailThumbs" class="thumbs"></div>
+          </div>
+          <div class="detail-meta">
+            <div class="item">
+              <div class="item-head">
+                <strong id="detailName">-</strong>
+                <span id="detailStatus">-</span>
+              </div>
+              <div class="tiny" id="detailSeller">-</div>
+            </div>
+            <div class="item">
+              <div class="item-head"><strong>Fiyat</strong></div>
+              <div id="detailPriceBox" class="price-wrap"></div>
+            </div>
+            <div class="item">
+              <div class="item-head"><strong>Açıklama</strong></div>
+              <div id="detailDesc" class="tiny" style="font-size:13px;line-height:1.6"></div>
+            </div>
+            <div class="item">
+              <div class="item-head"><strong>Etiketler</strong></div>
+              <div id="detailTags" class="row"></div>
+            </div>
+            <div class="detail-actions">
+              <button id="btnDetailMessage" class="btn" type="button">Mesajlaş</button>
+              <button id="btnDetailBuy" class="btn good" type="button">Satın al</button>
+            </div>
+            <div class="notice">İlana göz atınca diğer fotoğraflar burada görünür.</div>
           </div>
         </div>
       </div>
@@ -651,11 +759,27 @@
       adName: $("adName"),
       adPrice: $("adPrice"),
       adDesc: $("adDesc"),
-      adImageUrl: $("adImageUrl"),
+      adDiscount: $("adDiscount"),
+      adOldPrice: $("adOldPrice"),
+      adNewPrice: $("adNewPrice"),
+      adImageUrls: $("adImageUrls"),
       adImageFile: $("adImageFile"),
       adTags: $("adTags"),
       imagePreview: $("imagePreview"),
       modalSeller: $("modalSeller"),
+      modalDetail: $("modalDetail"),
+      btnCloseDetail: $("btnCloseDetail"),
+      btnDetailMessage: $("btnDetailMessage"),
+      btnDetailBuy: $("btnDetailBuy"),
+      detailTitle: $("detailTitle"),
+      detailMainImage: $("detailMainImage"),
+      detailThumbs: $("detailThumbs"),
+      detailName: $("detailName"),
+      detailStatus: $("detailStatus"),
+      detailSeller: $("detailSeller"),
+      detailPriceBox: $("detailPriceBox"),
+      detailDesc: $("detailDesc"),
+      detailTags: $("detailTags"),
       btnCloseSeller: $("btnCloseSeller"),
       btnMessageSeller: $("btnMessageSeller"),
       sellerName: $("sellerName"),
@@ -677,6 +801,8 @@
       currentListingId: null,
       currentSellerId: null,
       currentSeller: null,
+      currentDetailListingId: null,
+      currentDetailImageIndex: 0,
       unsubscribers: []
     };
 
@@ -760,12 +886,33 @@
       renderAll();
     }
 
+    function listingImages(item){
+      const images = Array.isArray(item?.images) ? item.images.filter(Boolean) : [];
+      const fallback = item?.imageData || item?.imageUrl;
+      if (fallback && !images.includes(fallback)) images.unshift(fallback);
+      return images.length ? images : [];
+    }
+
     function listingImage(item){
-      return item.imageData || item.imageUrl || "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+      const first = listingImages(item)[0];
+      return first || "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
         <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
           <rect width="1200" height="700" fill="#f3f4f6"/>
           <text x="600" y="350" text-anchor="middle" font-size="40" fill="#9ca3af" font-family="Arial">Görsel yok</text>
         </svg>`);
+    }
+
+    function renderPriceBlock(item){
+      if (item?.isDiscounted && item.oldPriceLabel && item.newPriceLabel){
+        return `
+          <div class="price-wrap">
+            <span class="price-old">${escapeHtml(item.oldPriceLabel)}</span>
+            <span class="price-new">${escapeHtml(item.newPriceLabel)}</span>
+            <span class="discount-badge">İndirimli</span>
+          </div>
+        `;
+      }
+      return `<span class="price-tag">${escapeHtml(item?.priceLabel || item?.newPriceLabel || "İstenen yok")}</span>`;
     }
 
     async function ensureUserDoc(user, displayName, isAdmin=false){
@@ -875,7 +1022,7 @@
 
       return `
         <div class="card">
-          <img src="${listingImage(item)}" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
+          <img src="${listingImage(item)}" alt="${escapeHtml(item.name)}" onclick="window.__openListingDetail('${item.id}')" style="cursor:pointer" onerror="this.style.display='none'">
           <div class="card-body">
             <div class="meta">
               <span>${owner}</span>
@@ -899,13 +1046,14 @@
               ${isMine ? `<span class="badge mine">Senin ilan</span>` : ""}
             </div>
 
-            <h4>${escapeHtml(item.name)}</h4>
+            <h4 style="cursor:pointer" onclick="window.__openListingDetail('${item.id}')">${escapeHtml(item.name)}</h4>
             <p>${escapeHtml(item.description || "")}</p>
             <div class="row">${tags}</div>
-            <div class="row"><span class="price-tag">${escapeHtml(item.priceLabel || "İstenen yok")}</span></div>
+            <div class="row">${renderPriceBlock(item)}</div>
             <div class="row">
               ${isPublished(item) && !isMine ? `<button class="btn" onclick="window.__openConversation('${item.id}')">Mesaj</button>` : `<button class="btn secondary" disabled>${isPublished(item) ? (isMine ? "Kendi ilanım" : "Kapalı") : "Kapalı"}</button>`}
               ${isPublished(item) && !isMine ? `<button class="btn good" onclick="window.__buyListing('${item.id}')">Satın al</button>` : ""}
+              <button class="btn secondary" onclick="window.__openListingDetail('${item.id}')">İlana göz at</button>
               ${forMine ? `<button class="btn secondary" onclick="window.__editListing('${item.id}')">Düzenle</button>` : ""}
               ${forMine ? `<button class="btn warn" onclick="window.__toggleListing('${item.id}')">${item.status === "published" ? "Kapat" : "Aç"}</button>` : ""}
               ${forMine ? `<button class="btn bad" onclick="window.__removeListing('${item.id}')">Sil</button>` : ""}
@@ -914,6 +1062,66 @@
           </div>
         </div>
       `;
+    }
+
+    function renderDetailModal(item){
+      if (!item) return;
+      const images = listingImages(item);
+      const mainIndex = Math.min(state.currentDetailImageIndex || 0, Math.max(images.length - 1, 0));
+      const mainImage = images[mainIndex] || listingImage(item);
+
+      refs.detailTitle.textContent = item.name || "İlan detayı";
+      refs.detailName.textContent = item.name || "-";
+      refs.detailStatus.innerHTML = item.status === "published" ? '<span class="badge ok">Yayında</span>' : '<span class="badge closed">Kapalı</span>';
+      refs.detailSeller.textContent = `${item.ownerName || "Bilinmeyen"} • ${formatDate(item.createdAt)}`;
+
+      if (item.isDiscounted && item.oldPriceLabel && item.newPriceLabel){
+        refs.detailPriceBox.innerHTML = `
+          <span class="price-old">${escapeHtml(item.oldPriceLabel)}</span>
+          <span class="price-new">${escapeHtml(item.newPriceLabel)}</span>
+          <span class="discount-badge">İndirimli</span>
+        `;
+      }else{
+        refs.detailPriceBox.innerHTML = `<span class="price-new">${escapeHtml(item.priceLabel || item.newPriceLabel || "İstenen yok")}</span>`;
+      }
+
+      refs.detailDesc.textContent = item.description || "";
+      refs.detailTags.innerHTML = (item.tags || []).map(t => `<span class="pill">#${escapeHtml(t)}</span>`).join("") || `<span class="tiny">Etiket yok</span>`;
+      refs.detailMainImage.src = mainImage;
+      refs.detailMainImage.alt = item.name || "İlan fotoğrafı";
+      refs.detailThumbs.innerHTML = images.map((src, idx) => `
+        <img class="thumb ${idx === mainIndex ? 'active' : ''}" src="${src}" alt="Fotoğraf ${idx + 1}" onclick="window.__setDetailImage('${item.id}', ${idx})">
+      `).join("") || `<div class="feed-item">Fotoğraf yok.</div>`;
+
+      const mine = state.user?.uid === item.ownerId;
+      refs.btnDetailMessage.classList.toggle("hidden", !isPublished(item) || mine);
+      refs.btnDetailBuy.classList.toggle("hidden", !isPublished(item) || mine);
+
+      refs.btnDetailMessage.onclick = async () => {
+        refs.modalDetail.classList.remove("show");
+        await openConversation(item.id);
+      };
+      refs.btnDetailBuy.onclick = async () => {
+        refs.modalDetail.classList.remove("show");
+        await buyListing(item.id);
+      };
+    }
+
+    async function openListingDetail(id){
+      const item = state.listings.find(x => x.id === id);
+      if (!item) return;
+      state.currentDetailListingId = id;
+      state.currentDetailImageIndex = 0;
+      renderDetailModal(item);
+      refs.modalDetail.classList.add("show");
+    }
+
+    async function setDetailImage(listingId, index){
+      const item = state.listings.find(x => x.id === listingId);
+      if (!item) return;
+      state.currentDetailListingId = listingId;
+      state.currentDetailImageIndex = index;
+      renderDetailModal(item);
     }
 
     function renderConversationItem(conv){
@@ -1318,28 +1526,40 @@
       const editId = refs.listingForm.dataset.editId || "";
       const name = refs.adName.value.trim();
       const description = refs.adDesc.value.trim();
-      const priceLabel = refs.adPrice.value.trim();
+      const isDiscounted = !!refs.adDiscount.checked;
+      const oldPriceLabel = refs.adOldPrice.value.trim();
+      const newPriceLabel = refs.adNewPrice.value.trim();
       const type = refs.adType.value;
       const category = refs.adCategory.value;
-      const imageUrl = refs.adImageUrl.value.trim();
       const tags = refs.adTags.value.split(",").map(x => x.trim()).filter(Boolean);
-      const file = refs.adImageFile.files?.[0];
+      const fileList = Array.from(refs.adImageFile.files || []);
+      const urlList = refs.adImageUrls.value.split(/\n+/).map(x => x.trim()).filter(Boolean);
+      const existingImages = (() => {
+        try { return JSON.parse(refs.listingForm.dataset.existingImages || "[]"); }
+        catch { return []; }
+      })();
 
-      if (!name || !description || !priceLabel) return alert("Ürün adı, açıklama ve istenen alanı zorunlu.");
+      if (!name || !description || !newPriceLabel) return alert("Ürün adı, açıklama ve yeni fiyat / istenen alanı zorunlu.");
+      if (isDiscounted && !oldPriceLabel) return alert("İndirimli ilan için eski fiyat gerekli.");
 
       if (isDuplicateListingName(name, editId)) {
         alert("Bu hesapta aynı isimli ilan zaten var.");
         return;
       }
 
-      let imageData = "";
-      if (file) imageData = await compressImageFile(file);
-      else if (imageUrl) imageData = imageUrl;
-      if (!imageData) return alert("Görüntü zorunlu.");
+      const images = [];
+      for (const file of fileList) {
+        const compressed = await compressImageFile(file);
+        if (compressed) images.push(compressed);
+      }
+      for (const url of urlList) images.push(url);
 
-      // Firestore belge boyutu aşıldığında yazma başarısız olur. Bunu daha önce yakalayıp net mesaj gösteriyoruz.
-      if (String(imageData).length > 950000) {
-        alert("Görsel hâlâ çok büyük. Lütfen daha küçük bir fotoğraf kullan.");
+      const finalImages = images.filter(Boolean).length ? images.filter(Boolean) : (editId ? existingImages : []);
+      if (!finalImages.length) return alert("En az bir fotoğraf eklemelisin.");
+
+      const mainImage = finalImages[0];
+      if (String(mainImage).length > 950000) {
+        alert("Kapak görseli hâlâ çok büyük. Lütfen daha küçük bir fotoğraf kullan.");
         return;
       }
 
@@ -1349,12 +1569,16 @@
         ownerName: state.profile.displayName,
         name,
         description,
-        priceLabel,
+        priceLabel: newPriceLabel,
+        oldPriceLabel: isDiscounted ? oldPriceLabel : "",
+        newPriceLabel,
+        isDiscounted,
         type,
         category,
         tags,
-        imageData,
-        imageUrl: file ? null : imageUrl,
+        images: finalImages,
+        imageData: mainImage,
+        imageUrl: mainImage,
         status: "published",
         createdAtMs: editId ? (state.listings.find(x => x.id === editId)?.createdAtMs || now) : now,
         updatedAtMs: now,
@@ -1376,6 +1600,7 @@
         }
 
         refs.listingForm.reset();
+        refs.listingForm.dataset.existingImages = "";
         refs.imagePreview.classList.add("hidden");
         refs.listingForm.dataset.editId = "";
         refs.modalListing.classList.remove("show");
@@ -1419,15 +1644,19 @@
       state.lastViewBeforeModal = state.view;
       refs.modalTitle.textContent = "İlan düzenle";
       refs.listingForm.dataset.editId = id;
+      refs.listingForm.dataset.existingImages = JSON.stringify(listingImages(item));
       refs.adType.value = item.type || "swap";
       refs.adCategory.value = item.category || "diger";
       refs.adName.value = item.name || "";
-      refs.adPrice.value = item.priceLabel || "";
-      refs.adDesc.value = item.description || "";
-      refs.adImageUrl.value = item.imageUrl || (item.imageData?.startsWith("data:") ? "" : item.imageData || "");
       refs.adTags.value = (item.tags || []).join(", ");
-      if (item.imageData){
-        refs.imagePreview.src = item.imageData;
+      refs.adDesc.value = item.description || "";
+      refs.adDiscount.checked = !!item.isDiscounted;
+      refs.adOldPrice.value = item.oldPriceLabel || "";
+      refs.adNewPrice.value = item.newPriceLabel || item.priceLabel || "";
+      refs.adImageUrls.value = "";
+      refs.adImageFile.value = "";
+      if (listingImages(item)[0]){
+        refs.imagePreview.src = listingImages(item)[0];
         refs.imagePreview.classList.remove("hidden");
       }else{
         refs.imagePreview.classList.add("hidden");
@@ -1435,29 +1664,11 @@
       refs.modalListing.classList.add("show");
     }
 
-    async function selectConversation(id){
-      state.currentConversationId = id;
-      setView("messages");
-      await markConversationRead(id);
-      renderAll();
-    }
-
-    async function selectForAdmin(id){
-      state.currentListingId = id;
-      const item = state.listings.find(x => x.id === id);
-      if (!item) return;
-      if (isPublished(item)){
-        await openConversation(id);
-      }else{
-        setView("shop");
-        renderAll();
-      }
-    }
-
     async function openModalForNew(){
       state.lastViewBeforeModal = state.view;
       refs.modalTitle.textContent = "İlan ekle";
       refs.listingForm.dataset.editId = "";
+      refs.listingForm.dataset.existingImages = "";
       refs.listingForm.reset();
       refs.imagePreview.classList.add("hidden");
       refs.modalListing.classList.add("show");
@@ -1592,6 +1803,9 @@
     refs.modalSeller.addEventListener("click", (e) => {
       if (e.target === refs.modalSeller) refs.modalSeller.classList.remove("show");
     });
+    refs.modalDetail.addEventListener("click", (e) => {
+      if (e.target === refs.modalDetail) refs.modalDetail.classList.remove("show");
+    });
 
     refs.adImageFile.addEventListener("change", async () => {
       const file = refs.adImageFile.files?.[0];
@@ -1599,11 +1813,11 @@
       const data = await fileToDataUrl(file);
       refs.imagePreview.src = data;
       refs.imagePreview.classList.remove("hidden");
-      refs.adImageUrl.value = "";
+      refs.adImageUrls.value = "";
     });
 
-    refs.adImageUrl.addEventListener("input", () => {
-      const url = refs.adImageUrl.value.trim();
+    refs.adImageUrls.addEventListener("input", () => {
+      const url = refs.adImageUrls.value.split(/\n+/).map(x => x.trim()).find(Boolean);
       if (url){
         refs.imagePreview.src = url;
         refs.imagePreview.classList.remove("hidden");
@@ -1615,6 +1829,7 @@
     refs.listingForm.onsubmit = addListing;
 
     refs.btnCloseSeller.onclick = () => refs.modalSeller.classList.remove("show");
+    refs.btnCloseDetail.onclick = () => refs.modalDetail.classList.remove("show");
     refs.btnMessageSeller.onclick = messageSeller;
 
     document.querySelectorAll(".menu button").forEach(btn => {
@@ -1629,6 +1844,8 @@
     window.__selectForAdmin = selectForAdmin;
     window.__openSeller = openSellerProfile;
     window.__buyListing = buyListing;
+    window.__openListingDetail = openListingDetail;
+    window.__setDetailImage = setDetailImage;
 
     onAuthStateChanged(auth, async (user) => {
       state.user = user || null;
@@ -1652,6 +1869,7 @@
       if (e.key === "Escape") {
         refs.modalListing.classList.remove("show");
         refs.modalSeller.classList.remove("show");
+        refs.modalDetail.classList.remove("show");
       }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
         e.preventDefault();
