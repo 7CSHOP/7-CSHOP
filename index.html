@@ -277,6 +277,23 @@
       display:grid;place-items:center;font-weight:900;
       background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;
     }
+    .conversation-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .mini-avatar{
+      width:36px;height:36px;border-radius:50%;flex:0 0 auto;overflow:hidden;
+      display:grid;place-items:center;font-weight:900;background:#eff6ff;color:#1d4ed8;
+      border:1px solid #bfdbfe;
+    }
+    .mini-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .seller-box .mini-avatar{margin-right:10px}
+    .seller-identity{display:flex;align-items:center;gap:10px;min-width:0}
+    .seller-identity .seller-text{min-width:0}
+    .seller-identity .seller-text strong,.seller-identity .seller-text small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .msg-row{display:flex;gap:10px;align-items:flex-end}
+    .msg-row.me{justify-content:flex-end}
+    .msg-avatar{width:32px;height:32px;border-radius:50%;overflow:hidden;flex:0 0 auto;display:grid;place-items:center;font-size:12px;font-weight:900;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+    .msg-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .msg-content{max-width:78%;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:#fff}
+    .msg-content.me{background:#dbeafe;border-color:#bfdbfe}
     .people-list-empty{padding:16px;border:1px dashed var(--line);border-radius:18px;background:#fff;color:var(--muted)}
     .profile-hero{
       display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;
@@ -706,9 +723,12 @@
           <div class="panel" style="box-shadow:none">
             <div class="panel-inner">
               <div class="seller-box">
-                <div>
-                  <strong id="sellerName">-</strong>
-                  <small id="sellerRole">-</small>
+                <div class="seller-identity">
+                  <div class="mini-avatar" id="sellerAvatarBox"><span>?</span></div>
+                  <div class="seller-text">
+                    <strong id="sellerName">-</strong>
+                    <small id="sellerRole">-</small>
+                  </div>
                 </div>
                 <button id="btnMessageSeller" class="btn">Mesajlaş</button>
               </div>
@@ -782,7 +802,7 @@
                 <strong id="detailName">-</strong>
                 <span id="detailStatus">-</span>
               </div>
-              <div class="tiny" id="detailSeller">-</div>
+              <div id="detailSeller" class="seller-box" style="margin-top:8px"></div>
             </div>
             <div class="item">
               <div class="item-head"><strong>Fiyat</strong></div>
@@ -946,6 +966,7 @@
       detailAllImages: $("detailAllImages"),
       btnCloseSeller: $("btnCloseSeller"),
       btnMessageSeller: $("btnMessageSeller"),
+      sellerAvatarBox: $("sellerAvatarBox"),
       sellerName: $("sellerName"),
       sellerRole: $("sellerRole"),
       sellerStats: $("sellerStats"),
@@ -1163,6 +1184,19 @@
       return state.users.find(u => u.uid === uid) || null;
     }
 
+    function getUserAvatar(uid){
+      if (!uid) return "";
+      const user = getUserById(uid) || (state.user?.uid === uid ? state.profile : null);
+      return user?.avatarDataUrl || user?.avatarUrl || user?.photoURL || "";
+    }
+
+    function getAvatarMarkup(avatarUrl, label){
+      const initials = String(label || "?").trim().slice(0, 2).toUpperCase() || "?";
+      return avatarUrl
+        ? `<img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(label || "Avatar")}">`
+        : `<span>${escapeHtml(initials)}</span>`;
+    }
+
     function getConversationPeer(conv){
       const otherId = (conv?.members || []).find(id => id && id !== state.user?.uid) || null;
       const user = otherId ? getUserById(otherId) : null;
@@ -1307,11 +1341,14 @@
             </div>
 
             <div class="seller-box">
-              <div>
-                <strong>
-                  <button class="profile-link" onclick="window.__openSeller('${item.ownerId}','${item.id}')">${owner}</button>
-                </strong>
-                <small>${isMine ? "Bu ilan sana ait." : "Profiline tıkla, mesajlaş."}</small>
+              <div class="seller-identity">
+                <div class="mini-avatar">${getAvatarMarkup(getUserAvatar(item.ownerId), item.ownerName || owner)}</div>
+                <div class="seller-text">
+                  <strong>
+                    <button class="profile-link" onclick="window.__openSeller('${item.ownerId}','${item.id}')">${owner}</button>
+                  </strong>
+                  <small>${isMine ? "Bu ilan sana ait." : "Profiline tıkla, mesajlaş."}</small>
+                </div>
               </div>
               <button class="btn secondary" onclick="window.__openSeller('${item.ownerId}','${item.id}')">Profil</button>
             </div>
@@ -1364,6 +1401,16 @@
         `;
       }
 
+      const sellerAvatar = getUserAvatar(item.ownerId);
+      refs.detailSeller.innerHTML = `
+        <div class="seller-identity" style="width:100%">
+          <div class="mini-avatar">${getAvatarMarkup(sellerAvatar, item.ownerName || "Satıcı")}</div>
+          <div class="seller-text">
+            <strong>${escapeHtml(item.ownerName || "Bilinmeyen")}</strong>
+            <small>${escapeHtml(formatDate(item.createdAt))}</small>
+          </div>
+        </div>
+      `;
       refs.detailDesc.textContent = item.description || "";
       refs.detailTags.innerHTML = (item.tags || []).map(t => `<span class="pill">#${escapeHtml(t)}</span>`).join("") || `<span class="tiny">Etiket yok</span>`;
       refs.detailMainImage.src = mainImage;
@@ -1422,12 +1469,13 @@
     function renderConversationItem(conv){
       const peer = getConversationPeer(conv);
       const unread = getUnreadCount(conv);
+      const avatarUrl = getUserAvatar(peer.otherId);
       const avatar = escapeHtml(String(peer.name || "?").trim().slice(0,2).toUpperCase());
       const lastSeen = peer.user?.lastSeenAt ? formatLastSeen(peer.user.lastSeenAt) : "Son aktif: bilinmiyor";
       return `
         <div class="item" style="cursor:pointer" onclick="window.__selectConversation('${conv.id}')">
           <div class="conversation-row">
-            <div class="conversation-avatar">${avatar}</div>
+            <div class="conversation-avatar">${getAvatarMarkup(avatarUrl, peer.name || avatar)}</div>
             <div style="flex:1;min-width:0">
               <div class="item-head" style="margin-bottom:4px">
                 <strong class="conversation-title">${escapeHtml(peer.name)}</strong>
@@ -1462,7 +1510,22 @@
         const mine = m.uid === state.user.uid;
         const system = m.type === "system";
         const seen = mine && lastMy && lastMy.index === idx && isMessageSeenByPeer(conv, m);
-        return `<div class="msg ${system ? "system" : mine ? "me" : ""}"><b>${escapeHtml(m.name || (system ? "Sistem" : "Anonim"))}</b><div>${escapeHtml(m.text || "")}</div><span class="small">${formatDate(m.createdAt)}</span>${seen ? `<span class="small">görüldü</span>` : ""}</div>`;
+        if (system){
+          return `<div class="msg system"><b>Sistem</b><div>${escapeHtml(m.text || "")}</div><span class="small">${formatDate(m.createdAt)}</span></div>`;
+        }
+        const senderAvatar = mine ? getUserAvatar(state.user.uid) : getUserAvatar(peer.otherId);
+        const senderName = escapeHtml(m.name || (mine ? state.profile?.displayName || "Sen" : peer.name || "Anonim"));
+        return `
+          <div class="msg-row ${mine ? "me" : ""}">
+            ${mine ? "" : `<div class="msg-avatar">${getAvatarMarkup(senderAvatar, m.name || peer.name || "?")}</div>`}
+            <div class="msg-content ${mine ? "me" : ""}">
+              <b>${senderName}</b>
+              <div>${escapeHtml(m.text || "")}</div>
+              <span class="small">${formatDate(m.createdAt)}</span>
+              ${seen ? `<span class="small">görüldü</span>` : ""}
+            </div>
+            ${mine ? `<div class="msg-avatar">${getAvatarMarkup(senderAvatar, m.name || state.profile?.displayName || "Sen")}</div>` : ""}
+          </div>`;
       }).join("");
 
       refs.messagesBox.innerHTML = html || `<div class="feed-item">Henüz mesaj yok.</div>`;
@@ -2176,6 +2239,8 @@
       const openCount = sellerAds.filter(x => x.status === "published").length;
       const closedCount = sellerAds.filter(x => x.status === "closed").length;
 
+      const sellerAvatar = seller.avatarDataUrl || seller.avatarUrl || seller.photoURL || "";
+      refs.sellerAvatarBox.innerHTML = getAvatarMarkup(sellerAvatar, seller.displayName || "Satıcı");
       refs.sellerName.textContent = seller.displayName || "Bilinmeyen";
       refs.sellerRole.textContent = seller.isAdmin ? "Yönetici" : "Üye";
 
