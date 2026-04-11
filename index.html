@@ -1135,15 +1135,23 @@
         displayName,
         isAdmin: !!isAdmin,
         email: user.email || null,
-        avatarUrl: user.photoURL || null,
-        avatarDataUrl: null,
         lastSeenAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
       if (!snap.exists()){
-        await setDoc(ref, { ...data, createdAt: serverTimestamp() });
+        await setDoc(ref, {
+          ...data,
+          avatarUrl: user.photoURL || null,
+          avatarDataUrl: null,
+          createdAt: serverTimestamp()
+        });
       }else{
-        await updateDoc(ref, data);
+        const existing = snap.data() || {};
+        await updateDoc(ref, {
+          ...data,
+          avatarUrl: existing.avatarUrl || null,
+          avatarDataUrl: existing.avatarDataUrl || null
+        });
       }
       return { uid:user.uid, displayName, isAdmin: !!isAdmin };
     }
@@ -1516,15 +1524,17 @@
         const senderAvatar = mine ? getUserAvatar(state.user.uid) : getUserAvatar(peer.otherId);
         const senderName = escapeHtml(m.name || (mine ? state.profile?.displayName || "Sen" : peer.name || "Anonim"));
         return `
-          <div class="msg-row ${mine ? "me" : ""}">
-            ${mine ? "" : `<div class="msg-avatar">${getAvatarMarkup(senderAvatar, m.name || peer.name || "?")}</div>`}
-            <div class="msg-content ${mine ? "me" : ""}">
-              <b>${senderName}</b>
-              <div>${escapeHtml(m.text || "")}</div>
-              <span class="small">${formatDate(m.createdAt)}</span>
-              ${seen ? `<span class="small">görüldü</span>` : ""}
+          <div class="msg ${mine ? "me" : ""}">
+            <div class="msg-row ${mine ? "me" : ""}">
+              ${mine ? "" : `<div class="msg-avatar">${getAvatarMarkup(senderAvatar, m.name || peer.name || "?")}</div>`}
+              <div class="msg-content ${mine ? "me" : ""}">
+                <b>${senderName}</b>
+                <div>${escapeHtml(m.text || "")}</div>
+                <span class="small">${formatDate(m.createdAt)}</span>
+                ${seen ? `<span class="small">görüldü</span>` : ""}
+              </div>
+              ${mine ? `<div class="msg-avatar">${getAvatarMarkup(senderAvatar, m.name || state.profile?.displayName || "Sen")}</div>` : ""}
             </div>
-            ${mine ? `<div class="msg-avatar">${getAvatarMarkup(senderAvatar, m.name || state.profile?.displayName || "Sen")}</div>` : ""}
           </div>`;
       }).join("");
 
