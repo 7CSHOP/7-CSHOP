@@ -1480,9 +1480,11 @@
     }
 
     function getConversationFallback(id){
+      const live = state.conversations.find(c => c.id === id) || null;
+      if (live) return live;
       return state.currentConversationCache && state.currentConversationCache.id === id
         ? state.currentConversationCache
-        : state.conversations.find(c => c.id === id) || null;
+        : null;
     }
 
     function getConversationPeople(conv){
@@ -1713,10 +1715,13 @@
       const order = conv.purchaseOrder || null;
       const orderHtml = order ? (() => {
         const listing = state.listings.find(x => x.id === order.listingId);
+        const price = Number(order.coinPrice || listing?.coinPrice || 0);
+        const buyerBalance = state.user?.uid === order.buyerId ? currentCoinBalance() : null;
+        const buyerHasEnough = state.user?.uid === order.buyerId ? buyerBalance >= price : true;
         const statusText = order.transferredAt ? "Coin aktarımı tamamlandı" : (order.buyerApproved && order.sellerApproved ? "Onaylandı" : "Onay bekleniyor");
         const meBuyer = state.user.uid === order.buyerId;
         const meSeller = state.user.uid === order.sellerId;
-        const canBuyerApprove = meBuyer && !order.buyerApproved && !order.transferredAt;
+        const canBuyerApprove = meBuyer && !order.buyerApproved && !order.transferredAt && buyerHasEnough;
         const canSellerApprove = meSeller && !order.sellerApproved && !order.transferredAt;
         return `
           <div class="order-card">
@@ -1724,7 +1729,8 @@
               <strong>${escapeHtml(listing?.name || order.itemName || "Sipariş")}</strong>
               <span class="order-status">${escapeHtml(statusText)}</span>
             </div>
-            <div class="tiny">${escapeHtml(formatCoin(order.coinPrice || listing?.coinPrice || 0))}</div>
+            <div class="tiny">${escapeHtml(formatCoin(price))}${meBuyer ? ` • Bakiyen: ${escapeHtml(formatCoin(currentCoinBalance()))}` : ''}</div>
+            ${meBuyer && !buyerHasEnough ? `<div class="tiny" style="color:#dc2626;font-weight:800">Yetersiz bakiye</div>` : ''}
             <div class="row">
               <span class="badge ${order.buyerApproved ? 'ok' : 'wait'}">Alıcı ${order.buyerApproved ? 'onayladı' : 'bekliyor'}</span>
               <span class="badge ${order.sellerApproved ? 'ok' : 'wait'}">Satıcı ${order.sellerApproved ? 'onayladı' : 'bekliyor'}</span>
@@ -2167,41 +2173,57 @@
 
     async function approveCoinOrder(convId, side){
       const convRef = doc(db, 'conversations', convId);
-      await runTransaction(db, async (tx) => {
-        const snap = await tx.get(convRef);
-        if (!snap.exists()) throw new Error('Sipariş yok');
-        const data = snap.data();
-        const order = data.purchaseOrder;
-        if (!order) throw new Error('Sipariş bulunamadı');
-        if (order.transferredAt) return;
-        if (side === 'buyer' && order.buyerId !== state.user.uid) throw new Error('Yetkisiz');
-        if (side === 'seller' && order.sellerId !== state.user.uid) throw new Error('Yetkisiz');
-        const next = { ...(order || {}) };
-        if (side === 'buyer') next.buyerApproved = true;
-        if (side === 'seller') next.sellerApproved = true;
-        next.updatedAtMs = Date.now();
-        const canFinish = next.buyerApproved && next.sellerApproved && !next.transferredAt;
-        if (canFinish){
-          const buyerRef = doc(db, 'users', next.buyerId);
-          const sellerRef = doc(db, 'users', next.sellerId);
-          const buyerSnap = await tx.get(buyerRef);
-          const sellerSnap = await tx.get(sellerRef);
-          if (!buyerSnap.exists() || !sellerSnap.exists()) throw new Error('Kullanıcı yok');
+      try{
+        const updatedOrder = await runTransaction(db, async (tx) => {
+          const snap = await tx.get(convRef);
+          if (!snap.exists()) throw new Error('Sipariş yok');
+          const data = snap.data();
+          const order = data.purchaseOrder;
+          if (!order) throw new Error('Sipariş bulunamadı');
+          if (order.transferredAt) return order;
+          if (side === 'buyer' && order.buyerId !== state.user.uid) throw new Error('Yetkisiz');
+          if (side === 'seller' && order.sellerId !== state.user.uid) throw new Error('Yetkisiz');
+
+          const next = { ...(order || {}) };
+          if (side === 'buyer') next.buyerApproved = true;
+          if (side === 'seller') next.sellerApproved = true;
+          next.updatedAtMs = Date.now();
+
           const price = Number(next.coinPrice || 0);
-          const buyerCoins = Number(buyerSnap.data().coinBalance || 0);
-          if (buyerCoins < price) throw new Error('Alıcının yeterli Coin yok');
-          tx.update(buyerRef, { coinBalance: buyerCoins - price, updatedAt: serverTimestamp() });
-          const sellerCoins = Number(sellerSnap.data().coinBalance || 0);
-          tx.update(sellerRef, { coinBalance: sellerCoins + price, updatedAt: serverTimestamp() });
-          next.transferredAt = Date.now();
-        }
-        tx.update(convRef, {
-          purchaseOrder: next,
-          updatedAt: serverTimestamp()
+          const canFinish = next.buyerApproved && next.sellerApproved && !next.transferredAt;
+          if (canFinish){
+            const buyerRef = doc(db, 'users', next.buyerId);
+            const sellerRef = doc(db, 'users', next.sellerId);
+            const buyerSnap = await tx.get(buyerRef);
+            const sellerSnap = await tx.get(sellerRef);
+            if (!buyerSnap.exists() || !sellerSnap.exists()) throw new Error('Kullanıcı yok');
+            const buyerCoins = Number(buyerSnap.data().coinBalance || 0);
+            if (buyerCoins < price) throw new Error('Yetersiz bakiye');
+            tx.update(buyerRef, { coinBalance: buyerCoins - price, updatedAt: serverTimestamp() });
+            const sellerCoins = Number(sellerSnap.data().coinBalance || 0);
+            tx.update(sellerRef, { coinBalance: sellerCoins + price, updatedAt: serverTimestamp() });
+            next.transferredAt = Date.now();
+          }
+
+          tx.update(convRef, {
+            purchaseOrder: next,
+            updatedAt: serverTimestamp()
+          });
+          return next;
         });
-      });
-      await logAction('Coin siparişi onayı', `${state.profile.displayName} → ${convId}`);
-      renderAll();
+
+        state.currentConversationCache = {
+          ...(state.currentConversationCache || {}),
+          id: convId,
+          purchaseOrder: updatedOrder
+        };
+        if (state.currentConversationId === convId) {
+          renderAll();
+        }
+        await logAction('Coin siparişi onayı', `${state.profile.displayName} → ${convId}`);
+      }catch(err){
+        alert(`Onay tamamlanamadı: ${err?.message || err}`);
+      }
     }
 
     async function openHelpConversation(){
