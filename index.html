@@ -311,6 +311,24 @@
     .profile-actions{display:flex;gap:10px;flex-wrap:wrap}
     .tiny{font-size:11px;color:var(--muted)}
     .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .coin-pill{background:#111827;color:#fff;border-color:#111827}
+    .coin-pill strong{font-weight:900}
+    .promo-shell{display:grid;gap:14px;margin-top:14px}
+    .promo-card{background:#f8fafc;border:1px solid var(--line);border-radius:18px;padding:14px}
+    .promo-card .item-actions{margin-top:10px}
+    .purchase-info{display:grid;gap:8px}
+    .purchase-info .price-new{font-size:24px}
+    .order-card{border:1px solid #bfdbfe;background:#eff6ff;border-radius:18px;padding:14px;display:grid;gap:10px;margin-bottom:12px}
+    .order-card .row{justify-content:flex-start}
+    .order-status{font-size:12px;font-weight:900;color:#1d4ed8}
+    .help-banner{padding:14px 16px;border-radius:18px;background:#f8fafc;border:1px solid var(--line)}
+    @media (max-width:760px){
+      .topbar-inner{align-items:stretch}
+      .actions{width:100%}
+      .actions .chip,.actions .pill{flex:1 1 auto;text-align:center}
+      .panel-inner{padding:16px}
+      .purchase-info .price-new{font-size:20px}
+    }
     .list{display:grid;gap:12px}
     .item{
       background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;
@@ -367,6 +385,7 @@
         </div>
         <div class="actions">
           <span id="whoami" class="pill hidden"></span>
+          <span id="coinBadge" class="pill hidden">Coin: 0</span>
           <button id="btnRefresh" class="chip">Yenile</button>
           <button id="btnOpenAdd" class="chip primary hidden">İlan ekle</button>
           <button id="btnLogout" class="chip bad hidden">Çıkış</button>
@@ -453,6 +472,7 @@
                 <button data-view="myads">İlanlarım</button>
                 <button data-view="messages">Mesajlar <span id="messagesBadge" class="badge notify hidden" style="margin-left:8px">0</span></button>
                 <button data-view="profile">Profil</button>
+                <button data-view="help" id="helpMenu">Yardım</button>
                 <button data-view="admin" id="adminMenu" class="hidden">Yönetim</button>
               </div>
               <div class="hr"></div>
@@ -587,6 +607,66 @@
                     </div>
                   </div>
                 </div>
+                <div class="panel" style="box-shadow:none;margin-top:16px">
+                  <div class="panel-inner">
+                    <div class="section-title">
+                      <div>
+                        <h3>Promosyon</h3>
+                        <p>Promosyon kodunu girin</p>
+                      </div>
+                    </div>
+                    <div class="two">
+                      <div class="field">
+                        <label>Promosyon kodunu girin</label>
+                        <input id="promoRedeemInput" class="input" placeholder="Kodu yaz" maxlength="48" />
+                      </div>
+                      <div class="field" style="align-self:end">
+                        <button id="btnRedeemPromo" class="btn" type="button">Kodu kullan</button>
+                      </div>
+                    </div>
+                    <div id="promoManagerPanel" class="panel hidden" style="box-shadow:none;margin-top:16px">
+                      <div class="panel-inner">
+                        <div class="section-title">
+                          <div>
+                            <h3>Promosyon yönetimi</h3>
+                            <p>Kod ekle, düzenle, sil ve ödül ver</p>
+                          </div>
+                        </div>
+                        <form id="promoForm" class="form">
+                          <div class="two">
+                            <div class="field">
+                              <label>Kod</label>
+                              <input id="promoCodeInput" class="input" placeholder="Örn: KUTU2026" maxlength="24" />
+                            </div>
+                            <div class="field">
+                              <label>Ödül Coin</label>
+                              <input id="promoRewardInput" class="input" type="number" min="0" placeholder="Örn: 25" />
+                            </div>
+                          </div>
+                          <div class="two">
+                            <div class="field">
+                              <label>Kaç kişi kullanabilecek</label>
+                              <input id="promoMaxUsesInput" class="input" type="number" min="1" placeholder="Örn: 100" />
+                            </div>
+                            <div class="field">
+                              <label>Süre (gün)</label>
+                              <input id="promoDaysInput" class="input" type="number" min="1" placeholder="Örn: 7" />
+                            </div>
+                          </div>
+                          <div class="field">
+                            <label><input id="promoActiveInput" type="checkbox" checked /> Aktif</label>
+                          </div>
+                          <div class="row">
+                            <button class="btn" type="submit">Kaydet</button>
+                            <button id="promoResetButton" class="btn secondary" type="button">Temizle</button>
+                          </div>
+                        </form>
+                        <div class="hr"></div>
+                        <div id="promoList" class="list"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div id="viewAdmin" class="hidden">
@@ -614,6 +694,33 @@
                     </div>
                   </div>
                 </div>
+              </div>
+              <div id="viewHelp" class="hidden">
+                <div class="panel" style="box-shadow:none">
+                  <div class="panel-inner">
+                    <div class="section-title">
+                      <div>
+                        <h3>Yardım</h3>
+                        <p>Sorununu Alper hesabına ilet</p>
+                      </div>
+                    </div>
+                    <form id="helpForm" class="form">
+                      <div class="field">
+                        <label>Sorunun başlığı</label>
+                        <input id="helpTitleInput" class="input" maxlength="30" placeholder="Maksimum 30 harf" />
+                      </div>
+                      <div class="field">
+                        <label>Sorun nedir?</label>
+                        <textarea id="helpBodyInput" class="input" maxlength="700" placeholder="Maksimum 700 harf"></textarea>
+                      </div>
+                      <button class="btn" type="submit">Gönder</button>
+                    </form>
+                    <div class="hr"></div>
+                    <div class="notice">Mesaj doğrudan Alper isimli hesaba gider.</div>
+                  </div>
+                </div>
+              </div>
+
               </div>
             </div>
           </div>
@@ -687,6 +794,17 @@
           <div class="field">
             <label>Yeni fiyat / istenen</label>
             <input id="adNewPrice" class="input" placeholder="Örn: 99 TL / oyuncak" />
+          </div>
+
+          <div class="two">
+            <div class="field">
+              <label><input id="adCoinSale" type="checkbox" /> Coin ile satış</label>
+              <div class="hint">Açarsan alım ekranında coin seçeneği görünür.</div>
+            </div>
+            <div class="field">
+              <label>Coin fiyatı</label>
+              <input id="adCoinPrice" class="input" type="number" min="0" placeholder="Örn: 250" />
+            </div>
           </div>
 
           <div class="two">
@@ -836,6 +954,25 @@
     </div>
   </div>
 
+
+
+  <div id="modalBuyOptions" class="modal">
+    <div class="modal-card" style="width:min(680px,100%)">
+      <div class="modal-head">
+        <strong>Satın alma yöntemi</strong>
+        <button id="btnCloseBuyOptions" class="chip">Kapat</button>
+      </div>
+      <div class="modal-body">
+        <div id="buyOptionInfo" class="notice"></div>
+        <div class="hr"></div>
+        <div class="grid" style="gap:10px">
+          <button id="btnBuyManual" class="btn secondary" type="button">El ile teslim</button>
+          <button id="btnBuyCoin" class="btn good" type="button">Coin ile alım</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
     import {
@@ -859,7 +996,8 @@
       onSnapshot,
       serverTimestamp,
       updateDoc,
-      deleteDoc
+      deleteDoc,
+      runTransaction
     } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -883,6 +1021,7 @@
       authScreen: $("authScreen"),
       appScreen: $("appScreen"),
       whoami: $("whoami"),
+      coinBadge: $("coinBadge"),
       btnOpenAdd: $("btnOpenAdd"),
       btnLogout: $("btnLogout"),
       btnRefresh: $("btnRefresh"),
@@ -915,12 +1054,24 @@
       btnDeleteConversation: $("btnDeleteConversation"),
       profileBox: $("profileBox"),
       profileStatsBox: $("profileStatsBox"),
+      promoRedeemInput: $("promoRedeemInput"),
+      btnRedeemPromo: $("btnRedeemPromo"),
+      promoManagerPanel: $("promoManagerPanel"),
+      promoForm: $("promoForm"),
+      promoCodeInput: $("promoCodeInput"),
+      promoRewardInput: $("promoRewardInput"),
+      promoMaxUsesInput: $("promoMaxUsesInput"),
+      promoDaysInput: $("promoDaysInput"),
+      promoActiveInput: $("promoActiveInput"),
+      promoList: $("promoList"),
+      promoResetButton: $("promoResetButton"),
       profileAvatarBox: $("profileAvatarBox"),
       profileNameText: $("profileNameText"),
       profileEmailText: $("profileEmailText"),
       profileRolePill: $("profileRolePill"),
       profilePhotoPill: $("profilePhotoPill"),
       adminMenu: $("adminMenu"),
+      helpMenu: $("helpMenu"),
       adminListings: $("adminListings"),
       adminLog: $("adminLog"),
       modalListing: $("modalListing"),
@@ -934,6 +1085,8 @@
       adDesc: $("adDesc"),
       adDiscount: $("adDiscount"),
       adOldPrice: $("adOldPrice"),
+      adCoinSale: $("adCoinSale"),
+      adCoinPrice: $("adCoinPrice"),
       adNewPrice: $("adNewPrice"),
       adImageUrls: $("adImageUrls"),
       adImageFile: $("adImageFile"),
@@ -950,7 +1103,12 @@
       btnDeleteProfilePhoto: $("btnDeleteProfilePhoto"),
       btnEditProfile: $("btnEditProfile"),
       modalDetail: $("modalDetail"),
+      modalBuyOptions: $("modalBuyOptions"),
       btnCloseDetail: $("btnCloseDetail"),
+      btnCloseBuyOptions: $("btnCloseBuyOptions"),
+      buyOptionInfo: $("buyOptionInfo"),
+      btnBuyManual: $("btnBuyManual"),
+      btnBuyCoin: $("btnBuyCoin"),
       btnDetailMessage: $("btnDetailMessage"),
       btnDetailBuy: $("btnDetailBuy"),
       detailTitle: $("detailTitle"),
@@ -970,7 +1128,11 @@
       sellerName: $("sellerName"),
       sellerRole: $("sellerRole"),
       sellerStats: $("sellerStats"),
-      sellerRecentAds: $("sellerRecentAds")
+      sellerRecentAds: $("sellerRecentAds"),
+      viewHelp: $("viewHelp"),
+      helpForm: $("helpForm"),
+      helpTitleInput: $("helpTitleInput"),
+      helpBodyInput: $("helpBodyInput")
     };
 
     const state = {
@@ -990,12 +1152,17 @@
       currentConversationCache: null,
       currentDetailListingId: null,
       currentDetailImageIndex: 0,
+      pendingPurchaseListingId: null,
+      promoUnlocked: false,
+      promoCodes: [],
       unsubscribers: []
     };
 
     const DAY = 24 * 60 * 60 * 1000;
     const LISTING_LIFETIME = 15 * DAY;
     const CHAT_LIFETIME = 72 * 60 * 60 * 1000;
+    const MANAGER_KEY = "alper9119bulut";
+    const HELP_TARGET_NAME = "alper";
 
     function slugify(name){
       return String(name).trim().toLowerCase()
@@ -1054,6 +1221,19 @@
       return new Date(v).toLocaleString("tr-TR", { dateStyle:"short", timeStyle:"short" });
     }
 
+    function formatCoin(value){
+      const num = Number(value || 0);
+      return `${num} Coin`;
+    }
+
+    function currentCoinBalance(){
+      return Number(state.profile?.coinBalance || 0);
+    }
+
+    function isManagerKey(value){
+      return String(value || "").trim().toLowerCase() === MANAGER_KEY.toLowerCase();
+    }
+
     function setAuthScreen(){
       refs.authScreen.classList.remove("hidden");
       refs.appScreen.classList.add("hidden");
@@ -1081,7 +1261,8 @@
         myads:["İlanlarım","Kendi ilanlarını düzenle, kapat, aç veya sil."],
         messages:["Mesajlar","İlan bazlı konuşmalar."],
         profile:["Profil","Hesap özetin."],
-        admin:["Yönetim","Tüm ilanlar ve son kayıtlar."]
+        admin:["Yönetim","Tüm ilanlar ve son kayıtlar."],
+        help:["Yardım","Sorununu Alper hesabına ilet."]
       };
       refs.viewTitle.textContent = map[view][0];
       refs.viewDesc.textContent = map[view][1];
@@ -1090,6 +1271,7 @@
       document.getElementById("viewMessages").classList.toggle("hidden", view !== "messages");
       document.getElementById("viewProfile").classList.toggle("hidden", view !== "profile");
       document.getElementById("viewAdmin").classList.toggle("hidden", view !== "admin");
+      document.getElementById("viewHelp").classList.toggle("hidden", view !== "help");
       renderAll();
     }
 
@@ -1111,18 +1293,20 @@
 
     function renderPriceBlock(item){
       const price = normalizePriceLabel(item?.priceLabel || item?.newPriceLabel || "İstenen yok");
+      const coin = Number(item?.coinPrice || 0);
+      const coinText = coin > 0 ? ` / ${formatCoin(coin)}` : "";
       if (item?.isDiscounted && item.oldPriceLabel && item.newPriceLabel){
         return `
           <div class="price-wrap">
             <span class="price-old">${escapeHtml(normalizePriceLabel(item.oldPriceLabel))}</span>
-            <span class="price-new">${escapeHtml(normalizePriceLabel(item.newPriceLabel))}</span>
+            <span class="price-new">${escapeHtml(normalizePriceLabel(item.newPriceLabel) + coinText)}</span>
             <span class="discount-badge">İndirimli</span>
           </div>
         `;
       }
       return `
         <div class="price-wrap">
-          <span class="price-new">${escapeHtml(price)}</span>
+          <span class="price-new">${escapeHtml(price + coinText)}</span>
         </div>
       `;
     }
@@ -1143,6 +1327,7 @@
           ...data,
           avatarUrl: user.photoURL || null,
           avatarDataUrl: null,
+          coinBalance: 0,
           createdAt: serverTimestamp()
         });
       }else{
@@ -1397,15 +1582,16 @@
       refs.detailStatus.innerHTML = item.status === "published" ? '<span class="badge ok">Yayında</span>' : '<span class="badge closed">Kapalı</span>';
       refs.detailSeller.textContent = `${item.ownerName || "Bilinmeyen"} • ${formatDate(item.createdAt)}`;
 
+      const coinText = Number(item.coinPrice || 0) > 0 ? ` / ${formatCoin(item.coinPrice)}` : "";
       if (item.isDiscounted && item.oldPriceLabel && item.newPriceLabel){
         refs.detailPriceBox.innerHTML = `
           <span class="price-old">${escapeHtml(normalizePriceLabel(item.oldPriceLabel))}</span>
-          <span class="price-new">${escapeHtml(normalizePriceLabel(item.newPriceLabel))}</span>
+          <span class="price-new">${escapeHtml(normalizePriceLabel(item.newPriceLabel) + coinText)}</span>
           <span class="discount-badge">İndirimli</span>
         `;
       }else{
         refs.detailPriceBox.innerHTML = `
-          <span class="price-new">${escapeHtml(normalizePriceLabel(item.priceLabel || item.newPriceLabel || "İstenen yok"))}</span>
+          <span class="price-new">${escapeHtml(normalizePriceLabel(item.priceLabel || item.newPriceLabel || "İstenen yok") + coinText)}</span>
         `;
       }
 
@@ -1437,6 +1623,7 @@
       const mine = state.user?.uid === item.ownerId;
       refs.btnDetailMessage.classList.toggle("hidden", !isPublished(item) || mine);
       refs.btnDetailBuy.classList.toggle("hidden", !isPublished(item) || mine);
+      refs.btnDetailBuy.textContent = item.coinPrice > 0 ? "Satın al" : "Satın al";
 
       refs.btnDetailMessage.onclick = async () => {
         refs.modalDetail.classList.remove("show");
@@ -1514,7 +1701,32 @@
       refs.btnDeleteConversation.classList.remove("hidden");
 
       const lastMy = getLastMyMessageMeta(conv);
-      const html = (conv.messages || []).map((m, idx) => {
+      const order = conv.purchaseOrder || null;
+      const orderHtml = order ? (() => {
+        const listing = state.listings.find(x => x.id === order.listingId);
+        const statusText = order.transferredAt ? "Coin aktarımı tamamlandı" : (order.buyerApproved && order.sellerApproved ? "Onaylandı" : "Onay bekleniyor");
+        const meBuyer = state.user.uid === order.buyerId;
+        const meSeller = state.user.uid === order.sellerId;
+        const canBuyerApprove = meBuyer && !order.buyerApproved && !order.transferredAt;
+        const canSellerApprove = meSeller && !order.sellerApproved && !order.transferredAt;
+        return `
+          <div class="order-card">
+            <div class="item-head">
+              <strong>${escapeHtml(listing?.name || order.itemName || "Sipariş")}</strong>
+              <span class="order-status">${escapeHtml(statusText)}</span>
+            </div>
+            <div class="tiny">${escapeHtml(formatCoin(order.coinPrice || listing?.coinPrice || 0))}</div>
+            <div class="row">
+              <span class="badge ${order.buyerApproved ? 'ok' : 'wait'}">Alıcı ${order.buyerApproved ? 'onayladı' : 'bekliyor'}</span>
+              <span class="badge ${order.sellerApproved ? 'ok' : 'wait'}">Satıcı ${order.sellerApproved ? 'onayladı' : 'bekliyor'}</span>
+            </div>
+            <div class="row">
+              ${canBuyerApprove ? `<button class="btn good" onclick="window.__approveCoinOrder('${conv.id}','buyer')">Alıcı onayı</button>` : ''}
+              ${canSellerApprove ? `<button class="btn good" onclick="window.__approveCoinOrder('${conv.id}','seller')">Satıcı onayı</button>` : ''}
+            </div>
+          </div>`;
+      })() : "";
+      const html = orderHtml + (conv.messages || []).map((m, idx) => {
         const mine = m.uid === state.user.uid;
         const system = m.type === "system";
         const seen = mine && lastMy && lastMy.index === idx && isMessageSeenByPeer(conv, m);
@@ -1569,7 +1781,12 @@
         <div class="item"><div class="item-head"><strong>Toplam ilan</strong></div><span>${mine.length}</span></div>
         <div class="item"><div class="item-head"><strong>Açık ilan</strong></div><span>${openCount}</span></div>
         <div class="item"><div class="item-head"><strong>Kapalı ilan</strong></div><span>${closedCount}</span></div>
+        <div class="item"><div class="item-head"><strong>Coin</strong></div><span>${formatCoin(currentCoinBalance())}</span></div>
       `;
+      if (refs.coinBadge) refs.coinBadge.textContent = formatCoin(currentCoinBalance());
+      if (refs.coinBadge) refs.coinBadge.classList.toggle('hidden', false);
+      if (refs.promoManagerPanel) refs.promoManagerPanel.classList.toggle('hidden', !state.promoUnlocked);
+      if (refs.promoManagerPanel && state.promoUnlocked) refs.promoManagerPanel.classList.remove('hidden');
     }
 
     function renderAdminLog(){
@@ -1626,18 +1843,407 @@
         refs.messagesBadge.textContent = unreadTotal > 99 ? "99+" : String(unreadTotal);
         refs.messagesBadge.classList.toggle("hidden", unreadTotal <= 0);
       }
+      if (refs.coinBadge){
+        refs.coinBadge.textContent = formatCoin(currentCoinBalance());
+      }
       if (state.view === "shop") renderShop();
       if (state.view === "myads") renderMyAds();
       if (state.view === "messages") renderConversations();
-      if (state.view === "profile") renderProfile();
+      if (state.view === "profile") { renderProfile(); renderPromoManager().catch(()=>{}); }
       if (state.view === "admin") {
         renderAdminListings();
         renderAdminLog();
       }
+      if (state.view === "help") renderHelp();
       if (state.view !== "messages") renderConversation();
       if (state.view !== "profile") renderProfile();
     }
 
+    function showModal(modal){
+      modal?.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function hideModal(modal){
+      modal?.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    async function renderPromoManager(){
+      if (!refs.promoManagerPanel) return;
+      refs.promoManagerPanel.classList.toggle('hidden', !state.promoUnlocked);
+      if (!state.promoUnlocked) return;
+      const items = sortDescByDate(state.promoCodes || []);
+      refs.promoList.innerHTML = items.map(code => {
+        const expires = code.expiresAtMs ? new Date(code.expiresAtMs).toLocaleDateString('tr-TR') : 'Süresiz';
+        const active = code.active !== false;
+        return `
+          <div class="promo-card">
+            <div class="item-head">
+              <strong>${escapeHtml(code.code || '')}</strong>
+              <span>${active ? 'Aktif' : 'Pasif'}</span>
+            </div>
+            <div class="tiny">Ödül: ${escapeHtml(formatCoin(code.rewardCoins || 0))} • Kullanım: ${Number(code.usedCount || 0)}/${Number(code.maxUses || 0)} • Bitiş: ${escapeHtml(expires)}</div>
+            <div class="item-actions">
+              <button class="btn secondary" type="button" onclick="window.__editPromoCode('${code.id}')">Düzenle</button>
+              <button class="btn bad" type="button" onclick="window.__deletePromoCode('${code.id}')">Sil</button>
+            </div>
+          </div>`;
+      }).join('') || `<div class="feed-item">Henüz promosyon kodu yok.</div>`;
+    }
+
+
+    function findUserByDisplayName(name){
+      const n = String(name || '').trim().toLowerCase();
+      return state.users.find(u => String(u.displayName || '').trim().toLowerCase() === n) || null;
+    }
+
+    async function saveCoinDelta(userId, delta){
+      return runTransaction(db, async (tx) => {
+        const ref = doc(db, 'users', userId);
+        const snap = await tx.get(ref);
+        if (!snap.exists()) throw new Error('Kullanıcı bulunamadı');
+        const current = Number(snap.data().coinBalance || 0);
+        const next = current + Number(delta || 0);
+        if (next < 0) throw new Error('Yetersiz Coin');
+        tx.update(ref, { coinBalance: next, updatedAt: serverTimestamp() });
+        return next;
+      });
+    }
+
+    async function savePromoCodeDoc(data, editId = ''){
+      const payload = {
+        code: String(data.code || '').trim(),
+        rewardCoins: Math.max(0, Number(data.rewardCoins || 0)),
+        maxUses: Math.max(1, Number(data.maxUses || 1)),
+        usedCount: Number(data.usedCount || 0),
+        expiresAtMs: Number(data.expiresAtMs || 0),
+        active: !!data.active,
+        usedBy: data.usedBy || {},
+        createdAtMs: data.createdAtMs || Date.now(),
+        updatedAtMs: Date.now(),
+        createdAt: data.createdAt || serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+      if (editId){
+        await updateDoc(doc(db, 'promoCodes', editId), payload);
+      }else{
+        await addDoc(collection(db, 'promoCodes'), payload);
+      }
+    }
+
+    function clearPromoForm(){
+      refs.promoForm?.reset();
+      if (refs.promoActiveInput) refs.promoActiveInput.checked = true;
+      if (refs.promoCodeInput) refs.promoCodeInput.value = '';
+      if (refs.promoRewardInput) refs.promoRewardInput.value = '';
+      if (refs.promoMaxUsesInput) refs.promoMaxUsesInput.value = '';
+      if (refs.promoDaysInput) refs.promoDaysInput.value = '';
+      if (refs.promoForm) refs.promoForm.dataset.editId = '';
+    }
+
+    async function redeemPromoCode(){
+      const raw = String(refs.promoRedeemInput?.value || '').trim();
+      if (!raw) return;
+      if (isManagerKey(raw)){
+        state.promoUnlocked = true;
+        refs.promoRedeemInput.value = '';
+        await renderPromoManager();
+        renderAll();
+        return;
+      }
+      const code = state.promoCodes.find(x => String(x.code || '').trim().toLowerCase() === raw.toLowerCase());
+      if (!code) return alert('Kod bulunamadı.');
+      if (code.active === false) return alert('Kod pasif.');
+      if (code.expiresAtMs && Date.now() > Number(code.expiresAtMs)) return alert('Kodun süresi dolmuş.');
+      if (Number(code.usedCount || 0) >= Number(code.maxUses || 0)) return alert('Kod kullanım hakkı bitmiş.');
+      if (code.usedBy && code.usedBy[state.user.uid]) return alert('Bu kodu zaten kullandın.');
+      const reward = Number(code.rewardCoins || 0);
+      if (reward <= 0) return alert('Ödül yok.');
+      try{
+        await runTransaction(db, async (tx) => {
+          const promoRef = doc(db, 'promoCodes', code.id);
+          const userRef = doc(db, 'users', state.user.uid);
+          const promoSnap = await tx.get(promoRef);
+          const userSnap = await tx.get(userRef);
+          if (!promoSnap.exists() || !userSnap.exists()) throw new Error('Kayıt bulunamadı');
+          const latest = promoSnap.data();
+          const usedBy = { ...(latest.usedBy || {}) };
+          if (usedBy[state.user.uid]) throw new Error('Bu kodu zaten kullandın.');
+          if (Number(latest.usedCount || 0) >= Number(latest.maxUses || 0)) throw new Error('Kod kullanım hakkı bitmiş.');
+          if (latest.expiresAtMs && Date.now() > Number(latest.expiresAtMs)) throw new Error('Kodun süresi dolmuş.');
+          usedBy[state.user.uid] = true;
+          tx.update(promoRef, {
+            usedCount: Number(latest.usedCount || 0) + 1,
+            usedBy,
+            updatedAtMs: Date.now(),
+            updatedAt: serverTimestamp()
+          });
+          const current = Number(userSnap.data().coinBalance || 0);
+          tx.update(userRef, { coinBalance: current + reward, updatedAt: serverTimestamp() });
+        });
+        refs.promoRedeemInput.value = '';
+        await logAction('Promosyon kullanıldı', `${state.profile.displayName} → ${raw}`);
+        renderAll();
+        alert(`Kod tamam. ${reward} Coin eklendi.`);
+      }catch(err){
+        alert('Kod kullanılamadı: ' + firebaseErrorMessage(err));
+      }
+    }
+
+    async function setPromoEdit(id){
+      const code = state.promoCodes.find(x => x.id === id);
+      if (!code) return;
+      refs.promoForm.dataset.editId = id;
+      refs.promoCodeInput.value = code.code || '';
+      refs.promoRewardInput.value = code.rewardCoins ?? '';
+      refs.promoMaxUsesInput.value = code.maxUses ?? '';
+      refs.promoDaysInput.value = code.expiresAtMs ? Math.max(1, Math.ceil((Number(code.expiresAtMs) - Date.now()) / DAY)) : '';
+      refs.promoActiveInput.checked = code.active !== false;
+    }
+
+    async function deletePromoCode(id){
+      const code = state.promoCodes.find(x => x.id === id);
+      if (!code) return;
+      if (!confirm(`"${code.code}" silinsin mi?`)) return;
+      await deleteDoc(doc(db, 'promoCodes', id));
+      await logAction('Promosyon silindi', code.code || id);
+      renderAll();
+    }
+
+    async function addOrUpdatePromo(e){
+      e.preventDefault();
+      if (!state.promoUnlocked) return;
+      const editId = refs.promoForm.dataset.editId || '';
+      const code = refs.promoCodeInput.value.trim();
+      const rewardCoins = Number(refs.promoRewardInput.value || 0);
+      const maxUses = Number(refs.promoMaxUsesInput.value || 1);
+      const days = Number(refs.promoDaysInput.value || 0);
+      const active = !!refs.promoActiveInput.checked;
+      if (!code) return alert('Kod gerekli.');
+      const expiresAtMs = days > 0 ? Date.now() + (days * DAY) : 0;
+      const existing = editId ? state.promoCodes.find(x => x.id === editId) : null;
+      await savePromoCodeDoc({
+        code,
+        rewardCoins,
+        maxUses,
+        expiresAtMs,
+        active,
+        usedCount: existing?.usedCount || 0,
+        usedBy: existing?.usedBy || {},
+        createdAtMs: existing?.createdAtMs || Date.now(),
+        createdAt: existing?.createdAt || serverTimestamp()
+      }, editId);
+      clearPromoForm();
+      await logAction(editId ? 'Promosyon düzenlendi' : 'Promosyon eklendi', code);
+      renderAll();
+    }
+
+    async function manualPurchaseFromModal(){
+      const listingId = state.pendingPurchaseListingId;
+      if (!listingId) return;
+      const item = state.listings.find(x => x.id === listingId);
+      if (!item) return;
+      hideModal(refs.modalBuyOptions);
+      const msg = `Ben ${state.profile.displayName}, "${item.name}" ürününü el ile teslim almak istiyorum.`;
+      let conv = findConversationByPeer(item.ownerId);
+      if (!conv){
+        const ref = await addDoc(collection(db, 'conversations'), {
+          listingId,
+          latestListingId: listingId,
+          latestListingName: item.name || '',
+          members: [state.user.uid, item.ownerId],
+          memberNames: Array.from(new Set([state.profile.displayName, item.ownerName].filter(Boolean))),
+          messages: [{ uid: 'system', name: 'Sistem', text: msg, type: 'system', createdAt: new Date().toISOString() }],
+          lastMessage: msg,
+          unreadBy: { [item.ownerId]: 1 },
+          readBy: { [state.user.uid]: Date.now() },
+          createdAtMs: Date.now(),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+        conv = { id: ref.id };
+      }else{
+        const convRef = doc(db, 'conversations', conv.id);
+        const snap = await getDoc(convRef);
+        const data = snap.data();
+        const messages = Array.isArray(data.messages) ? data.messages : [];
+        const unreadBy = { ...(data.unreadBy || {}) };
+        unreadBy[item.ownerId] = (Number(unreadBy[item.ownerId]) || 0) + 1;
+        await updateDoc(convRef, {
+          messages: [...messages, { uid: 'system', name: 'Sistem', text: msg, type: 'system', createdAt: new Date().toISOString() }],
+          lastMessage: msg,
+          unreadBy,
+          readBy: { ...(data.readBy || {}), [state.user.uid]: Date.now() },
+          updatedAt: serverTimestamp(),
+          listingId,
+          latestListingId: listingId,
+          latestListingName: item.name || data.latestListingName || ''
+        });
+      }
+      await logAction('El teslim isteği', `${state.profile.displayName} → ${item.name}`);
+      state.pendingPurchaseListingId = null;
+      await openConversation(listingId);
+    }
+
+    async function coinPurchaseFromModal(){
+      const listingId = state.pendingPurchaseListingId;
+      if (!listingId) return;
+      const item = state.listings.find(x => x.id === listingId);
+      if (!item || Number(item.coinPrice || 0) <= 0) return alert('Bu ilanda Coin seçeneği yok.');
+      hideModal(refs.modalBuyOptions);
+      let conv = findConversationByPeer(item.ownerId);
+      const message = `Coin ile alım istiyorum. Fiyat: ${formatCoin(item.coinPrice)}. İki taraf onaylayınca coin aktarılacak.`;
+      const baseOrder = {
+        listingId,
+        itemName: item.name || '',
+        buyerId: state.user.uid,
+        sellerId: item.ownerId,
+        coinPrice: Number(item.coinPrice || 0),
+        buyerApproved: false,
+        sellerApproved: false,
+        transferredAt: null,
+        createdAtMs: Date.now(),
+        updatedAtMs: Date.now()
+      };
+      if (!conv){
+        const ref = await addDoc(collection(db, 'conversations'), {
+          listingId,
+          latestListingId: listingId,
+          latestListingName: item.name || '',
+          members: [state.user.uid, item.ownerId],
+          memberNames: Array.from(new Set([state.profile.displayName, item.ownerName].filter(Boolean))),
+          messages: [{ uid: 'system', name: 'Sistem', text: message, type: 'system', createdAt: new Date().toISOString() }],
+          lastMessage: message,
+          unreadBy: { [item.ownerId]: 1 },
+          readBy: { [state.user.uid]: Date.now() },
+          purchaseOrder: baseOrder,
+          createdAtMs: Date.now(),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+        conv = { id: ref.id, purchaseOrder: baseOrder };
+      }else{
+        const convRef = doc(db, 'conversations', conv.id);
+        const snap = await getDoc(convRef);
+        const data = snap.data();
+        const messages = Array.isArray(data.messages) ? data.messages : [];
+        const unreadBy = { ...(data.unreadBy || {}) };
+        unreadBy[item.ownerId] = (Number(unreadBy[item.ownerId]) || 0) + 1;
+        await updateDoc(convRef, {
+          listingId,
+          latestListingId: listingId,
+          latestListingName: item.name || data.latestListingName || '',
+          messages: [...messages, { uid: 'system', name: 'Sistem', text: message, type: 'system', createdAt: new Date().toISOString() }],
+          lastMessage: message,
+          unreadBy,
+          readBy: { ...(data.readBy || {}), [state.user.uid]: Date.now() },
+          purchaseOrder: baseOrder,
+          updatedAt: serverTimestamp()
+        });
+      }
+      await logAction('Coin alım isteği', `${state.profile.displayName} → ${item.name}`);
+      state.pendingPurchaseListingId = null;
+      state.currentConversationId = conv.id || state.currentConversationId;
+      if (conv.id) state.currentConversationCache = { ...(state.currentConversationCache || {}), id: conv.id, purchaseOrder: baseOrder };
+      setView('messages');
+      await renderAll();
+    }
+
+    async function approveCoinOrder(convId, side){
+      const convRef = doc(db, 'conversations', convId);
+      await runTransaction(db, async (tx) => {
+        const snap = await tx.get(convRef);
+        if (!snap.exists()) throw new Error('Sipariş yok');
+        const data = snap.data();
+        const order = data.purchaseOrder;
+        if (!order) throw new Error('Sipariş bulunamadı');
+        if (order.transferredAt) return;
+        if (side === 'buyer' && order.buyerId !== state.user.uid) throw new Error('Yetkisiz');
+        if (side === 'seller' && order.sellerId !== state.user.uid) throw new Error('Yetkisiz');
+        const next = { ...(order || {}) };
+        if (side === 'buyer') next.buyerApproved = true;
+        if (side === 'seller') next.sellerApproved = true;
+        next.updatedAtMs = Date.now();
+        const canFinish = next.buyerApproved && next.sellerApproved && !next.transferredAt;
+        if (canFinish){
+          const buyerRef = doc(db, 'users', next.buyerId);
+          const sellerRef = doc(db, 'users', next.sellerId);
+          const buyerSnap = await tx.get(buyerRef);
+          const sellerSnap = await tx.get(sellerRef);
+          if (!buyerSnap.exists() || !sellerSnap.exists()) throw new Error('Kullanıcı yok');
+          const price = Number(next.coinPrice || 0);
+          const buyerCoins = Number(buyerSnap.data().coinBalance || 0);
+          if (buyerCoins < price) throw new Error('Alıcının yeterli Coin yok');
+          tx.update(buyerRef, { coinBalance: buyerCoins - price, updatedAt: serverTimestamp() });
+          const sellerCoins = Number(sellerSnap.data().coinBalance || 0);
+          tx.update(sellerRef, { coinBalance: sellerCoins + price, updatedAt: serverTimestamp() });
+          next.transferredAt = Date.now();
+        }
+        tx.update(convRef, {
+          purchaseOrder: next,
+          updatedAt: serverTimestamp()
+        });
+      });
+      await logAction('Coin siparişi onayı', `${state.profile.displayName} → ${convId}`);
+      renderAll();
+    }
+
+    async function openHelpConversation(){
+      const title = String(refs.helpTitleInput?.value || '').trim();
+      const body = String(refs.helpBodyInput?.value || '').trim();
+      if (!title || !body) return alert('Başlık ve sorun alanı gerekli.');
+      const target = findUserByDisplayName('Alper');
+      const text = `Yardım başlığı: ${title}
+Sorun: ${body}`;
+      if (!target) {
+        await addDoc(collection(db, 'helpRequests'), {
+          fromUid: state.user.uid,
+          fromName: state.profile.displayName,
+          title,
+          body,
+          createdAtMs: Date.now(),
+          createdAt: serverTimestamp()
+        });
+        alert('Alper hesabı bulunamadı, istek kaydedildi.');
+        return;
+      }
+      const existing = state.conversations.find(c => (c.members || []).includes(state.user.uid) && (c.members || []).includes(target.uid) && c.listingId === 'help');
+      if (existing){
+        await updateDoc(doc(db, 'conversations', existing.id), {
+          messages: [...(existing.messages || []), { uid: 'system', name: 'Sistem', text, type: 'system', createdAt: new Date().toISOString() }],
+          lastMessage: title,
+          unreadBy: { ...(existing.unreadBy || {}), [target.uid]: (Number(existing.unreadBy?.[target.uid]) || 0) + 1 },
+          updatedAt: serverTimestamp()
+        });
+        state.currentConversationId = existing.id;
+        setView('messages');
+        renderAll();
+        return;
+      }
+      const ref = await addDoc(collection(db, 'conversations'), {
+        listingId: 'help',
+        latestListingId: 'help',
+        latestListingName: 'Yardım',
+        members: [state.user.uid, target.uid],
+        memberNames: Array.from(new Set([state.profile.displayName, target.displayName].filter(Boolean))),
+        messages: [{ uid: 'system', name: 'Sistem', text, type: 'system', createdAt: new Date().toISOString() }],
+        lastMessage: title,
+        unreadBy: { [target.uid]: 1 },
+        readBy: { [state.user.uid]: Date.now() },
+        createdAtMs: Date.now(),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      state.currentConversationId = ref.id;
+      setView('messages');
+      await logAction('Yardım mesajı', `${state.profile.displayName} → Alper`);
+      renderAll();
+    }
+
+    function renderHelp(){
+      refs.viewHelp?.classList.remove('hidden');
+    }
     async function fileToDataUrl(file){
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -1859,7 +2465,12 @@
         renderAll();
       });
 
-      state.unsubscribers.push(u1,u2,u3,u4,u5);
+      const u6 = onSnapshot(collection(db, "promoCodes"), snap => {
+        state.promoCodes = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        renderAll();
+      });
+
+      state.unsubscribers.push(u1,u2,u3,u4,u5,u6);
     }
 
     async function openConversation(listingId){
@@ -1974,6 +2585,17 @@
       if (!state.user) return;
       const item = state.listings.find(x => x.id === listingId);
       if (!item || !isPublished(item)) return;
+      state.pendingPurchaseListingId = listingId;
+      refs.buyOptionInfo.innerHTML = `
+        <div class="purchase-info">
+          <strong>${escapeHtml(item.name || '')}</strong>
+          <div class="tiny">Satıcı: ${escapeHtml(item.ownerName || '')}</div>
+          <div class="tiny">Coin seçeneği varsa coin ile de alabilirsin.</div>
+          ${item.coinPrice ? `<div class="price-new">${escapeHtml(formatCoin(item.coinPrice))}</div>` : `<div class="tiny">Bu ilanda coin fiyatı tanımlı değil.</div>`}
+        </div>`;
+      refs.btnBuyCoin.disabled = !(Number(item.coinPrice || 0) > 0);
+      showModal(refs.modalBuyOptions);
+      return;
 
       const buyText = `Ben ${state.profile.displayName}, "${item.name}" ürününü almak istiyorum.`;
 
@@ -2072,6 +2694,8 @@
       const isDiscounted = !!refs.adDiscount.checked;
       const oldPriceLabel = normalizePriceLabel(refs.adOldPrice.value);
       const newPriceLabel = normalizePriceLabel(refs.adNewPrice.value);
+      const coinSale = !!refs.adCoinSale.checked;
+      const coinPrice = coinSale ? Math.max(0, Number(refs.adCoinPrice.value || 0)) : 0;
       const type = refs.adType.value;
       const category = refs.adCategory.value;
       const tags = refs.adTags.value.split(",").map(x => x.trim()).filter(Boolean);
@@ -2084,6 +2708,7 @@
 
       if (!name || !description || !newPriceLabel) return alert("Ürün adı, açıklama ve yeni fiyat / istenen alanı zorunlu.");
       if (isDiscounted && !oldPriceLabel) return alert("İndirimli ilan için eski fiyat gerekli.");
+      if (coinSale && coinPrice <= 0) return alert("Coin satış için coin fiyatı gerekli.");
 
       if (isDuplicateListingName(name, editId)) {
         alert("Bu hesapta aynı isimli ilan zaten var.");
@@ -2116,6 +2741,8 @@
         oldPriceLabel: isDiscounted ? oldPriceLabel : "",
         newPriceLabel,
         isDiscounted,
+        coinSale,
+        coinPrice,
         type,
         category,
         tags,
@@ -2145,6 +2772,8 @@
         refs.listingForm.reset();
         refs.listingForm.dataset.existingImages = "";
         refs.imagePreview.classList.add("hidden");
+        refs.adCoinSale.checked = false;
+        refs.adCoinPrice.value = "";
         refs.listingForm.dataset.editId = "";
         refs.modalListing.classList.remove("show");
         refs.modalTitle.textContent = "İlan ekle";
@@ -2198,6 +2827,8 @@
       refs.adNewPrice.value = item.newPriceLabel || item.priceLabel || "";
       refs.adImageUrls.value = "";
       refs.adImageFile.value = "";
+      refs.adCoinSale.checked = !!item.coinSale;
+      refs.adCoinPrice.value = item.coinPrice || "";
       if (listingImages(item)[0]){
         refs.imagePreview.src = listingImages(item)[0];
         refs.imagePreview.classList.remove("hidden");
@@ -2213,6 +2844,8 @@
       refs.listingForm.dataset.editId = "";
       refs.listingForm.dataset.existingImages = "";
       refs.listingForm.reset();
+      refs.adCoinSale.checked = false;
+      refs.adCoinPrice.value = "";
       refs.imagePreview.classList.add("hidden");
       refs.modalListing.classList.add("show");
     }
@@ -2456,6 +3089,9 @@
         document.body.style.overflow = "";
       }
     });
+    refs.modalBuyOptions.addEventListener("click", (e) => {
+      if (e.target === refs.modalBuyOptions) hideModal(refs.modalBuyOptions);
+    });
 
     refs.adImageFile.addEventListener("change", async () => {
       const file = refs.adImageFile.files?.[0];
@@ -2483,6 +3119,13 @@
       refs.modalDetail.classList.remove("show");
       document.body.style.overflow = "";
     };
+    refs.btnCloseBuyOptions.onclick = () => hideModal(refs.modalBuyOptions);
+    refs.btnBuyManual.onclick = manualPurchaseFromModal;
+    refs.btnBuyCoin.onclick = coinPurchaseFromModal;
+    refs.btnRedeemPromo.onclick = redeemPromoCode;
+    refs.promoForm.onsubmit = addOrUpdatePromo;
+    refs.promoResetButton.onclick = clearPromoForm;
+    refs.helpForm.onsubmit = async (e) => { e.preventDefault(); await openHelpConversation(); };
     refs.btnMessageSeller.onclick = messageSeller;
 
     document.querySelectorAll(".menu button").forEach(btn => {
@@ -2497,11 +3140,15 @@
     window.__selectForAdmin = selectForAdmin;
     window.__openSeller = openSellerProfile;
     window.__buyListing = buyListing;
+    window.__approveCoinOrder = approveCoinOrder;
     window.__openListingDetail = openListingDetail;
     window.__setDetailImage = setDetailImage;
+    window.__editPromoCode = setPromoEdit;
+    window.__deletePromoCode = deletePromoCode;
 
     onAuthStateChanged(auth, async (user) => {
       state.user = user || null;
+      state.promoUnlocked = false;
       if (!user){
         state.profile = null;
         state.isAdmin = false;
@@ -2514,6 +3161,7 @@
       const dn = user.displayName || user.email?.split("@")[0] || "Üye";
       state.profile = await ensureUserDoc(user, dn, false);
       state.isAdmin = !!state.profile.isAdmin;
+      if (refs.coinBadge) refs.coinBadge.classList.remove('hidden');
       setAppScreen();
       await touchActivity();
       await loadLiveData();
@@ -2537,6 +3185,7 @@
 
     refs.loginName.value = "";
     refs.loginPass.value = "";
+    if (refs.coinBadge) refs.coinBadge.textContent = formatCoin(0);
 
     setInterval(async () => {
       try{
