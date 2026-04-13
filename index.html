@@ -171,7 +171,6 @@
     }
     .modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:18px 20px;border-bottom:1px solid var(--line)}
     .modal-body{padding:20px}
-
     #modalDetail .detail-modal-card{
       width:100vw;
       height:100vh;
@@ -392,7 +391,6 @@
         </div>
       </div>
     </div>
-
     <div class="container">
       <div id="authScreen" class="hero">
         <div class="grid auth-grid">
@@ -414,7 +412,6 @@
               </div>
             </div>
           </div>
-
           <div class="panel">
             <div class="panel-inner">
               <div class="tabs">
@@ -422,7 +419,6 @@
                 <button id="tabRegister" class="tab">Kayıt</button>
               </div>
               <div class="hr"></div>
-
               <form id="loginForm" class="form">
                 <div class="field">
                   <label>Kullanıcı adı</label>
@@ -434,7 +430,6 @@
                 </div>
                 <button class="btn" type="submit">Giriş yap</button>
               </form>
-
               <form id="registerForm" class="form hidden">
                 <div class="field">
                   <label>İsim / kullanıcı adı</label>
@@ -456,7 +451,6 @@
           </div>
         </div>
       </div>
-
       <div id="appScreen" class="hidden">
         <div class="layout">
           <div class="sidebar panel">
@@ -488,7 +482,6 @@
               </div>
             </div>
           </div>
-
           <div class="main panel">
             <div class="panel-inner">
               <div class="section-title">
@@ -501,7 +494,6 @@
                   <span id="onlineBadge" class="pill">Hazır</span>
                 </div>
               </div>
-
               <div id="viewShop">
                 <div class="searchbar">
                   <input id="searchInput" class="input" placeholder="İlan ara..." />
@@ -523,7 +515,6 @@
                 <div class="hr"></div>
                 <div id="listingsGrid" class="cards"></div>
               </div>
-
               <div id="viewMyAds" class="hidden">
                 <div class="notice">
                   Burada kendi ilanların görünür. Durumu kapatabilir, tekrar açabilir, düzenleyebilir veya silebilirsin.
@@ -531,7 +522,6 @@
                 <div class="hr"></div>
                 <div id="myAdsList" class="cards"></div>
               </div>
-
               <div id="viewMessages" class="hidden">
                 <div class="admin-grid">
                   <div class="panel" style="box-shadow:none">
@@ -565,7 +555,6 @@
                   </div>
                 </div>
               </div>
-
               <div id="viewProfile" class="hidden">
                 <div class="admin-grid">
                   <div class="panel" style="box-shadow:none">
@@ -668,7 +657,6 @@
                   </div>
                 </div>
               </div>
-
               <div id="viewAdmin" class="hidden">
                 <div class="admin-grid">
                   <div class="panel" style="box-shadow:none">
@@ -720,17 +708,14 @@
                   </div>
                 </div>
               </div>
-
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
     <div class="footer">7/C Shop • Tek dosya demo • Firebase Auth + Firestore</div>
   </div>
-
   <div id="modalListing" class="modal">
     <div class="modal-card">
       <div class="modal-head">
@@ -759,7 +744,6 @@
               </select>
             </div>
           </div>
-
           <div class="two">
             <div class="field">
               <label>Ürün adı</label>
@@ -770,16 +754,13 @@
               <input id="adTags" class="input" placeholder="örnek: yeni, temiz, acil" />
             </div>
           </div>
-
           <div class="field">
             <label>Açıklama</label>
             <textarea id="adDesc" class="input" placeholder="Ürün durumu, ne istediğin, pazarlık notu..."></textarea>
           </div>
-
           <div class="notice">
             İstersen indirimli ilan açabilirsin. Eski fiyat üstte çizili görünür, yeni fiyat normal görünür.
           </div>
-
           <div class="two">
             <div class="field">
               <label><input id="adDiscount" type="checkbox" /> İndirimli ilan</label>
@@ -790,12 +771,10 @@
               <input id="adOldPrice" class="input" placeholder="Örn: 150 TL" />
             </div>
           </div>
-
           <div class="field">
             <label>Yeni fiyat / istenen</label>
             <input id="adNewPrice" class="input" placeholder="Örn: 99 TL / oyuncak" />
           </div>
-
           <div class="two">
             <div class="field">
               <label><input id="adCoinSale" type="checkbox" /> Coin ile satış</label>
@@ -806,30 +785,27 @@
               <input id="adCoinPrice" class="input" type="number" min="0" placeholder="Örn: 250" />
             </div>
           </div>
-
           <div class="two">
             <div class="field">
               <label>Fotoğraf ekle</label>
               <input id="adImageFile" class="input" type="file" accept="image/*" multiple />
               <div class="hint">Birden fazla fotoğraf seçebilirsin. İlk fotoğraf kapakta görünür.</div>
+              <div id="selectedImagePreviews" class="thumbs hidden" style="margin-top:10px;flex-wrap:wrap"></div>
             </div>
             <div class="field">
               <label>Fotoğraf URL'leri</label>
               <textarea id="adImageUrls" class="input" placeholder="Her satıra bir fotoğraf URL'si yazabilirsin."></textarea>
             </div>
           </div>
-
           <div class="field">
             <label>Kapak önizleme</label>
             <img id="imagePreview" class="preview hidden" alt="Önizleme">
           </div>
-
           <button class="btn" type="submit">Kaydet</button>
         </form>
       </div>
     </div>
   </div>
-
   <div id="modalSeller" class="modal">
     <div class="modal-card" style="width:min(720px,100%)">
       <div class="modal-head">
@@ -865,7 +841,6 @@
       </div>
     </div>
   </div>
-
   <div id="modalProfileEdit" class="modal">
     <div class="modal-card" style="width:min(760px,100%)">
       <div class="modal-head">
@@ -901,7 +876,6 @@
       </div>
     </div>
   </div>
-
   <div id="modalDetail" class="modal">
     <div class="modal-card detail-modal-card">
       <div class="modal-head">
@@ -953,9 +927,6 @@
       </div>
     </div>
   </div>
-
-
-
   <div id="modalBuyOptions" class="modal">
     <div class="modal-card" style="width:min(680px,100%)">
       <div class="modal-head">
@@ -972,7 +943,6 @@
       </div>
     </div>
   </div>
-
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
     import {
@@ -999,7 +969,6 @@
       deleteDoc,
       runTransaction
     } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
-
     const firebaseConfig = {
       apiKey: "AIzaSyBeIGkhnS59kFgzYLWvrO1rL6oyfqqSF-U",
       authDomain: "c-shop-3b43a.firebaseapp.com",
@@ -1009,14 +978,11 @@
       appId: "1:1026954337566:web:ebe164f83133f9a09f7d0f",
       measurementId: "G-28L0HDBVPD"
     };
-
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     await setPersistence(auth, browserSessionPersistence);
-
     const $ = (id) => document.getElementById(id);
-
     const refs = {
       authScreen: $("authScreen"),
       appScreen: $("appScreen"),
@@ -1092,6 +1058,7 @@
       adImageFile: $("adImageFile"),
       adTags: $("adTags"),
       imagePreview: $("imagePreview"),
+      selectedImagePreviews: $("selectedImagePreviews"),
       modalSeller: $("modalSeller"),
       modalProfileEdit: $("modalProfileEdit"),
       btnCloseProfileEdit: $("btnCloseProfileEdit"),
@@ -1134,7 +1101,6 @@
       helpTitleInput: $("helpTitleInput"),
       helpBodyInput: $("helpBodyInput")
     };
-
     const state = {
       user: null,
       profile: null,
@@ -1155,26 +1121,23 @@
       pendingPurchaseListingId: null,
       promoUnlocked: false,
       promoCodes: [],
-      unsubscribers: []
+      unsubscribers: [],
+      listingDraftImages: []
     };
-
     const DAY = 24 * 60 * 60 * 1000;
     const LISTING_LIFETIME = 15 * DAY;
     const CHAT_LIFETIME = 72 * 60 * 60 * 1000;
     const MANAGER_KEY = "alper9119bulut";
     const HELP_TARGET_NAME = "alper";
-
     function slugify(name){
       return String(name).trim().toLowerCase()
         .replace(/[^a-z0-9ğüşöçıİı\s-]/gi,"")
         .replace(/\s+/g,"-")
         .slice(0,32) || "user";
     }
-
     function normalizeName(name){
       return String(name || "").trim().toLowerCase().replace(/\s+/g, " ");
     }
-
     function normalizePriceLabel(value){
       const raw = String(value ?? "").trim().replace(/\s+/g, " ");
       if (!raw) return "";
@@ -1188,7 +1151,6 @@
       }
       return raw;
     }
-
     function escapeHtml(str){
       return String(str ?? "")
         .replaceAll("&","&amp;")
@@ -1197,13 +1159,11 @@
         .replaceAll('"',"&quot;")
         .replaceAll("'","&#39;");
     }
-
     function truncateText(str, maxLen = 50){
       const value = String(str ?? "").trim();
       if (value.length <= maxLen) return value;
       return value.slice(0, maxLen) + "...";
     }
-
     function tsValue(ts){
       if (!ts) return 0;
       try{
@@ -1214,35 +1174,28 @@
         return 0;
       }
     }
-
     function formatDate(ts){
       const v = tsValue(ts);
       if (!v) return "az önce";
       return new Date(v).toLocaleString("tr-TR", { dateStyle:"short", timeStyle:"short" });
     }
-
     function formatCoin(value){
       const num = Number(value || 0);
       return `${num} Coin`;
     }
-
     function currentCoinBalance(){
       return Number(state.profile?.coinBalance || 0);
     }
-
     function itemCoinPrice(item){
       return Math.max(0, Number(item?.coinPrice || 0));
     }
-
     function canAffordCoinItem(item){
       const price = itemCoinPrice(item);
       return price > 0 && currentCoinBalance() >= price;
     }
-
     function isManagerKey(value){
       return String(value || "").trim().toLowerCase() === MANAGER_KEY.toLowerCase();
     }
-
     function setAuthScreen(){
       refs.authScreen.classList.remove("hidden");
       refs.appScreen.classList.add("hidden");
@@ -1251,7 +1204,6 @@
       refs.whoami.classList.add("hidden");
       refs.adminMenu.classList.add("hidden");
     }
-
     function setAppScreen(){
       refs.authScreen.classList.add("hidden");
       refs.appScreen.classList.remove("hidden");
@@ -1261,7 +1213,6 @@
       refs.adminMenu.classList.toggle("hidden", !state.isAdmin);
       refs.whoami.textContent = `${state.profile?.displayName || "Üye"}${state.isAdmin ? " • Yönetici" : ""}`;
     }
-
     function setView(view){
       state.view = view;
       document.querySelectorAll(".menu button").forEach(b => b.classList.toggle("active", b.dataset.view === view));
@@ -1283,14 +1234,46 @@
       document.getElementById("viewHelp").classList.toggle("hidden", view !== "help");
       renderAll();
     }
-
     function listingImages(item){
       const images = Array.isArray(item?.images) ? item.images.filter(Boolean) : [];
       const fallback = item?.imageData || item?.imageUrl;
       if (fallback && !images.includes(fallback)) images.unshift(fallback);
       return images.length ? images : [];
     }
-
+    function renderSelectedImagePreviews(images){
+      const list = Array.isArray(images) ? images.filter(Boolean).slice(0, 5) : [];
+      if (!refs.selectedImagePreviews) return;
+      if (!list.length){
+        refs.selectedImagePreviews.innerHTML = '';
+        refs.selectedImagePreviews.classList.add('hidden');
+        if (refs.imagePreview) refs.imagePreview.classList.add('hidden');
+        return;
+      }
+      refs.selectedImagePreviews.innerHTML = list.map((src, idx) => `
+        <img class="thumb ${idx === 0 ? 'active' : ''}" src="${escapeHtml(src)}" alt="Fotoğraf ${idx + 1}" title="Fotoğraf ${idx + 1}">
+      `).join('');
+      refs.selectedImagePreviews.classList.remove('hidden');
+      if (refs.imagePreview){
+        refs.imagePreview.src = list[0];
+        refs.imagePreview.classList.remove('hidden');
+      }
+    }
+    function setDraftImages(images){
+      state.listingDraftImages = Array.isArray(images) ? images.filter(Boolean).slice(0, 5) : [];
+      renderSelectedImagePreviews(state.listingDraftImages);
+    }
+    function appendDraftImages(images){
+      const current = Array.isArray(state.listingDraftImages) ? [...state.listingDraftImages] : [];
+      for (const src of (Array.isArray(images) ? images : [])){
+        const value = String(src || '').trim();
+        if (!value) continue;
+        if (current.includes(value)) continue;
+        current.push(value);
+        if (current.length >= 5) break;
+      }
+      state.listingDraftImages = current.slice(0, 5);
+      renderSelectedImagePreviews(state.listingDraftImages);
+    }
     function listingImage(item){
       const first = listingImages(item)[0];
       return first || "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
@@ -1299,7 +1282,6 @@
           <text x="600" y="350" text-anchor="middle" font-size="40" fill="#9ca3af" font-family="Arial">Görsel yok</text>
         </svg>`);
     }
-
     function renderPriceBlock(item){
       const price = normalizePriceLabel(item?.priceLabel || item?.newPriceLabel || "İstenen yok");
       const coin = Number(item?.coinPrice || 0);
@@ -1319,7 +1301,6 @@
         </div>
       `;
     }
-
     async function ensureUserDoc(user, displayName, isAdmin=false){
       const ref = doc(db, "users", user.uid);
       const snap = await getDoc(ref);
@@ -1349,7 +1330,6 @@
       }
       return { uid:user.uid, displayName, isAdmin: !!isAdmin };
     }
-
     async function logAction(action, detail){
       try{
         await addDoc(collection(db, "logs"), {
@@ -1360,52 +1340,42 @@
         });
       }catch{}
     }
-
     function normalizeType(t){
       return t === "sell" ? "satış" : t === "swap" ? "takas" : "takasTL";
     }
-
     function isPublished(item){
       return item?.status === "published";
     }
-
     function sortDescByDate(arr, field="createdAt"){
       return [...arr].sort((a,b) => tsValue(b[field]) - tsValue(a[field]));
     }
-
     function getUnreadCount(conv){
       const map = conv?.unreadBy || {};
       return Math.max(0, Number(map?.[state.user?.uid] || 0));
     }
-
     function totalUnreadCount(){
       return state.conversations.reduce((sum, conv) => sum + getUnreadCount(conv), 0);
     }
-
     function getUserById(uid){
       return state.users.find(u => u.uid === uid) || null;
     }
-
     function getUserAvatar(uid){
       if (!uid) return "";
       const user = getUserById(uid) || (state.user?.uid === uid ? state.profile : null);
       return user?.avatarDataUrl || user?.avatarUrl || user?.photoURL || "";
     }
-
     function getAvatarMarkup(avatarUrl, label){
       const initials = String(label || "?").trim().slice(0, 2).toUpperCase() || "?";
       return avatarUrl
         ? `<img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(label || "Avatar")}">`
         : `<span>${escapeHtml(initials)}</span>`;
     }
-
     function getConversationPeer(conv){
       const otherId = (conv?.members || []).find(id => id && id !== state.user?.uid) || null;
       const user = otherId ? getUserById(otherId) : null;
       const name = user?.displayName || (conv?.memberNames || []).find(n => n !== state.profile?.displayName) || "Sohbet";
       return { otherId, user, name };
     }
-
     function formatLastSeen(value){
       const ms = tsValue(value);
       if (!ms) return "Son aktif: bilinmiyor";
@@ -1415,14 +1385,12 @@
       if (diff < 24 * 60 * 60 * 1000) return `Son aktif: ${Math.max(1, Math.floor(diff / 3600000))} saat önce`;
       return `Son aktif: ${new Date(ms).toLocaleString("tr-TR", { dateStyle:"short", timeStyle:"short" })}`;
     }
-
     async function touchActivity(){
       if (!state.user) return;
       try{
         await updateDoc(doc(db, "users", state.user.uid), { lastSeenAt: serverTimestamp(), updatedAt: serverTimestamp() });
       }catch{}
     }
-
     async function markConversationRead(convId){
       if (!convId || !state.user) return;
       const conv = state.conversations.find(c => c.id === convId);
@@ -1433,12 +1401,10 @@
       readBy[state.user.uid] = Date.now();
       await updateDoc(doc(db, "conversations", convId), { unreadBy, readBy, updatedAt: serverTimestamp() });
     }
-
     function filterListings(list){
       const q = refs.searchInput.value.trim().toLowerCase();
       const type = refs.filterType.value;
       const cat = refs.filterCategory.value;
-
       return list.filter(item => {
         if (state.view === "shop" && !isPublished(item)) return false;
         if (type !== "all" && item.type !== type) return false;
@@ -1448,11 +1414,9 @@
         return hay.includes(q);
       });
     }
-
     function myListings(){
       return sortDescByDate(state.listings.filter(x => x.ownerId === state.user?.uid));
     }
-
     function findConversationByPeer(otherId){
       const matches = state.conversations.filter(c => {
         const members = Array.isArray(c?.members) ? c.members : [];
@@ -1464,12 +1428,10 @@
         return tb - ta;
       })[0] || null;
     }
-
     function getConversationLatestListingName(conv){
       const listing = state.listings.find(x => x.id === conv?.listingId);
       return conv?.latestListingName || listing?.name || listing?.ownerName || "İlan";
     }
-
     function isDuplicateListingName(name, editingId = ""){
       const target = normalizeName(name);
       return state.listings.some(x =>
@@ -1478,7 +1440,6 @@
         normalizeName(x.name) === target
       );
     }
-
     function getConversationFallback(id){
       const live = state.conversations.find(c => c.id === id) || null;
       if (live) return live;
@@ -1486,12 +1447,10 @@
         ? state.currentConversationCache
         : null;
     }
-
     function getConversationPeople(conv){
       const names = Array.from(new Set((conv?.memberNames || []).filter(Boolean)));
       return names.length ? names : ["Sohbet"];
     }
-
     function conversationSearchText(conv){
       const listing = state.listings.find(x => x.id === conv.listingId);
       return [
@@ -1502,7 +1461,6 @@
         conv?.messages?.map(m => m.text).join(" ")
       ].filter(Boolean).join(" ").toLowerCase();
     }
-
     function getLastMyMessageMeta(conv){
       const messages = Array.isArray(conv?.messages) ? conv.messages : [];
       for (let i = messages.length - 1; i >= 0; i--){
@@ -1512,7 +1470,6 @@
       }
       return null;
     }
-
     function isMessageSeenByPeer(conv, message){
       if (!conv || !message) return false;
       const peer = getConversationPeer(conv);
@@ -1522,7 +1479,6 @@
       if (!readAt) return false;
       return tsValue(readAt) >= tsValue(message.createdAt);
     }
-
     function renderListingCard(item, forMine=false){
       const owner = escapeHtml(item.ownerName || "Bilinmeyen");
       const isMine = state.user?.uid === item.ownerId;
@@ -1530,11 +1486,9 @@
         item.status === "published" ? `<span class="badge ok">Yayında</span>` :
         item.status === "closed" ? `<span class="badge closed">Kapalı</span>` :
         `<span class="badge no">Arşiv</span>`;
-
       const typeBadge = `<span class="badge mine">${escapeHtml(normalizeType(item.type))}</span>`;
       const categoryBadge = `<span class="badge wait">${escapeHtml(item.category || "diger")}</span>`;
       const tags = (item.tags || []).map(t => `<span class="pill">#${escapeHtml(t)}</span>`).join("");
-
       return `
         <div class="card">
           <img src="${listingImage(item)}" alt="${escapeHtml(item.name)}" onclick="window.__openListingDetail('${item.id}')" style="cursor:pointer" onerror="this.style.display='none'">
@@ -1543,7 +1497,6 @@
               <span>${owner}</span>
               <span>${formatDate(item.createdAt)}</span>
             </div>
-
             <div class="seller-box">
               <div class="seller-identity">
                 <div class="mini-avatar">${getAvatarMarkup(getUserAvatar(item.ownerId), item.ownerName || owner)}</div>
@@ -1556,14 +1509,12 @@
               </div>
               <button class="btn secondary" onclick="window.__openSeller('${item.ownerId}','${item.id}')">Profil</button>
             </div>
-
             <div class="row">
               ${statusBadge}
               ${typeBadge}
               ${categoryBadge}
               ${isMine ? `<span class="badge mine">Senin ilan</span>` : ""}
             </div>
-
             <h4 style="cursor:pointer" title="${escapeHtml(item.name)}" onclick="window.__openListingDetail('${item.id}')">${escapeHtml(truncateText(item.name || "", 40))}</h4>
             <p>${escapeHtml(truncateText(item.description || "", 50))}</p>
             <div class="row">${tags}</div>
@@ -1581,18 +1532,15 @@
         </div>
       `;
     }
-
     function renderDetailModal(item){
       if (!item) return;
       const images = listingImages(item);
       const mainIndex = Math.min(state.currentDetailImageIndex || 0, Math.max(images.length - 1, 0));
       const mainImage = images[mainIndex] || listingImage(item);
-
       refs.detailTitle.textContent = item.name || "İlan detayı";
       refs.detailName.textContent = item.name || "-";
       refs.detailStatus.innerHTML = item.status === "published" ? '<span class="badge ok">Yayında</span>' : '<span class="badge closed">Kapalı</span>';
       refs.detailSeller.textContent = `${item.ownerName || "Bilinmeyen"} • ${formatDate(item.createdAt)}`;
-
       const coinText = Number(item.coinPrice || 0) > 0 ? ` / ${formatCoin(item.coinPrice)}` : "";
       if (item.isDiscounted && item.oldPriceLabel && item.newPriceLabel){
         refs.detailPriceBox.innerHTML = `
@@ -1605,7 +1553,6 @@
           <span class="price-new">${escapeHtml(normalizePriceLabel(item.priceLabel || item.newPriceLabel || "İstenen yok") + coinText)}</span>
         `;
       }
-
       const sellerAvatar = getUserAvatar(item.ownerId);
       refs.detailSeller.innerHTML = `
         <div class="seller-identity" style="width:100%">
@@ -1630,12 +1577,10 @@
           <span>Fotoğraf ${idx + 1}${idx === mainIndex ? ' • Seçili' : ''}</span>
         </div>
       `).join("") || `<div class="feed-item">Fotoğraf yok.</div>`;
-
       const mine = state.user?.uid === item.ownerId;
       refs.btnDetailMessage.classList.toggle("hidden", !isPublished(item) || mine);
       refs.btnDetailBuy.classList.toggle("hidden", !isPublished(item) || mine);
       refs.btnDetailBuy.textContent = item.coinPrice > 0 ? "Satın al" : "Satın al";
-
       refs.btnDetailMessage.onclick = async () => {
         refs.modalDetail.classList.remove("show");
         document.body.style.overflow = "";
@@ -1647,7 +1592,6 @@
         await buyListing(item.id);
       };
     }
-
     async function openListingDetail(id){
       const item = state.listings.find(x => x.id === id);
       if (!item) return;
@@ -1657,7 +1601,6 @@
       refs.modalDetail.classList.add("show");
       document.body.style.overflow = "hidden";
     }
-
     async function setDetailImage(listingId, index){
       const item = state.listings.find(x => x.id === listingId);
       if (!item) return;
@@ -1665,13 +1608,11 @@
       state.currentDetailImageIndex = index;
       renderDetailModal(item);
     }
-
     async function selectForAdmin(id){
       const item = state.listings.find(x => x.id === id);
       if (!item) return;
       await openListingDetail(id);
     }
-
     function renderConversationItem(conv){
       const peer = getConversationPeer(conv);
       const unread = getUnreadCount(conv);
@@ -1695,7 +1636,6 @@
         </div>
       `;
     }
-
     function renderConversation(){
       const conv = getConversationFallback(state.currentConversationId);
       if (!conv){
@@ -1705,12 +1645,10 @@
         refs.btnDeleteConversation.classList.add("hidden");
         return;
       }
-
       const peer = getConversationPeer(conv);
       refs.chatTitle.textContent = peer.name || "Sohbet";
       refs.chatSub.textContent = `${getConversationLatestListingName(conv)} • ${peer.user?.lastSeenAt ? formatLastSeen(peer.user.lastSeenAt) : "Son aktif: bilinmiyor"}`;
       refs.btnDeleteConversation.classList.remove("hidden");
-
       const lastMy = getLastMyMessageMeta(conv);
       const order = conv.purchaseOrder || null;
       const orderHtml = order ? (() => {
@@ -1764,11 +1702,9 @@
             </div>
           </div>`;
       }).join("");
-
       refs.messagesBox.innerHTML = html || `<div class="feed-item">Henüz mesaj yok.</div>`;
       refs.messagesBox.scrollTop = refs.messagesBox.scrollHeight;
     }
-
     function renderProfile(){
       const p = state.profile || {};
       const mine = myListings();
@@ -1776,7 +1712,6 @@
       const closedCount = mine.filter(x => x.status === "closed").length;
       const avatar = p.avatarDataUrl || p.avatarUrl || p.photoURL || "";
       const initials = (p.displayName || "?").trim().slice(0,2).toUpperCase();
-
       refs.profileNameText.textContent = p.displayName || "-";
       refs.profileEmailText.textContent = p.email || "E-posta görünmüyor";
       refs.profileRolePill.textContent = state.isAdmin ? "Yönetici" : "Üye";
@@ -1784,7 +1719,6 @@
       refs.profileAvatarBox.innerHTML = avatar
         ? `<img src="${escapeHtml(avatar)}" alt="Profil fotoğrafı">`
         : `<span class="avatar-fallback">${escapeHtml(initials)}</span>`;
-
       refs.profileBox.innerHTML = `
         <div class="item"><div class="item-head"><strong>İsim</strong></div><span>${escapeHtml(p.displayName || "")}</span></div>
         <div class="item"><div class="item-head"><strong>Rol</strong></div><span>${state.isAdmin ? "Yönetici" : "Üye"}</span></div>
@@ -1803,7 +1737,6 @@
       if (refs.promoManagerPanel) refs.promoManagerPanel.classList.toggle('hidden', !state.promoUnlocked);
       if (refs.promoManagerPanel && state.promoUnlocked) refs.promoManagerPanel.classList.remove('hidden');
     }
-
     function renderAdminLog(){
       refs.adminLog.innerHTML = sortDescByDate(state.logs).slice(0, 25).map(x => `
         <div class="item">
@@ -1815,7 +1748,6 @@
         </div>
       `).join("") || `<div class="feed-item">Kayıt yok.</div>`;
     }
-
     function renderAdminListings(){
       refs.adminListings.innerHTML = sortDescByDate(state.listings).map(item => `
         <div class="item">
@@ -1831,18 +1763,15 @@
         </div>
       `).join("") || `<div class="feed-item">Kayıt yok.</div>`;
     }
-
     function renderMyAds(){
       const mine = myListings();
       refs.myAdsList.innerHTML = mine.map(x => renderListingCard(x, true)).join("") || `<div class="feed-item">Henüz ilan yok.</div>`;
     }
-
     function renderShop(){
       const items = filterListings(sortDescByDate(state.listings)).filter(x => x.status === "published");
       refs.listingsGrid.innerHTML = items.map(x => renderListingCard(x, false)).join("") || `<div class="feed-item">Burada henüz ilan yok.</div>`;
       refs.countBadge.textContent = `${items.length} ilan`;
     }
-
     function renderConversations(){
       const q = (refs.messageSearchInput?.value || "").trim().toLowerCase();
       const mine = sortDescByDate(state.conversations).filter(c => (c.members || []).includes(state.user.uid));
@@ -1850,7 +1779,6 @@
       refs.conversationList.innerHTML = filtered.map(renderConversationItem).join("") || `<div class="people-list-empty">Henüz konuşma yok.</div>`;
       renderConversation();
     }
-
     function renderAll(){
       if (!state.user) return;
       const unreadTotal = totalUnreadCount();
@@ -1873,17 +1801,14 @@
       if (state.view !== "messages") renderConversation();
       if (state.view !== "profile") renderProfile();
     }
-
     function showModal(modal){
       modal?.classList.add('show');
       document.body.style.overflow = 'hidden';
     }
-
     function hideModal(modal){
       modal?.classList.remove('show');
       document.body.style.overflow = '';
     }
-
     async function renderPromoManager(){
       if (!refs.promoManagerPanel) return;
       refs.promoManagerPanel.classList.toggle('hidden', !state.promoUnlocked);
@@ -1906,13 +1831,10 @@
           </div>`;
       }).join('') || `<div class="feed-item">Henüz promosyon kodu yok.</div>`;
     }
-
-
     function findUserByDisplayName(name){
       const n = String(name || '').trim().toLowerCase();
       return state.users.find(u => String(u.displayName || '').trim().toLowerCase() === n) || null;
     }
-
     async function saveCoinDelta(userId, delta){
       return runTransaction(db, async (tx) => {
         const ref = doc(db, 'users', userId);
@@ -1925,7 +1847,6 @@
         return next;
       });
     }
-
     async function savePromoCodeDoc(data, editId = ''){
       const payload = {
         code: String(data.code || '').trim(),
@@ -1946,7 +1867,6 @@
         await addDoc(collection(db, 'promoCodes'), payload);
       }
     }
-
     function clearPromoForm(){
       refs.promoForm?.reset();
       if (refs.promoActiveInput) refs.promoActiveInput.checked = true;
@@ -1956,7 +1876,6 @@
       if (refs.promoDaysInput) refs.promoDaysInput.value = '';
       if (refs.promoForm) refs.promoForm.dataset.editId = '';
     }
-
     async function redeemPromoCode(){
       const raw = String(refs.promoRedeemInput?.value || '').trim();
       if (!raw) return;
@@ -2005,7 +1924,6 @@
         alert('Kod kullanılamadı: ' + firebaseErrorMessage(err));
       }
     }
-
     async function setPromoEdit(id){
       const code = state.promoCodes.find(x => x.id === id);
       if (!code) return;
@@ -2016,7 +1934,6 @@
       refs.promoDaysInput.value = code.expiresAtMs ? Math.max(1, Math.ceil((Number(code.expiresAtMs) - Date.now()) / DAY)) : '';
       refs.promoActiveInput.checked = code.active !== false;
     }
-
     async function deletePromoCode(id){
       const code = state.promoCodes.find(x => x.id === id);
       if (!code) return;
@@ -2025,7 +1942,6 @@
       await logAction('Promosyon silindi', code.code || id);
       renderAll();
     }
-
     async function addOrUpdatePromo(e){
       e.preventDefault();
       if (!state.promoUnlocked) return;
@@ -2053,7 +1969,6 @@
       await logAction(editId ? 'Promosyon düzenlendi' : 'Promosyon eklendi', code);
       renderAll();
     }
-
     async function manualPurchaseFromModal(){
       const listingId = state.pendingPurchaseListingId;
       if (!listingId) return;
@@ -2100,7 +2015,6 @@
       state.pendingPurchaseListingId = null;
       await openConversation(listingId);
     }
-
     async function coinPurchaseFromModal(){
       const listingId = state.pendingPurchaseListingId;
       if (!listingId) return;
@@ -2170,7 +2084,6 @@
       setView('messages');
       await renderAll();
     }
-
     async function approveCoinOrder(convId, side){
       const convRef = doc(db, 'conversations', convId);
       try{
@@ -2183,12 +2096,10 @@
           if (order.transferredAt) return order;
           if (side === 'buyer' && order.buyerId !== state.user.uid) throw new Error('Yetkisiz');
           if (side === 'seller' && order.sellerId !== state.user.uid) throw new Error('Yetkisiz');
-
           const next = { ...(order || {}) };
           if (side === 'buyer') next.buyerApproved = true;
           if (side === 'seller') next.sellerApproved = true;
           next.updatedAtMs = Date.now();
-
           const price = Number(next.coinPrice || 0);
           const canFinish = next.buyerApproved && next.sellerApproved && !next.transferredAt;
           if (canFinish){
@@ -2204,14 +2115,12 @@
             tx.update(sellerRef, { coinBalance: sellerCoins + price, updatedAt: serverTimestamp() });
             next.transferredAt = Date.now();
           }
-
           tx.update(convRef, {
             purchaseOrder: next,
             updatedAt: serverTimestamp()
           });
           return next;
         });
-
         state.currentConversationCache = {
           ...(state.currentConversationCache || {}),
           id: convId,
@@ -2225,7 +2134,6 @@
         alert(`Onay tamamlanamadı: ${err?.message || err}`);
       }
     }
-
     async function openHelpConversation(){
       const title = String(refs.helpTitleInput?.value || '').trim();
       const body = String(refs.helpBodyInput?.value || '').trim();
@@ -2277,7 +2185,6 @@ Sorun: ${body}`;
       await logAction('Yardım mesajı', `${state.profile.displayName} → Alper`);
       renderAll();
     }
-
     function renderHelp(){
       refs.viewHelp?.classList.remove('hidden');
     }
@@ -2289,7 +2196,6 @@ Sorun: ${body}`;
         reader.readAsDataURL(file);
       });
     }
-
     function loadImage(src){
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -2298,7 +2204,6 @@ Sorun: ${body}`;
         img.src = src;
       });
     }
-
     async function blobToDataUrl(blob){
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -2307,7 +2212,6 @@ Sorun: ${body}`;
         reader.readAsDataURL(blob);
       });
     }
-
     function dataUrlToBlob(dataUrl){
       const parts = String(dataUrl || "").split(",");
       if (parts.length < 2) return null;
@@ -2319,18 +2223,15 @@ Sorun: ${body}`;
       for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
       return new Blob([bytes], { type: mime });
     }
-
     async function fileFromDataUrl(dataUrl){
       const blob = dataUrlToBlob(dataUrl);
       if (!blob) return null;
       return blobToDataUrl(blob);
     }
-
     async function compressImageFile(file, maxSide = 1400, quality = 0.82, maxBytes = 950000){
       if (!file || !String(file.type || "").startsWith("image/")) {
         return fileToDataUrl(file);
       }
-
       const sourceUrl = URL.createObjectURL(file);
       try{
         const img = await loadImage(sourceUrl);
@@ -2338,19 +2239,16 @@ Sorun: ${body}`;
         const naturalHeight = img.naturalHeight || img.height || 1;
         const safeSides = [maxSide, Math.round(maxSide * 0.85), Math.round(maxSide * 0.7), 1024, 768, 640, 512, 384];
         const qualitySteps = [quality, 0.72, 0.62, 0.52, 0.42, 0.34, 0.28];
-
         let best = "";
         for (const side of safeSides){
           const scale = Math.min(1, side / Math.max(naturalWidth, naturalHeight));
           const width = Math.max(1, Math.round(naturalWidth * scale));
           const height = Math.max(1, Math.round(naturalHeight * scale));
-
           const canvas = document.createElement("canvas");
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext("2d", { alpha: true });
           ctx.drawImage(img, 0, 0, width, height);
-
           for (const q of qualitySteps){
             const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", q));
             if (!blob) continue;
@@ -2361,19 +2259,16 @@ Sorun: ${body}`;
             }
           }
         }
-
         if (best) return best;
         return await fileToDataUrl(file);
       }finally{
         URL.revokeObjectURL(sourceUrl);
       }
     }
-
     function firebaseErrorMessage(err){
       const code = String(err?.code || err?.name || "unknown");
       const message = String(err?.message || "Bilinmeyen hata");
       const lower = `${code} ${message}`.toLowerCase();
-
       if (lower.includes("permission-denied")) {
         return "Kayıt izni yok. Firestore kuralları bu yazmayı engelliyor.";
       }
@@ -2385,10 +2280,8 @@ Sorun: ${body}`;
       }
       return `${code}: ${message}`;
     }
-
     async function cleanupExpired(){
       const now = Date.now();
-
       const listingsSnap = await getDocs(collection(db, "listings"));
       for (const d of listingsSnap.docs){
         const data = d.data();
@@ -2396,14 +2289,12 @@ Sorun: ${body}`;
           typeof data.createdAtMs === "number"
             ? data.createdAtMs
             : tsValue(data.createdAt);
-
         if (!created) continue;
         if (now - created > LISTING_LIFETIME){
           await deleteDoc(doc(db, "listings", d.id));
           await logAction("İlan süre doldu", data.name || d.id);
         }
       }
-
       const convSnap = await getDocs(collection(db, "conversations"));
       for (const d of convSnap.docs){
         const data = d.data();
@@ -2411,7 +2302,6 @@ Sorun: ${body}`;
           typeof data.createdAtMs === "number"
             ? data.createdAtMs
             : tsValue(data.createdAt);
-
         if (!created) continue;
         if (now - created > CHAT_LIFETIME){
           await deleteDoc(doc(db, "conversations", d.id));
@@ -2419,14 +2309,12 @@ Sorun: ${body}`;
         }
       }
     }
-
     function clearListeners(){
       for (const u of state.unsubscribers) {
         try{ u && u(); }catch{}
       }
       state.unsubscribers = [];
     }
-
     async function saveProfileUpdates({ displayName, avatarUrl, avatarDataUrl }){
       if (!state.user) return;
       const ref = doc(db, "users", state.user.uid);
@@ -2463,20 +2351,16 @@ Sorun: ${body}`;
       state.user.displayName = nextName;
       await touchActivity();
     }
-
     async function loadLiveData(){
       clearListeners();
-
       const u1 = onSnapshot(collection(db, "listings"), snap => {
         state.listings = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         renderAll();
       });
-
       const u2 = onSnapshot(collection(db, "logs"), snap => {
         state.logs = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         if (state.view === "admin") renderAdminLog();
       });
-
       const u3 = onSnapshot(doc(db, "users", state.user.uid), snap => {
         if (snap.exists()){
           state.profile = { uid: state.user.uid, ...snap.data() };
@@ -2486,7 +2370,6 @@ Sorun: ${body}`;
           renderAll();
         }
       });
-
       const u4 = onSnapshot(collection(db, "conversations"), snap => {
         state.conversations = snap.docs.map(d => ({ id:d.id, ...d.data() }))
           .filter(c => (c.members || []).includes(state.user.uid));
@@ -2496,25 +2379,20 @@ Sorun: ${body}`;
         }
         renderAll();
       });
-
       const u5 = onSnapshot(collection(db, "users"), snap => {
         state.users = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         renderAll();
       });
-
       const u6 = onSnapshot(collection(db, "promoCodes"), snap => {
         state.promoCodes = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         renderAll();
       });
-
       state.unsubscribers.push(u1,u2,u3,u4,u5,u6);
     }
-
     async function openConversation(listingId){
       if (!state.user) return;
       const item = state.listings.find(x => x.id === listingId);
       if (!item || !isPublished(item)) return;
-
       let conv = findConversationByPeer(item.ownerId);
       if (!conv){
         const ref = await addDoc(collection(db, "conversations"), {
@@ -2555,7 +2433,6 @@ Sorun: ${body}`;
           });
         }catch{}
       }
-
       state.currentConversationId = conv.id;
       state.currentConversationCache = conv;
       state.currentListingId = listingId;
@@ -2564,16 +2441,13 @@ Sorun: ${body}`;
       await markConversationRead(conv.id);
       renderAll();
     }
-
     async function sendMessage(payloadText){
       const isEvent = payloadText && typeof payloadText === "object" && typeof payloadText.type === "string";
       const text = String(isEvent ? refs.messageInput.value : (payloadText ?? refs.messageInput.value)).trim();
       if (!text || !state.currentConversationId) return;
-
       const convRef = doc(db, "conversations", state.currentConversationId);
       const snap = await getDoc(convRef);
       if (!snap.exists()) return;
-
       const data = snap.data();
       const messages = Array.isArray(data.messages) ? data.messages : [];
       const next = {
@@ -2582,14 +2456,12 @@ Sorun: ${body}`;
         text,
         createdAt: new Date().toISOString()
       };
-
       const unreadBy = { ...(data.unreadBy || {}) };
       for (const member of (data.members || [])) {
         if (member !== state.user.uid) unreadBy[member] = (Number(unreadBy[member]) || 0) + 1;
       }
       const readBy = { ...(data.readBy || {}) };
       readBy[state.user.uid] = Date.now();
-
       await updateDoc(convRef, {
         messages: [...messages, next],
         lastMessage: text,
@@ -2597,7 +2469,6 @@ Sorun: ${body}`;
         readBy,
         updatedAt: serverTimestamp()
       });
-
       state.currentConversationCache = {
         ...(state.currentConversationCache || data),
         id: state.currentConversationId,
@@ -2611,23 +2482,19 @@ Sorun: ${body}`;
         members: data.members || [],
         memberNames: data.memberNames || []
       };
-
       refs.messageInput.value = "";
       await touchActivity();
       await logAction("Mesaj", `${state.profile.displayName}: ${text}`);
       renderAll();
     }
-
     async function buyListing(listingId){
       if (!state.user) return;
       const item = state.listings.find(x => x.id === listingId);
       if (!item || !isPublished(item)) return;
-
       state.pendingPurchaseListingId = listingId;
       const price = itemCoinPrice(item);
       const balance = currentCoinBalance();
       const affordable = price > 0 && balance >= price;
-
       refs.buyOptionInfo.innerHTML = `
         <div class="purchase-info">
           <strong>${escapeHtml(item.name || '')}</strong>
@@ -2640,9 +2507,7 @@ Sorun: ${body}`;
       refs.btnBuyCoin.textContent = affordable ? 'Coin ile alım' : 'Coin ile alım • Yetersiz bakiye';
       showModal(refs.modalBuyOptions);
       return;
-
       const buyText = `Ben ${state.profile.displayName}, "${item.name}" ürününü almak istiyorum.`;
-
       let conv = findConversationByPeer(item.ownerId);
       if (!conv){
         const ref = await addDoc(collection(db, "conversations"), {
@@ -2718,7 +2583,6 @@ Sorun: ${body}`;
           readBy
         };
       }
-
       await logAction("Satın al isteği", `${state.profile.displayName} → ${item.name}`);
       await touchActivity();
       state.currentConversationId = conv.id;
@@ -2728,10 +2592,8 @@ Sorun: ${body}`;
       await markConversationRead(conv.id);
       renderAll();
     }
-
     async function addListing(e){
       e.preventDefault();
-
       const editId = refs.listingForm.dataset.editId || "";
       const name = refs.adName.value.trim();
       const description = refs.adDesc.value.trim();
@@ -2743,38 +2605,29 @@ Sorun: ${body}`;
       const type = refs.adType.value;
       const category = refs.adCategory.value;
       const tags = refs.adTags.value.split(",").map(x => x.trim()).filter(Boolean);
-      const fileList = Array.from(refs.adImageFile.files || []);
       const urlList = refs.adImageUrls.value.split(/\n+/).map(x => x.trim()).filter(Boolean);
       const existingImages = (() => {
         try { return JSON.parse(refs.listingForm.dataset.existingImages || "[]"); }
         catch { return []; }
       })();
-
       if (!name || !description || !newPriceLabel) return alert("Ürün adı, açıklama ve yeni fiyat / istenen alanı zorunlu.");
       if (isDiscounted && !oldPriceLabel) return alert("İndirimli ilan için eski fiyat gerekli.");
       if (coinSale && coinPrice <= 0) return alert("Coin satış için coin fiyatı gerekli.");
-
       if (isDuplicateListingName(name, editId)) {
         alert("Bu hesapta aynı isimli ilan zaten var.");
         return;
       }
-
-      const images = [];
-      for (const file of fileList) {
-        const compressed = await compressImageFile(file);
-        if (compressed) images.push(compressed);
-      }
-      for (const url of urlList) images.push(url);
-
-      const finalImages = images.filter(Boolean).length ? images.filter(Boolean) : (editId ? existingImages : []);
-      if (!finalImages.length) return alert("En az bir fotoğraf eklemelisin.");
-
-      const mainImage = finalImages[0];
+      const finalImages = [...(Array.isArray(state.listingDraftImages) ? state.listingDraftImages : []), ...urlList]
+        .filter(Boolean)
+        .filter((v, i, arr) => arr.indexOf(v) === i)
+        .slice(0, 5);
+      const usableImages = finalImages.length ? finalImages : (editId ? existingImages : []);
+      if (!usableImages.length) return alert("En az bir fotoğraf eklemelisin.");
+      const mainImage = usableImages[0];
       if (String(mainImage).length > 950000) {
         alert("Kapak görseli hâlâ çok büyük. Lütfen daha küçük bir fotoğraf kullan.");
         return;
       }
-
       const now = Date.now();
       const payload = {
         ownerId: state.user.uid,
@@ -2790,7 +2643,7 @@ Sorun: ${body}`;
         type,
         category,
         tags,
-        images: finalImages,
+        images: usableImages,
         imageData: mainImage,
         imageUrl: mainImage,
         status: "published",
@@ -2799,7 +2652,6 @@ Sorun: ${body}`;
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
-
       try{
         if (editId){
           await updateDoc(doc(db, "listings", editId), {
@@ -2812,10 +2664,10 @@ Sorun: ${body}`;
           await addDoc(collection(db, "listings"), payload);
           await logAction("İlan eklendi", `${state.profile.displayName} → ${name}`);
         }
-
         refs.listingForm.reset();
         refs.listingForm.dataset.existingImages = "";
-        refs.imagePreview.classList.add("hidden");
+        setDraftImages([]);
+        refs.adImageUrls.value = "";
         refs.adCoinSale.checked = false;
         refs.adCoinPrice.value = "";
         refs.listingForm.dataset.editId = "";
@@ -2827,20 +2679,16 @@ Sorun: ${body}`;
         alert("İlan kaydedilemedi: " + firebaseErrorMessage(err));
       }
     }
-
     async function removeListing(id){
       const item = state.listings.find(x => x.id === id);
       if (!item) return;
       const mine = item.ownerId === state.user.uid;
       if (!mine && !state.isAdmin) return;
-
       const ok = confirm(`"${item.name}" silinsin mi? Bu işlem geri alınmaz.`);
       if (!ok) return;
-
       await deleteDoc(doc(db, "listings", id));
       await logAction("İlan silindi", `${state.profile?.displayName || "user"} → ${item.name}`);
     }
-
     async function toggleListing(id){
       const item = state.listings.find(x => x.id === id);
       if (!item || item.ownerId !== state.user.uid) return;
@@ -2852,11 +2700,9 @@ Sorun: ${body}`;
       });
       await logAction("İlan durumu", `${state.profile.displayName} → ${item.name} → ${next}`);
     }
-
     async function editListing(id){
       const item = state.listings.find(x => x.id === id);
       if (!item || item.ownerId !== state.user.uid) return;
-
       state.lastViewBeforeModal = state.view;
       refs.modalTitle.textContent = "İlan düzenle";
       refs.listingForm.dataset.editId = id;
@@ -2873,27 +2719,21 @@ Sorun: ${body}`;
       refs.adImageFile.value = "";
       refs.adCoinSale.checked = !!item.coinSale;
       refs.adCoinPrice.value = item.coinPrice || "";
-      if (listingImages(item)[0]){
-        refs.imagePreview.src = listingImages(item)[0];
-        refs.imagePreview.classList.remove("hidden");
-      }else{
-        refs.imagePreview.classList.add("hidden");
-      }
+      setDraftImages(listingImages(item));
       refs.modalListing.classList.add("show");
     }
-
     async function openModalForNew(){
       state.lastViewBeforeModal = state.view;
       refs.modalTitle.textContent = "İlan ekle";
       refs.listingForm.dataset.editId = "";
       refs.listingForm.dataset.existingImages = "";
       refs.listingForm.reset();
+      refs.adImageUrls.value = "";
       refs.adCoinSale.checked = false;
       refs.adCoinPrice.value = "";
-      refs.imagePreview.classList.add("hidden");
+      setDraftImages([]);
       refs.modalListing.classList.add("show");
     }
-
     async function selectConversation(id){
       state.currentConversationId = id;
       state.currentConversationCache = state.conversations.find(c => c.id === id) || state.currentConversationCache;
@@ -2901,7 +2741,6 @@ Sorun: ${body}`;
       await markConversationRead(id);
       renderAll();
     }
-
     async function deleteConversation(){
       if (!state.currentConversationId) return;
       const ok = confirm("Bu sohbet silinsin mi?");
@@ -2912,31 +2751,25 @@ Sorun: ${body}`;
       state.currentConversationCache = null;
       renderAll();
     }
-
     async function openSellerProfile(userId, listingId){
       const userSnap = await getDoc(doc(db, "users", userId));
       if (!userSnap.exists()) return;
-
       const seller = { uid: userId, ...userSnap.data() };
       state.currentSellerId = userId;
       state.currentSeller = seller;
       state.currentListingId = listingId || null;
-
       const sellerAds = state.listings.filter(x => x.ownerId === userId);
       const openCount = sellerAds.filter(x => x.status === "published").length;
       const closedCount = sellerAds.filter(x => x.status === "closed").length;
-
       const sellerAvatar = seller.avatarDataUrl || seller.avatarUrl || seller.photoURL || "";
       refs.sellerAvatarBox.innerHTML = getAvatarMarkup(sellerAvatar, seller.displayName || "Satıcı");
       refs.sellerName.textContent = seller.displayName || "Bilinmeyen";
       refs.sellerRole.textContent = seller.isAdmin ? "Yönetici" : "Üye";
-
       refs.sellerStats.innerHTML = `
         <div class="item"><div class="item-head"><strong>Toplam ilan</strong></div><span>${sellerAds.length}</span></div>
         <div class="item"><div class="item-head"><strong>Açık ilan</strong></div><span>${openCount}</span></div>
         <div class="item"><div class="item-head"><strong>Kapalı ilan</strong></div><span>${closedCount}</span></div>
       `;
-
       refs.sellerRecentAds.innerHTML = sortDescByDate(sellerAds).slice(0, 5).map(x => `
         <div class="item">
           <div class="item-head">
@@ -2946,10 +2779,8 @@ Sorun: ${body}`;
           <div class="tiny">${escapeHtml(x.priceLabel || "")}</div>
         </div>
       `).join("") || `<div class="feed-item">İlan yok.</div>`;
-
       refs.modalSeller.classList.add("show");
     }
-
     async function messageSeller(){
       if (!state.currentSellerId) return;
       const sellerListings = state.listings.filter(x => x.ownerId === state.currentSellerId && isPublished(x));
@@ -2958,7 +2789,6 @@ Sorun: ${body}`;
       refs.modalSeller.classList.remove("show");
       await openConversation(listing.id);
     }
-
     function openProfileEdit(){
       const p = state.profile || {};
       refs.profileNameInput.value = p.displayName || state.user?.displayName || "";
@@ -2972,7 +2802,6 @@ Sorun: ${body}`;
       }
       refs.modalProfileEdit.classList.add("show");
     }
-
     async function clearProfilePhoto(){
       if (!state.user) return;
       refs.profileAvatarFile.value = "";
@@ -2990,7 +2819,6 @@ Sorun: ${body}`;
         alert("PP silinemedi: " + firebaseErrorMessage(err));
       }
     }
-
     refs.profileAvatarFile.addEventListener("change", async () => {
       const file = refs.profileAvatarFile.files?.[0];
       if (!file) return;
@@ -2999,7 +2827,6 @@ Sorun: ${body}`;
       refs.profileAvatarPreview.classList.remove("hidden");
       refs.profileAvatarUrl.value = "";
     });
-
     refs.profileAvatarUrl.addEventListener("input", () => {
       const url = refs.profileAvatarUrl.value.trim();
       if (url){
@@ -3009,17 +2836,13 @@ Sorun: ${body}`;
         refs.profileAvatarPreview.classList.add("hidden");
       }
     });
-
     function autoFormatPriceInput(input){
       if (!input) return;
       const formatted = normalizePriceLabel(input.value);
       if (formatted) input.value = formatted;
     }
-
     refs.adOldPrice.addEventListener("blur", () => autoFormatPriceInput(refs.adOldPrice));
     refs.adNewPrice.addEventListener("blur", () => autoFormatPriceInput(refs.adNewPrice));
-
-
     refs.profileForm.onsubmit = async (e) => {
       e.preventDefault();
       if (!state.user) return;
@@ -3034,7 +2857,6 @@ Sorun: ${body}`;
       }else if (url){
         avatarDataUrl = null;
       }
-
       try{
         await saveProfileUpdates({ displayName: name, avatarUrl, avatarDataUrl });
         refs.modalProfileEdit.classList.remove("show");
@@ -3044,7 +2866,6 @@ Sorun: ${body}`;
         alert("Profil kaydedilemedi: " + firebaseErrorMessage(err));
       }
     };
-
     refs.tabLogin.onclick = () => {
       refs.tabLogin.classList.add("active");
       refs.tabRegister.classList.remove("active");
@@ -3057,13 +2878,11 @@ Sorun: ${body}`;
       refs.registerForm.classList.remove("hidden");
       refs.loginForm.classList.add("hidden");
     };
-
     refs.loginForm.onsubmit = async (e) => {
       e.preventDefault();
       const name = refs.loginName.value.trim();
       const pass = refs.loginPass.value.trim();
       if (!name || !pass) return;
-
       try{
         const email = `${slugify(name)}@7cshop.app`;
         const cred = await signInWithEmailAndPassword(auth, email, pass);
@@ -3079,7 +2898,6 @@ Sorun: ${body}`;
         alert("Giriş başarısız.");
       }
     };
-
     refs.registerForm.onsubmit = async (e) => {
       e.preventDefault();
       const name = refs.regName.value.trim();
@@ -3087,7 +2905,6 @@ Sorun: ${body}`;
       const pass2 = refs.regPass2.value.trim();
       if (!name || !pass || !pass2) return alert("Tüm alanları doldur.");
       if (pass !== pass2) return alert("Şifreler aynı olmalı.");
-
       try{
         const email = `${slugify(name)}@7cshop.app`;
         const cred = await createUserWithEmailAndPassword(auth, email, pass);
@@ -3103,7 +2920,6 @@ Sorun: ${body}`;
         alert("Kayıt başarısız.");
       }
     };
-
     refs.btnOpenAdd.onclick = openModalForNew;
     refs.btnEditProfile.onclick = openProfileEdit;
     refs.btnDeleteProfilePhoto.onclick = clearProfilePhoto;
@@ -3117,7 +2933,6 @@ Sorun: ${body}`;
     refs.messageSearchInput.oninput = renderAll;
     refs.filterType.onchange = renderAll;
     refs.filterCategory.onchange = renderAll;
-
     refs.modalListing.addEventListener("click", (e) => {
       if (e.target === refs.modalListing) refs.modalListing.classList.remove("show");
     });
@@ -3136,28 +2951,30 @@ Sorun: ${body}`;
     refs.modalBuyOptions.addEventListener("click", (e) => {
       if (e.target === refs.modalBuyOptions) hideModal(refs.modalBuyOptions);
     });
-
     refs.adImageFile.addEventListener("change", async () => {
-      const file = refs.adImageFile.files?.[0];
-      if (!file) return;
-      const data = await fileToDataUrl(file);
-      refs.imagePreview.src = data;
-      refs.imagePreview.classList.remove("hidden");
-      refs.adImageUrls.value = "";
+      const files = Array.from(refs.adImageFile.files || []).slice(0, 5);
+      if (!files.length) {
+        renderSelectedImagePreviews(state.listingDraftImages);
+        return;
+      }
+      const dataList = [];
+      for (const file of files) {
+        const data = await fileToDataUrl(file);
+        if (data) dataList.push(data);
+      }
+      appendDraftImages(dataList);
+      refs.adImageFile.value = "";
     });
-
     refs.adImageUrls.addEventListener("input", () => {
-      const url = refs.adImageUrls.value.split(/\n+/).map(x => x.trim()).find(Boolean);
-      if (url){
-        refs.imagePreview.src = url;
+      const urls = refs.adImageUrls.value.split(/\n+/).map(x => x.trim()).filter(Boolean);
+      if (urls.length) {
+        refs.imagePreview.src = urls[0];
         refs.imagePreview.classList.remove("hidden");
-      }else if (!refs.adImageFile.files?.[0]){
-        refs.imagePreview.classList.add("hidden");
+      } else {
+        renderSelectedImagePreviews(state.listingDraftImages);
       }
     });
-
     refs.listingForm.onsubmit = addListing;
-
     refs.btnCloseSeller.onclick = () => refs.modalSeller.classList.remove("show");
     refs.btnCloseDetail.onclick = () => {
       refs.modalDetail.classList.remove("show");
@@ -3171,11 +2988,9 @@ Sorun: ${body}`;
     refs.promoResetButton.onclick = clearPromoForm;
     refs.helpForm.onsubmit = async (e) => { e.preventDefault(); await openHelpConversation(); };
     refs.btnMessageSeller.onclick = messageSeller;
-
     document.querySelectorAll(".menu button").forEach(btn => {
       btn.onclick = () => setView(btn.dataset.view);
     });
-
     window.__openConversation = openConversation;
     window.__selectConversation = selectConversation;
     window.__removeListing = removeListing;
@@ -3189,7 +3004,6 @@ Sorun: ${body}`;
     window.__setDetailImage = setDetailImage;
     window.__editPromoCode = setPromoEdit;
     window.__deletePromoCode = deletePromoCode;
-
     onAuthStateChanged(auth, async (user) => {
       state.user = user || null;
       state.promoUnlocked = false;
@@ -3201,7 +3015,6 @@ Sorun: ${body}`;
         setAuthScreen();
         return;
       }
-
       const dn = user.displayName || user.email?.split("@")[0] || "Üye";
       state.profile = await ensureUserDoc(user, dn, false);
       state.isAdmin = !!state.profile.isAdmin;
@@ -3212,7 +3025,6 @@ Sorun: ${body}`;
       setView("shop");
       await cleanupExpired();
     });
-
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         refs.modalListing.classList.remove("show");
@@ -3226,18 +3038,15 @@ Sorun: ${body}`;
         refs.searchInput.focus();
       }
     });
-
     refs.loginName.value = "";
     refs.loginPass.value = "";
     if (refs.coinBadge) refs.coinBadge.textContent = formatCoin(0);
-
     setInterval(async () => {
       try{
         await cleanupExpired();
         await touchActivity();
       }catch{}
     }, 10 * 60 * 1000);
-
     window.addEventListener("focus", () => { touchActivity().catch(() => {}); });
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
