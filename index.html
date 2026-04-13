@@ -1236,7 +1236,7 @@
     }
     function listingImages(item){
       const images = Array.isArray(item?.images) ? item.images.filter(Boolean) : [];
-      const fallback = item?.imageData || item?.imageUrl;
+      const fallback = item?.coverImage || item?.imageData || item?.imageUrl;
       if (fallback && !images.includes(fallback)) images.unshift(fallback);
       return images.length ? images : [];
     }
@@ -2265,6 +2265,97 @@ Sorun: ${body}`;
         URL.revokeObjectURL(sourceUrl);
       }
     }
+    async function compressDataUrl(dataUrl, maxSide = 1400, quality = 0.82, maxBytes = 950000){
+      const blob = dataUrlToBlob(dataUrl);
+      if (!blob) return String(dataUrl || "");
+      const sourceUrl = URL.createObjectURL(blob);
+      try{
+        const img = await loadImage(sourceUrl);
+        const naturalWidth = img.naturalWidth || img.width || 1;
+        const naturalHeight = img.naturalHeight || img.height || 1;
+        const safeSides = [maxSide, Math.round(maxSide * 0.85), Math.round(maxSide * 0.7), 1024, 768, 640, 512, 384];
+        const qualitySteps = [quality, 0.72, 0.62, 0.52, 0.42, 0.34, 0.28];
+        let best = "";
+        for (const side of safeSides){
+          const scale = Math.min(1, side / Math.max(naturalWidth, naturalHeight));
+          const width = Math.max(1, Math.round(naturalWidth * scale));
+          const height = Math.max(1, Math.round(naturalHeight * scale));
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d", { alpha: true });
+          ctx.drawImage(img, 0, 0, width, height);
+          for (const q of qualitySteps){
+            const blob2 = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", q));
+            if (!blob2) continue;
+            const out = await blobToDataUrl(blob2);
+            best = out;
+            if (out.length <= maxBytes) return out;
+          }
+        }
+        return best || String(dataUrl || "");
+      }finally{
+        URL.revokeObjectURL(sourceUrl);
+      }
+    }
+
+    async function compactImageSource(src, opts = {}){
+      const value = String(src || "").trim();
+      if (!value) return "";
+      if (!value.startsWith("data:image/")) return value;
+      const maxSide = Number(opts.maxSide || 1080);
+      const quality = Number(opts.quality || 0.72);
+      const maxBytes = Number(opts.maxBytes || 260000);
+      let out = value;
+      try{
+        out = await compressDataUrl(value, maxSide, quality, maxBytes);
+        if (out.length > maxBytes) {
+          out = await compressDataUrl(out, Math.max(384, Math.round(maxSide * 0.75)), Math.max(0.28, quality * 0.8), Math.max(120000, Math.floor(maxBytes * 0.7)));
+        }
+      }catch{
+        out = value;
+      }
+      return out;
+    }
+
+    async function compactImageList(images, maxCount = 5){
+      const unique = [];
+      for (const src of Array.isArray(images) ? images : []){
+        const value = String(src || "").trim();
+        if (!value || unique.includes(value)) continue;
+        unique.push(value);
+        if (unique.length >= maxCount) break;
+      }
+      const compacted = [];
+      for (const src of unique){
+        compacted.push(await compactImageSource(src));
+      }
+      return compacted.filter(Boolean);
+    }
+
+    function estimateDocSize(obj){
+      try{
+        return new Blob([JSON.stringify(obj)]).size;
+      }catch{
+        return Infinity;
+      }
+    }
+
+    function trimListingPayload(payload){
+      const limit = 800000;
+      let next = { ...payload, images: Array.isArray(payload.images) ? [...payload.images] : [] };
+      if (estimateDocSize(next) <= limit) return next;
+
+      const reduced = Array.isArray(next.images) ? [...next.images] : [];
+      while (estimateDocSize({ ...next, images: reduced }) > limit && reduced.length > 1){
+        reduced.pop();
+      }
+      next.images = reduced;
+      next.coverImage = reduced[0] || next.coverImage || "";
+      next.imageData = null;
+      next.imageUrl = null;
+      return next;
+    }
     function firebaseErrorMessage(err){
       const code = String(err?.code || err?.name || "unknown");
       const message = String(err?.message || "Bilinmeyen hata");
@@ -2319,11 +2410,16 @@ Sorun: ${body}`;
       if (!state.user) return;
       const ref = doc(db, "users", state.user.uid);
       const nextName = String(displayName || state.profile?.displayName || "Üye").trim();
-      const finalPhoto = avatarUrl || avatarDataUrl || null;
+      let photo = avatarUrl || avatarDataUrl || null;
+      if (photo && String(photo).startsWith("data:image/")) {
+        try{
+          photo = await compactImageSource(photo, { maxSide: 384, quality: 0.78, maxBytes: 220000 });
+        }catch{}
+      }
       const payload = {
         displayName: nextName,
-        avatarUrl: avatarUrl || null,
-        avatarDataUrl: avatarDataUrl || null,
+        avatarUrl: photo,
+        avatarDataUrl: null,
         email: state.user.email || state.profile?.email || null,
         isAdmin: !!state.profile?.isAdmin,
         updatedAt: serverTimestamp()
@@ -2334,19 +2430,22 @@ Sorun: ${body}`;
         const message = String(err?.message || err?.code || "").toLowerCase();
         if ((message.includes("document too large") || message.includes("1 mib") || message.includes("1,048,576"))){
           const fallbackPayload = {
-            ...payload,
-            avatarDataUrl: state.profile?.avatarDataUrl || null,
-            avatarUrl: state.profile?.avatarUrl || null
+            displayName: nextName,
+            avatarUrl: state.profile?.avatarUrl || null,
+            avatarDataUrl: null,
+            email: state.user.email || state.profile?.email || null,
+            isAdmin: !!state.profile?.isAdmin,
+            updatedAt: serverTimestamp()
           };
           await updateDoc(ref, fallbackPayload);
-          await updateProfile(state.user, { displayName: nextName, photoURL: fallbackPayload.avatarUrl || fallbackPayload.avatarDataUrl || null });
+          await updateProfile(state.user, { displayName: nextName, photoURL: fallbackPayload.avatarUrl || null });
           state.profile = { ...(state.profile || {}), ...fallbackPayload, uid: state.user.uid };
           state.user.displayName = nextName;
           return;
         }
         throw err;
       }
-      await updateProfile(state.user, { displayName: nextName, photoURL: finalPhoto });
+      await updateProfile(state.user, { displayName: nextName, photoURL: photo });
       state.profile = { ...(state.profile || {}), ...payload, uid: state.user.uid };
       state.user.displayName = nextName;
       await touchActivity();
@@ -2617,19 +2716,18 @@ Sorun: ${body}`;
         alert("Bu hesapta aynı isimli ilan zaten var.");
         return;
       }
-      const finalImages = [...(Array.isArray(state.listingDraftImages) ? state.listingDraftImages : []), ...urlList]
+
+      const enteredImages = [...(Array.isArray(state.listingDraftImages) ? state.listingDraftImages : []), ...urlList]
         .filter(Boolean)
         .filter((v, i, arr) => arr.indexOf(v) === i)
         .slice(0, 5);
-      const usableImages = finalImages.length ? finalImages : (editId ? existingImages : []);
+      const usableImages = enteredImages.length ? enteredImages : (editId ? existingImages : []);
       if (!usableImages.length) return alert("En az bir fotoğraf eklemelisin.");
-      const mainImage = usableImages[0];
-      if (String(mainImage).length > 950000) {
-        alert("Kapak görseli hâlâ çok büyük. Lütfen daha küçük bir fotoğraf kullan.");
-        return;
-      }
-      const now = Date.now();
-      const payload = {
+
+      let finalImages = await compactImageList(usableImages, 5);
+      if (!finalImages.length) return alert("Fotoğraf işlenemedi.");
+
+      let payload = {
         ownerId: state.user.uid,
         ownerName: state.profile.displayName,
         name,
@@ -2643,15 +2741,22 @@ Sorun: ${body}`;
         type,
         category,
         tags,
-        images: usableImages,
-        imageData: mainImage,
-        imageUrl: mainImage,
+        images: finalImages,
+        coverImage: finalImages[0] || "",
         status: "published",
-        createdAtMs: editId ? (state.listings.find(x => x.id === editId)?.createdAtMs || now) : now,
-        updatedAtMs: now,
+        createdAtMs: editId ? (state.listings.find(x => x.id === editId)?.createdAtMs || Date.now()) : Date.now(),
+        updatedAtMs: Date.now(),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
+
+      payload = trimListingPayload(payload);
+      const size = estimateDocSize(payload);
+      if (size > 800000) {
+        alert("İlan çok büyük. Fotoğraf sayısını azalt veya daha küçük görsel yükle.");
+        return;
+      }
+
       try{
         if (editId){
           await updateDoc(doc(db, "listings", editId), {
@@ -2959,7 +3064,7 @@ Sorun: ${body}`;
       }
       const dataList = [];
       for (const file of files) {
-        const data = await fileToDataUrl(file);
+        const data = await compressImageFile(file, 1080, 0.72, 240000);
         if (data) dataList.push(data);
       }
       appendDraftImages(dataList);
