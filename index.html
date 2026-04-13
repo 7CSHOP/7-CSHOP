@@ -1230,6 +1230,15 @@
       return Number(state.profile?.coinBalance || 0);
     }
 
+    function itemCoinPrice(item){
+      return Math.max(0, Number(item?.coinPrice || 0));
+    }
+
+    function canAffordCoinItem(item){
+      const price = itemCoinPrice(item);
+      return price > 0 && currentCoinBalance() >= price;
+    }
+
     function isManagerKey(value){
       return String(value || "").trim().toLowerCase() === MANAGER_KEY.toLowerCase();
     }
@@ -2090,7 +2099,13 @@
       const listingId = state.pendingPurchaseListingId;
       if (!listingId) return;
       const item = state.listings.find(x => x.id === listingId);
-      if (!item || Number(item.coinPrice || 0) <= 0) return alert('Bu ilanda Coin seçeneği yok.');
+      const price = itemCoinPrice(item);
+      const balance = currentCoinBalance();
+      if (!item || price <= 0) return alert('Bu ilanda Coin seçeneği yok.');
+      if (balance < price) {
+        alert('Yetersiz bakiye');
+        return;
+      }
       hideModal(refs.modalBuyOptions);
       let conv = findConversationByPeer(item.ownerId);
       const message = `Coin ile alım istiyorum. Fiyat: ${formatCoin(item.coinPrice)}. İki taraf onaylayınca coin aktarılacak.`;
@@ -2585,15 +2600,22 @@ Sorun: ${body}`;
       if (!state.user) return;
       const item = state.listings.find(x => x.id === listingId);
       if (!item || !isPublished(item)) return;
+
       state.pendingPurchaseListingId = listingId;
+      const price = itemCoinPrice(item);
+      const balance = currentCoinBalance();
+      const affordable = price > 0 && balance >= price;
+
       refs.buyOptionInfo.innerHTML = `
         <div class="purchase-info">
           <strong>${escapeHtml(item.name || '')}</strong>
           <div class="tiny">Satıcı: ${escapeHtml(item.ownerName || '')}</div>
           <div class="tiny">Coin seçeneği varsa coin ile de alabilirsin.</div>
-          ${item.coinPrice ? `<div class="price-new">${escapeHtml(formatCoin(item.coinPrice))}</div>` : `<div class="tiny">Bu ilanda coin fiyatı tanımlı değil.</div>`}
+          ${price > 0 ? `<div class="price-new">${escapeHtml(formatCoin(price))}</div>` : `<div class="tiny">Bu ilanda coin fiyatı tanımlı değil.</div>`}
+          ${price > 0 ? `<div class="tiny">Bakiyen: ${escapeHtml(formatCoin(balance))}${affordable ? '' : ' • Yetersiz bakiye'}</div>` : ''}
         </div>`;
-      refs.btnBuyCoin.disabled = !(Number(item.coinPrice || 0) > 0);
+      refs.btnBuyCoin.disabled = !affordable;
+      refs.btnBuyCoin.textContent = affordable ? 'Coin ile alım' : 'Coin ile alım • Yetersiz bakiye';
       showModal(refs.modalBuyOptions);
       return;
 
