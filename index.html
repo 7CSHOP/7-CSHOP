@@ -264,6 +264,34 @@
     .detail-meta{display:grid;gap:10px}
     .detail-meta .item{box-shadow:none}
     .detail-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .rating-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.rating-row .tiny{font-size:11px;font-weight:700}
+    .star-picker{display:flex;gap:2px;flex-wrap:nowrap;white-space:nowrap;align-items:center}
+    .star-btn{
+      width:18px;height:18px;border-radius:6px;border:1px solid #f59e0b;background:transparent;
+      color:#f59e0b;font-weight:900;cursor:pointer;transition:.15s;font-size:11px;line-height:1;
+      display:inline-flex;align-items:center;justify-content:center;padding:0;flex:0 0 auto;
+    }
+    .star-btn:hover{transform:translateY(-1px);background:#fff7ed}
+    .star-btn.active{background:#f59e0b;color:#fff;box-shadow:0 4px 10px rgba(245,158,11,.25)}
+    .rating-inline{display:inline-flex;align-items:center;gap:1px;white-space:nowrap;font-size:10px;line-height:1;color:#f59e0b;font-weight:900;letter-spacing:-.04em}
+    .rating-inline.muted{color:#d1d5db}
+    .review-shell{display:grid;gap:12px}
+    .review-card{
+      border:1px solid var(--line);border-radius:18px;padding:12px;background:#fff;display:grid;gap:8px;
+      box-shadow:0 8px 16px rgba(17,24,39,.03)
+    }
+    .review-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .review-meta{font-size:12px;color:var(--muted)}
+    .review-text{font-size:13px;line-height:1.6;color:#374151}
+    .achievement-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+    .achievement-card{
+      border:1px solid var(--line);border-radius:18px;padding:12px;background:#fff;display:grid;gap:6px
+    }
+    .achievement-card.done{background:#eff6ff;border-color:#bfdbfe}
+    .achievement-card strong{font-size:13px}
+    .achievement-card span{font-size:12px;color:var(--muted)}
+    .achievement-progress{height:7px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+    .achievement-progress > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#2563eb,#7c3aed)}
     @media (max-width:900px){
       .detail-top{grid-template-columns:1fr}
       .task-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -313,7 +341,7 @@
     .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .coin-pill{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#111827;border-color:#f59e0b;box-shadow:0 10px 22px rgba(245,158,11,.22)}
     .coin-pill strong{font-weight:900}
-    .coin-plus{min-width:28px;width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:16px;line-height:1;border-radius:999px}
+    .coin-plus{min-width:24px;width:24px;height:24px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px;line-height:1;border-radius:999px}
     .task-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px 10px;display:grid;gap:6px;box-shadow:0 8px 16px rgba(17,24,39,.03)}
     .task-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap}
     .task-head strong{font-size:13px}
@@ -630,6 +658,17 @@
                       </div>
                       <div class="list" id="profileStatsBox"></div>
                     </div>
+                  </div>
+                </div>
+                <div class="panel" style="box-shadow:none;margin-top:16px">
+                  <div class="panel-inner">
+                    <div class="section-title">
+                      <div>
+                        <h3>Başarılar</h3>
+                        <p>İlerledikçe açılan rozetler</p>
+                      </div>
+                    </div>
+                    <div id="achievementBox" class="achievement-grid"></div>
                   </div>
                 </div>
                 <div class="panel" style="box-shadow:none;margin-top:16px">
@@ -965,6 +1004,21 @@
               <button id="btnDetailMessage" class="btn" type="button">Mesajlaş</button>
               <button id="btnDetailBuy" class="btn good" type="button">Satın al</button>
             </div>
+            <div class="item">
+              <div class="item-head">
+                <strong>Yorum ve yıldız</strong>
+                <span id="detailRatingSummary">Puan yok</span>
+              </div>
+              <div class="review-shell">
+                <div class="rating-row">
+                  <span class="tiny">Puanın:</span>
+                  <div id="reviewStars" class="star-picker"></div>
+                  <button id="btnSubmitReview" class="btn secondary" type="button">Yorum gönder</button>
+                </div>
+                <textarea id="reviewComment" class="input" maxlength="300" placeholder="Kısa yorum yaz..."></textarea>
+                <div id="reviewList" class="list"></div>
+              </div>
+            </div>
             <div class="detail-all">
               <div class="item">
                 <div class="item-head">
@@ -1157,6 +1211,11 @@
       detailTags: $("detailTags"),
       detailPhotoCount: $("detailPhotoCount"),
       detailAllImages: $("detailAllImages"),
+      detailRatingSummary: $("detailRatingSummary"),
+      reviewStars: $("reviewStars"),
+      reviewComment: $("reviewComment"),
+      btnSubmitReview: $("btnSubmitReview"),
+      reviewList: $("reviewList"),
       btnCloseSeller: $("btnCloseSeller"),
       btnMessageSeller: $("btnMessageSeller"),
       sellerAvatarBox: $("sellerAvatarBox"),
@@ -1164,6 +1223,7 @@
       sellerRole: $("sellerRole"),
       sellerStats: $("sellerStats"),
       sellerRecentAds: $("sellerRecentAds"),
+      achievementBox: $("achievementBox"),
       viewHelp: $("viewHelp"),
       helpForm: $("helpForm"),
       helpTitleInput: $("helpTitleInput"),
@@ -1203,7 +1263,10 @@
       taskTicker: null,
       adWatch: null,
       lastTaskSyncDay: "",
-      lastSessionTickAt: 0
+      lastSessionTickAt: 0,
+      serverClock: { anchorServerMs: 0, anchorPerfMs: 0, synced: false, syncing: false },
+      reviewCache: {},
+      reviewLoadingId: ""
     };
     const DAY = 24 * 60 * 60 * 1000;
     const LISTING_LIFETIME = 15 * DAY;
@@ -1437,8 +1500,24 @@
     function normalizeType(t){
       return t === "sell" ? "satış" : t === "swap" ? "takas" : "takasTL";
     }
-    function dateKeyFromMs(ms = Date.now()){
-      return new Date(Number(ms || Date.now()) + (3 * 60 * 60 * 1000)).toISOString().slice(0, 10);
+    function getRealNowMs(){
+      if (state.serverClock?.anchorServerMs && state.serverClock?.anchorPerfMs){
+        return state.serverClock.anchorServerMs + (performance.now() - state.serverClock.anchorPerfMs);
+      }
+      return Date.now();
+    }
+    function dateKeyFromMs(ms = getRealNowMs()){
+      const dtf = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Europe/Istanbul",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      });
+      const parts = dtf.formatToParts(new Date(Number(ms || getRealNowMs())));
+      const year = parts.find(p => p.type === "year")?.value || "0000";
+      const month = parts.find(p => p.type === "month")?.value || "01";
+      const day = parts.find(p => p.type === "day")?.value || "01";
+      return `${year}-${month}-${day}`;
     }
     function shiftDateKey(key, deltaDays){
       if (!key) return "";
@@ -1475,6 +1554,33 @@
     }
     function rewardStatus(done){
       return done ? "Tamamlandı" : "Devam ediyor";
+    }
+    async function syncServerClock(force = false){
+      if (!state.user || state.serverClock.syncing) return state.serverClock.anchorServerMs;
+      const freshEnough = state.serverClock.synced && !force && (performance.now() - (state.serverClock.anchorPerfMs || 0) < 5 * 60 * 1000);
+      if (freshEnough) return state.serverClock.anchorServerMs;
+      state.serverClock.syncing = true;
+      try{
+        const ref = doc(db, "users", state.user.uid);
+        await updateDoc(ref, { clockProbeAt: serverTimestamp(), updatedAt: serverTimestamp() });
+        await new Promise(r => setTimeout(r, 250));
+        let serverMs = 0;
+        for (let i = 0; i < 3; i++){
+          const snap = await getDoc(ref);
+          serverMs = tsValue(snap.data()?.clockProbeAt) || tsValue(snap.data()?.updatedAt) || tsValue(snap.data()?.lastSeenAt);
+          if (serverMs) break;
+          await new Promise(r => setTimeout(r, 150));
+        }
+        if (serverMs){
+          state.serverClock.anchorServerMs = serverMs;
+          state.serverClock.anchorPerfMs = performance.now();
+          state.serverClock.synced = true;
+        }
+      }catch{}
+      finally{
+        state.serverClock.syncing = false;
+      }
+      return state.serverClock.anchorServerMs;
     }
     function isPublished(item){
       return item?.status === "published";
@@ -1621,6 +1727,7 @@
         `<span class="badge no">Arşiv</span>`;
       const typeBadge = `<span class="badge mine">${escapeHtml(normalizeType(item.type))}</span>`;
       const categoryBadge = `<span class="badge wait">${escapeHtml(item.category || "diger")}</span>`;
+      const ratingBadge = Number(item.ratingCount || 0) > 0 ? `<span class="rating-inline" aria-label="${Number(item.ratingAvg || 0).toFixed(1)} yıldız">${"★".repeat(Math.max(1, Math.round(Number(item.ratingAvg || 0))))}</span>` : `<span class="rating-inline muted" aria-label="Henüz puan yok">☆☆☆☆☆</span>`;
       const tags = (item.tags || []).map(t => `<span class="pill">#${escapeHtml(t)}</span>`).join("");
       return `
         <div class="card">
@@ -1651,7 +1758,7 @@
             <h4 style="cursor:pointer" title="${escapeHtml(item.name)}" onclick="window.__openListingDetail('${item.id}')">${escapeHtml(truncateText(item.name || "", 40))}</h4>
             <p>${escapeHtml(truncateText(item.description || "", 50))}</p>
             <div class="row">${tags}</div>
-            <div class="row">${renderPriceBlock(item)}</div>
+            <div class="row">${renderPriceBlock(item)}${ratingBadge}</div>
             <div class="row">
               ${isPublished(item) && !isMine ? `<button class="btn" onclick="window.__openConversation('${item.id}')">Mesaj</button>` : `<button class="btn secondary" disabled>${isPublished(item) ? (isMine ? "Kendi ilanım" : "Kapalı") : "Kapalı"}</button>`}
               ${isPublished(item) && !isMine ? `<button class="btn good" onclick="window.__buyListing('${item.id}')">Satın al</button>` : ""}
@@ -1674,6 +1781,12 @@
       refs.detailName.textContent = item.name || "-";
       refs.detailStatus.innerHTML = item.status === "published" ? '<span class="badge ok">Yayında</span>' : '<span class="badge closed">Kapalı</span>';
       refs.detailSeller.textContent = `${item.ownerName || "Bilinmeyen"} • ${formatDate(item.createdAt)}`;
+      renderStarButtons(Number(refs.reviewStars?.dataset.value || 5));
+      const cachedReviews = state.reviewCache[item.id] || [];
+      const summary = averageRating(cachedReviews);
+      if (refs.detailRatingSummary){
+        refs.detailRatingSummary.textContent = summary.count ? `${summary.avg.toFixed(1)} / 5 • ${summary.count} yorum` : "Puan yok";
+      }
       const coinText = Number(item.coinPrice || 0) > 0 ? ` / ${formatCoin(item.coinPrice)}` : "";
       if (item.isDiscounted && item.oldPriceLabel && item.newPriceLabel){
         refs.detailPriceBox.innerHTML = `
@@ -1698,6 +1811,16 @@
       `;
       refs.detailDesc.textContent = item.description || "";
       refs.detailTags.innerHTML = (item.tags || []).map(t => `<span class="pill">#${escapeHtml(t)}</span>`).join("") || `<span class="tiny">Etiket yok</span>`;
+      refs.reviewList.innerHTML = (cachedReviews || []).map(r => `
+        <div class="review-card">
+          <div class="review-head">
+            <strong>${escapeHtml(r.name || "Üye")}</strong>
+            <span class="rating-inline" aria-label="${Number(r.rating || 0)} yıldız">${escapeHtml(starText(r.rating || 0))}</span>
+          </div>
+          <div class="review-meta">${escapeHtml(new Date(Number(r.createdAtMs || 0)).toLocaleString("tr-TR", { dateStyle:"short", timeStyle:"short" }))}</div>
+          <div class="review-text">${escapeHtml(r.comment || "")}</div>
+        </div>
+      `).join("") || `<div class="feed-item">Henüz yorum yok.</div>`;
       refs.detailMainImage.src = mainImage;
       refs.detailMainImage.alt = item.name || "İlan fotoğrafı";
       refs.detailThumbs.innerHTML = images.map((src, idx) => `
@@ -1714,6 +1837,7 @@
       refs.btnDetailMessage.classList.toggle("hidden", !isPublished(item) || mine);
       refs.btnDetailBuy.classList.toggle("hidden", !isPublished(item) || mine);
       refs.btnDetailBuy.textContent = item.coinPrice > 0 ? "Satın al" : "Satın al";
+      if (refs.reviewComment) refs.reviewComment.value = '';
       refs.btnDetailMessage.onclick = async () => {
         refs.modalDetail.classList.remove("show");
         document.body.style.overflow = "";
@@ -1724,6 +1848,7 @@
         document.body.style.overflow = "";
         await buyListing(item.id);
       };
+      loadListingReviews(item.id).catch(()=>{});
     }
     async function openListingDetail(id){
       const item = state.listings.find(x => x.id === id);
@@ -1740,6 +1865,140 @@
       state.currentDetailListingId = listingId;
       state.currentDetailImageIndex = index;
       renderDetailModal(item);
+    }
+    function starText(rating = 0){
+      const value = Math.max(0, Math.min(5, Number(rating || 0)));
+      return "✦✦✦✦✦".slice(0, value) + "✧✧✧✧✧".slice(0, 5 - value);
+    }
+    function renderStarButtons(active = 5){
+      if (!refs.reviewStars) return;
+      refs.reviewStars.innerHTML = [1,2,3,4,5].map(n => `
+        <button class="star-btn ${n <= active ? 'active' : ''}" type="button" data-rating="${n}" aria-label="${n} puan" title="${n} puan" onclick="window.__setReviewRating(${n})">✦</button>
+      `).join("");
+      refs.reviewStars.dataset.value = String(active);
+    }
+    function averageRating(reviews){
+      const arr = Array.isArray(reviews) ? reviews : [];
+      if (!arr.length) return { avg: 0, count: 0 };
+      const total = arr.reduce((sum, r) => sum + Math.max(0, Math.min(5, Number(r.rating || 0))), 0);
+      return { avg: total / arr.length, count: arr.length };
+    }
+    async function loadListingReviews(listingId){
+      if (!listingId) return [];
+      if (state.reviewLoadingId === listingId) return state.reviewCache[listingId] || [];
+      state.reviewLoadingId = listingId;
+      try{
+        const snap = await getDocs(collection(db, "listings", listingId, "reviews"));
+        const reviews = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+          .sort((a, b) => (Number(b.createdAtMs || 0) - Number(a.createdAtMs || 0)));
+        state.reviewCache[listingId] = reviews;
+        if (state.currentDetailListingId === listingId){
+          const current = state.listings.find(x => x.id === listingId);
+          if (current) renderDetailModal(current);
+        }
+        return reviews;
+      }catch{
+        return state.reviewCache[listingId] || [];
+      }finally{
+        if (state.reviewLoadingId === listingId) state.reviewLoadingId = "";
+      }
+    }
+    async function refreshListingRating(listingId){
+      const reviews = state.reviewCache[listingId] || [];
+      const { avg, count } = averageRating(reviews);
+      try{
+        await updateDoc(doc(db, "listings", listingId), {
+          ratingAvg: Number(avg.toFixed(2)),
+          ratingCount: count,
+          updatedAt: serverTimestamp()
+        });
+      }catch{}
+    }
+    async function submitReview(){
+      const listingId = state.currentDetailListingId;
+      if (!listingId || !state.user) return;
+      const rating = Math.max(1, Math.min(5, Number(refs.reviewStars?.dataset.value || 5)));
+      const comment = String(refs.reviewComment?.value || "").trim();
+      if (!comment) return alert("Kısa bir yorum yaz.");
+      const reviewRef = collection(db, "listings", listingId, "reviews");
+      try{
+        const snap = await getDocs(reviewRef);
+        const existing = snap.docs.find(d => d.data()?.uid === state.user.uid);
+        const payload = {
+          uid: state.user.uid,
+          name: state.profile?.displayName || "Üye",
+          rating,
+          comment,
+          createdAtMs: getRealNowMs(),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        };
+        if (existing){
+          await updateDoc(doc(db, "listings", listingId, "reviews", existing.id), payload);
+        }else{
+          await addDoc(reviewRef, payload);
+          try{
+            const nextCount = Number(state.profile?.stats?.reviewsWritten || 0) + 1;
+            await updateDoc(doc(db, "users", state.user.uid), {
+              "stats.reviewsWritten": nextCount,
+              updatedAt: serverTimestamp()
+            });
+            state.profile = {
+              ...(state.profile || {}),
+              stats: {
+                ...(state.profile?.stats || {}),
+                reviewsWritten: nextCount
+              }
+            };
+          }catch{}
+        }
+        state.reviewCache[listingId] = (await loadListingReviews(listingId)).slice();
+        await refreshListingRating(listingId);
+        refs.reviewComment.value = "";
+        renderDetailModal(state.listings.find(x => x.id === listingId));
+        await logAction("Yorum eklendi", `${state.profile.displayName} → ${listingId}`);
+      }catch(err){
+        alert("Yorum kaydedilemedi: " + firebaseErrorMessage(err));
+      }
+    }
+    function achievementListForProfile(){
+      const mine = myListings();
+      const p = normalizeTaskState(state.profile?.taskState);
+      const today = dateKeyFromMs(getRealNowMs());
+      const reviewsWritten = Number(state.profile?.stats?.reviewsWritten || 0);
+      const ratingReceived = mine.filter(x => Number(x.ratingCount || 0) > 0).length;
+      return [
+        { key:"first-listing", title:"İlk ilan", desc:"1 ilan ekle", current: mine.length, target: 1 },
+        { key:"five-listings", title:"5 ilan", desc:"5 ilan ekle", current: mine.length, target: 5 },
+        { key:"fifteen-listings", title:"15 ilan", desc:"15 ilan ekle", current: mine.length, target: 15 },
+        { key:"first-review", title:"İlk yorum", desc:"1 yorum yaz", current: reviewsWritten, target: 1 },
+        { key:"first-rating", title:"İlk puan", desc:"1 ilanına puan gelsin", current: ratingReceived, target: 1 },
+        { key:"seven-login", title:"7 gün giriş", desc:"7 gün üst üste giriş yap", current: Math.min(p.loginStreak || 0, 7), target: 7 },
+        { key:"one-hour", title:"1 saat aktif", desc:"Sitede 1 saat kal", current: p.sessionMs || 0, target: 60 * 60 * 1000 },
+        { key:"twentyfour", title:"24 saat gezin", desc:"Toplam 24 saat gezin", current: p.browseMs || 0, target: 24 * 60 * 60 * 1000 },
+        { key:"ad", title:"Günün reklamı", desc:"Bugün 1 reklam izle", current: p.dailyAdDate === today ? 1 : 0, target: 1 }
+      ];
+    }
+    function renderAchievements(){
+      if (!refs.achievementBox) return;
+      const list = achievementListForProfile();
+      refs.achievementBox.innerHTML = list.map(item => {
+        const done = Number(item.current || 0) >= Number(item.target || 0);
+        const ratio = item.target > 0 ? Math.min(100, Math.round((Number(item.current || 0) / Number(item.target)) * 100)) : 0;
+        const label = item.key === "one-hour"
+          ? `${Math.min(Math.floor((item.current || 0) / 60000), 60)}/60 dk`
+          : item.key === "twentyfour"
+            ? `${Math.min(Math.floor((item.current || 0) / 3600000), 24)}/24 saat`
+            : `${Math.min(item.current || 0, item.target)}/${item.target}`;
+        return `
+          <div class="achievement-card ${done ? 'done' : ''}">
+            <strong>${escapeHtml(item.title)}</strong>
+            <span>${escapeHtml(item.desc)}</span>
+            <div class="review-meta">${escapeHtml(label)}</div>
+            <div class="achievement-progress"><i style="width:${ratio}%"></i></div>
+          </div>
+        `;
+      }).join("") || `<div class="feed-item">Başarı yok.</div>`;
     }
     async function selectForAdmin(id){
       const item = state.listings.find(x => x.id === id);
@@ -1865,6 +2124,7 @@
         <div class="item"><div class="item-head"><strong>Kapalı ilan</strong></div><span>${closedCount}</span></div>
         <div class="item"><div class="item-head"><strong>Coin</strong></div><span>${formatCoin(currentCoinBalance())}</span></div>
       `;
+      renderAchievements();
       if (refs.coinBadge) refs.coinBadge.textContent = formatCoin(currentCoinBalance());
       if (refs.coinBadge) refs.coinBadge.classList.toggle('hidden', false);
       if (refs.promoManagerPanel) refs.promoManagerPanel.classList.toggle('hidden', !state.promoUnlocked);
@@ -1952,7 +2212,7 @@
       });
     }
     async function syncLoginTask(){
-      const today = dateKeyFromMs();
+      const today = dateKeyFromMs(getRealNowMs());
       const yesterday = shiftDateKey(today, -1);
       return mutateTaskState((taskState) => {
         if (taskState.loginLastDate === today) return { rewardCoins: 0 };
@@ -1964,7 +2224,7 @@
           taskState.loginRewarded = true;
           rewardCoins = 1;
         }
-        taskState.updatedAtMs = Date.now();
+        taskState.updatedAtMs = getRealNowMs();
         return { rewardCoins };
       });
     }
@@ -1983,7 +2243,7 @@
           taskState.browseRewarded = true;
           rewardCoins += 3;
         }
-        taskState.updatedAtMs = Date.now();
+        taskState.updatedAtMs = getRealNowMs();
         return { rewardCoins };
       });
     }
@@ -2030,7 +2290,7 @@
           taskState.listingsRewarded = true;
           rewardCoins = 1;
         }
-        taskState.updatedAtMs = Date.now();
+        taskState.updatedAtMs = getRealNowMs();
         return { rewardCoins };
       });
     }
@@ -2041,12 +2301,12 @@
       if (message && refs.adStatusText) refs.adStatusText.textContent = message;
     }
     async function finishAdWatch(){
-      const today = dateKeyFromMs();
+      const today = dateKeyFromMs(getRealNowMs());
       try{
         const result = await mutateTaskState((taskState) => {
           if (taskState.dailyAdDate === today) return { rewardCoins: 0 };
           taskState.dailyAdDate = today;
-          taskState.updatedAtMs = Date.now();
+          taskState.updatedAtMs = getRealNowMs();
           return { rewardCoins: 1 };
         });
         stopAdWatch('Coin eklendi.');
@@ -2061,7 +2321,7 @@
     function startAdWatch(){
       if (!state.user) return;
       const p = normalizeTaskState(state.profile?.taskState);
-      const today = dateKeyFromMs();
+      const today = dateKeyFromMs(getRealNowMs());
       if (p.dailyAdDate === today) return alert('Bugün reklam ödülünü zaten aldın.');
       if (state.adWatch) return;
       if (refs.modalAd) showModal(refs.modalAd);
@@ -2092,14 +2352,15 @@
     }
     async function tickTaskTime(){
       if (!state.user || document.hidden || !document.hasFocus()) return;
-      const now = Date.now();
+      await syncServerClock().catch(()=>{});
+      const now = getRealNowMs();
       const last = state.lastSessionTickAt || now;
       state.lastSessionTickAt = now;
       const delta = Math.min(60000, Math.max(0, now - last || 60000));
       if (!delta) return;
       try{
         await syncTimeTasks(delta);
-        const currentDay = dateKeyFromMs();
+        const currentDay = dateKeyFromMs(now);
         if (state.lastTaskSyncDay && state.lastTaskSyncDay !== currentDay){
           await syncLoginTask();
         }
@@ -2227,7 +2488,7 @@
         active: !!data.active,
         usedBy: data.usedBy || {},
         createdAtMs: data.createdAtMs || Date.now(),
-        updatedAtMs: Date.now(),
+        updatedAtMs: getRealNowMs(),
         createdAt: data.createdAt || serverTimestamp(),
         updatedAt: serverTimestamp()
       };
@@ -2280,7 +2541,7 @@
           tx.update(promoRef, {
             usedCount: Number(latest.usedCount || 0) + 1,
             usedBy,
-            updatedAtMs: Date.now(),
+            updatedAtMs: getRealNowMs(),
             updatedAt: serverTimestamp()
           });
           const current = Number(userSnap.data().coinBalance || 0);
@@ -2354,11 +2615,11 @@
           latestListingName: item.name || '',
           members: [state.user.uid, item.ownerId],
           memberNames: Array.from(new Set([state.profile.displayName, item.ownerName].filter(Boolean))),
-          messages: [{ uid: 'system', name: 'Sistem', text: msg, type: 'system', createdAt: new Date().toISOString() }],
+          messages: [{ uid: 'system', name: 'Sistem', text: msg, type: 'system', createdAt: new Date(getRealNowMs()).toISOString() }],
           lastMessage: msg,
           unreadBy: { [item.ownerId]: 1 },
-          readBy: { [state.user.uid]: Date.now() },
-          createdAtMs: Date.now(),
+          readBy: { [state.user.uid]: getRealNowMs() },
+          createdAtMs: getRealNowMs(),
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
@@ -2371,10 +2632,10 @@
         const unreadBy = { ...(data.unreadBy || {}) };
         unreadBy[item.ownerId] = (Number(unreadBy[item.ownerId]) || 0) + 1;
         await updateDoc(convRef, {
-          messages: [...messages, { uid: 'system', name: 'Sistem', text: msg, type: 'system', createdAt: new Date().toISOString() }],
+          messages: [...messages, { uid: 'system', name: 'Sistem', text: msg, type: 'system', createdAt: new Date(getRealNowMs()).toISOString() }],
           lastMessage: msg,
           unreadBy,
-          readBy: { ...(data.readBy || {}), [state.user.uid]: Date.now() },
+          readBy: { ...(data.readBy || {}), [state.user.uid]: getRealNowMs() },
           updatedAt: serverTimestamp(),
           listingId,
           latestListingId: listingId,
@@ -2408,7 +2669,7 @@
         buyerApproved: false,
         sellerApproved: false,
         transferredAt: null,
-        createdAtMs: Date.now(),
+        createdAtMs: getRealNowMs(),
         updatedAtMs: Date.now()
       };
       if (!conv){
@@ -2418,12 +2679,12 @@
           latestListingName: item.name || '',
           members: [state.user.uid, item.ownerId],
           memberNames: Array.from(new Set([state.profile.displayName, item.ownerName].filter(Boolean))),
-          messages: [{ uid: 'system', name: 'Sistem', text: message, type: 'system', createdAt: new Date().toISOString() }],
+          messages: [{ uid: 'system', name: 'Sistem', text: message, type: 'system', createdAt: new Date(getRealNowMs()).toISOString() }],
           lastMessage: message,
           unreadBy: { [item.ownerId]: 1 },
-          readBy: { [state.user.uid]: Date.now() },
+          readBy: { [state.user.uid]: getRealNowMs() },
           purchaseOrder: baseOrder,
-          createdAtMs: Date.now(),
+          createdAtMs: getRealNowMs(),
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
@@ -2439,10 +2700,10 @@
           listingId,
           latestListingId: listingId,
           latestListingName: item.name || data.latestListingName || '',
-          messages: [...messages, { uid: 'system', name: 'Sistem', text: message, type: 'system', createdAt: new Date().toISOString() }],
+          messages: [...messages, { uid: 'system', name: 'Sistem', text: message, type: 'system', createdAt: new Date(getRealNowMs()).toISOString() }],
           lastMessage: message,
           unreadBy,
-          readBy: { ...(data.readBy || {}), [state.user.uid]: Date.now() },
+          readBy: { ...(data.readBy || {}), [state.user.uid]: getRealNowMs() },
           purchaseOrder: baseOrder,
           updatedAt: serverTimestamp()
         });
@@ -2517,7 +2778,7 @@ Sorun: ${body}`;
           fromName: state.profile.displayName,
           title,
           body,
-          createdAtMs: Date.now(),
+          createdAtMs: getRealNowMs(),
           createdAt: serverTimestamp()
         });
         alert('Alper hesabı bulunamadı, istek kaydedildi.');
@@ -2526,7 +2787,7 @@ Sorun: ${body}`;
       const existing = state.conversations.find(c => (c.members || []).includes(state.user.uid) && (c.members || []).includes(target.uid) && c.listingId === 'help');
       if (existing){
         await updateDoc(doc(db, 'conversations', existing.id), {
-          messages: [...(existing.messages || []), { uid: 'system', name: 'Sistem', text, type: 'system', createdAt: new Date().toISOString() }],
+          messages: [...(existing.messages || []), { uid: 'system', name: 'Sistem', text, type: 'system', createdAt: new Date(getRealNowMs()).toISOString() }],
           lastMessage: title,
           unreadBy: { ...(existing.unreadBy || {}), [target.uid]: (Number(existing.unreadBy?.[target.uid]) || 0) + 1 },
           updatedAt: serverTimestamp()
@@ -2542,11 +2803,11 @@ Sorun: ${body}`;
         latestListingName: 'Yardım',
         members: [state.user.uid, target.uid],
         memberNames: Array.from(new Set([state.profile.displayName, target.displayName].filter(Boolean))),
-        messages: [{ uid: 'system', name: 'Sistem', text, type: 'system', createdAt: new Date().toISOString() }],
+        messages: [{ uid: 'system', name: 'Sistem', text, type: 'system', createdAt: new Date(getRealNowMs()).toISOString() }],
         lastMessage: title,
         unreadBy: { [target.uid]: 1 },
-        readBy: { [state.user.uid]: Date.now() },
-        createdAtMs: Date.now(),
+        readBy: { [state.user.uid]: getRealNowMs() },
+        createdAtMs: getRealNowMs(),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
@@ -2874,8 +3135,8 @@ Sorun: ${body}`;
           messages: [],
           lastMessage: "",
           unreadBy: {},
-          readBy: { [state.user.uid]: Date.now() },
-          createdAtMs: Date.now(),
+          readBy: { [state.user.uid]: getRealNowMs() },
+          createdAtMs: getRealNowMs(),
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
@@ -2924,7 +3185,7 @@ Sorun: ${body}`;
         uid: state.user.uid,
         name: state.profile.displayName,
         text,
-        createdAt: new Date().toISOString()
+        createdAt: new Date(getRealNowMs()).toISOString()
       };
       const unreadBy = { ...(data.unreadBy || {}) };
       for (const member of (data.members || [])) {
@@ -2991,12 +3252,12 @@ Sorun: ${body}`;
             name: "Sistem",
             text: buyText,
             type: "system",
-            createdAt: new Date().toISOString()
+            createdAt: new Date(getRealNowMs()).toISOString()
           }],
           lastMessage: buyText,
           unreadBy: { [item.ownerId]: 1 },
-          readBy: { [state.user.uid]: Date.now() },
-          createdAtMs: Date.now(),
+          readBy: { [state.user.uid]: getRealNowMs() },
+          createdAtMs: getRealNowMs(),
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
@@ -3029,7 +3290,7 @@ Sorun: ${body}`;
             name: "Sistem",
             text: buyText,
             type: "system",
-            createdAt: new Date().toISOString()
+            createdAt: new Date(getRealNowMs()).toISOString()
           }],
           lastMessage: buyText,
           unreadBy,
@@ -3046,7 +3307,7 @@ Sorun: ${body}`;
             name: "Sistem",
             text: buyText,
             type: "system",
-            createdAt: new Date().toISOString()
+            createdAt: new Date(getRealNowMs()).toISOString()
           }],
           lastMessage: buyText,
           unreadBy,
@@ -3116,7 +3377,7 @@ Sorun: ${body}`;
         coverImage: finalImages[0] || "",
         status: "published",
         createdAtMs: editId ? (state.listings.find(x => x.id === editId)?.createdAtMs || Date.now()) : Date.now(),
-        updatedAtMs: Date.now(),
+        updatedAtMs: getRealNowMs(),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
@@ -3406,7 +3667,8 @@ Sorun: ${body}`;
     refs.btnRefresh.onclick = async () => { await cleanupExpired(); renderAll(); };
     refs.btnSendMessage.onclick = () => sendMessage();
     refs.btnDeleteConversation.onclick = deleteConversation;
-    refs.btnWatchAd.onclick = () => startAdWatch();
+    refs.btnSubmitReview.onclick = submitReview;
+    refs.btnWatchAd.onclick = startAdWatch;
     refs.searchInput.oninput = renderAll;
     refs.messageSearchInput.oninput = renderAll;
     refs.filterType.onchange = renderAll;
@@ -3486,6 +3748,11 @@ Sorun: ${body}`;
     window.__setDetailImage = setDetailImage;
     window.__editPromoCode = setPromoEdit;
     window.__deletePromoCode = deletePromoCode;
+    window.__setReviewRating = (n) => {
+      if (!refs.reviewStars) return;
+      renderStarButtons(Number(n || 5));
+    };
+    window.__submitReview = submitReview;
     onAuthStateChanged(auth, async (user) => {
       state.user = user || null;
       state.promoUnlocked = false;
@@ -3495,6 +3762,8 @@ Sorun: ${body}`;
         state.currentConversationCache = null;
         state.currentConversationId = null;
         state.lastTaskSyncDay = "";
+        state.lastSessionTickAt = 0;
+        state.serverClock = { anchorServerMs: 0, anchorPerfMs: 0, synced: false, syncing: false };
         if (state.adWatch?.timer) clearInterval(state.adWatch.timer);
         state.adWatch = null;
         setAuthScreen();
@@ -3507,8 +3776,10 @@ Sorun: ${body}`;
       setAppScreen();
       await touchActivity();
       await loadLiveData();
+      await syncServerClock(true).catch(()=>{});
       await syncLoginTask().catch(()=>{});
       state.lastTaskSyncDay = dateKeyFromMs();
+      state.lastSessionTickAt = getRealNowMs();
       if (!state.taskTicker){
         state.taskTicker = setInterval(() => { tickTaskTime().catch(()=>{}); }, 60000);
       }
@@ -3537,13 +3808,14 @@ Sorun: ${body}`;
         await touchActivity();
       }catch{}
     }, 10 * 60 * 1000);
-    window.addEventListener("focus", () => { touchActivity().catch(() => {}); });
+    window.addEventListener("focus", () => { touchActivity().catch(() => {}); syncServerClock().catch(()=>{}); });
     window.addEventListener("beforeunload", () => {
       if (state.adWatch?.timer) clearInterval(state.adWatch.timer);
     });
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         touchActivity().catch(() => {});
+        syncServerClock().catch(()=>{});
       } else if (state.adWatch) {
         stopAdWatch('Sekme gizlendi.');
       }
