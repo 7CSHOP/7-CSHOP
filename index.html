@@ -266,6 +266,7 @@
     .detail-actions{display:flex;gap:10px;flex-wrap:wrap}
     @media (max-width:900px){
       .detail-top{grid-template-columns:1fr}
+      .task-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
     }
     .message-search{display:grid;gap:10px;margin-bottom:12px}
     .conversation-title{font-weight:900;font-size:15px;line-height:1.25}
@@ -310,8 +311,40 @@
     .profile-actions{display:flex;gap:10px;flex-wrap:wrap}
     .tiny{font-size:11px;color:var(--muted)}
     .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .coin-pill{background:#111827;color:#fff;border-color:#111827}
+    .coin-pill{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#111827;border-color:#f59e0b;box-shadow:0 10px 22px rgba(245,158,11,.22)}
     .coin-pill strong{font-weight:900}
+    .coin-plus{min-width:28px;width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:16px;line-height:1;border-radius:999px}
+    .task-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px 10px;display:grid;gap:6px;box-shadow:0 8px 16px rgba(17,24,39,.03)}
+    .task-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap}
+    .task-head strong{font-size:13px}
+    .task-meta{font-size:10px;color:var(--muted);line-height:1.4}
+    .progress{height:7px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+    .progress-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,#f59e0b,#fbbf24);width:0%}
+    .task-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+    .task-summary .stat{background:#fff7ed;border-color:#fed7aa;padding:8px}
+    .ad-viewport{display:grid;gap:12px;align-items:center;justify-items:center;text-align:center;padding:10px 0}
+    .ad-frame{width:min(100%,560px);border-radius:22px;border:1px solid #fcd34d;background:linear-gradient(180deg,#fff9db,#fff);box-shadow:0 20px 40px rgba(245,158,11,.16);padding:14px}
+    .ad-kicker{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#a16207;background:#fef3c7;border:1px solid #fde68a;border-radius:999px;padding:6px 10px}
+    .ad-carousel{display:grid;gap:10px;margin-top:10px}
+    .ad-feature{border-radius:18px;background:linear-gradient(135deg,#111827,#4b5563);color:#fff;padding:18px;text-align:left;display:grid;gap:10px;min-height:160px}
+    .ad-feature.active{background:linear-gradient(135deg,#f59e0b,#f97316)}
+    .ad-brand{font-size:30px;font-weight:900;line-height:1.05}
+    .ad-headline{font-size:18px;font-weight:800;line-height:1.25}
+    .ad-copy{font-size:13px;line-height:1.55;opacity:.96}
+    .ad-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .ad-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);font-size:12px;font-weight:700}
+    .ad-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .ad-card{border:1px solid var(--line);border-radius:16px;background:#fff;padding:10px;text-align:left;display:grid;gap:6px}
+    .ad-card.active{border-color:#f59e0b;box-shadow:0 10px 22px rgba(245,158,11,.12)}
+    .ad-card strong{font-size:13px}
+    .ad-card span{font-size:11px;color:var(--muted);line-height:1.35}
+    .ad-dots{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+    .ad-dot{width:8px;height:8px;border-radius:50%;background:#d1d5db}
+    .ad-dot.active{background:#f59e0b}
+    .ad-count{font-size:38px;font-weight:900;line-height:1}
+    .ad-note{font-size:12px;color:var(--muted)}
+    .ad-progress{width:100%;max-width:560px;height:12px;background:#f3f4f6;border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+    .ad-progress span{display:block;height:100%;width:0%;background:linear-gradient(90deg,#f59e0b,#fde68a)}
     .promo-shell{display:grid;gap:14px;margin-top:14px}
     .promo-card{background:#f8fafc;border:1px solid var(--line);border-radius:18px;padding:14px}
     .promo-card .item-actions{margin-top:10px}
@@ -365,6 +398,7 @@
     @media (max-width:760px){
       .cards,.two,.stats{grid-template-columns:1fr}
       .hero-copy h2{font-size:32px}
+      .task-summary{grid-template-columns:1fr 1fr}
       .topbar-inner{padding:14px}
       .container{padding:14px}
       .msg{max-width:92%}
@@ -384,7 +418,8 @@
         </div>
         <div class="actions">
           <span id="whoami" class="pill hidden"></span>
-          <span id="coinBadge" class="pill hidden">Coin: 0</span>
+          <span id="coinBadge" class="pill coin-pill hidden">Coin: 0</span>
+          <button id="btnWatchAd" class="chip warn hidden coin-plus" title="Reklam izleyip coin kazan">+</button>
           <button id="btnRefresh" class="chip">Yenile</button>
           <button id="btnOpenAdd" class="chip primary hidden">İlan ekle</button>
           <button id="btnLogout" class="chip bad hidden">Çıkış</button>
@@ -466,6 +501,7 @@
                 <button data-view="myads">İlanlarım</button>
                 <button data-view="messages">Mesajlar <span id="messagesBadge" class="badge notify hidden" style="margin-left:8px">0</span></button>
                 <button data-view="profile">Profil</button>
+                <button data-view="tasks">Görevler</button>
                 <button data-view="help" id="helpMenu">Yardım</button>
                 <button data-view="admin" id="adminMenu" class="hidden">Yönetim</button>
               </div>
@@ -654,6 +690,23 @@
                         <div id="promoList" class="list"></div>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+              <div id="viewTasks" class="hidden">
+                <div class="panel" style="box-shadow:none">
+                  <div class="panel-inner">
+                    <div class="section-title">
+                      <div>
+                        <h3>Görevler</h3>
+                        <p>Her profil için ayrı ilerleme tutulur</p>
+                      </div>
+                    </div>
+                    <div class="notice">Görevler kısa ve nettir. İlerlemen otomatik kaydedilir.</div>
+                    <div class="hr"></div>
+                    <div class="task-summary" id="taskSummary"></div>
+                    <div class="hr"></div>
+                    <div id="taskList" class="list"></div>
                   </div>
                 </div>
               </div>
@@ -943,6 +996,21 @@
       </div>
     </div>
   </div>
+  <div id="modalAd" class="modal">
+    <div class="modal-card" style="width:min(760px,100%)">
+      <div class="modal-head">
+        <strong>Reklam izle ve coin kazan</strong>
+        <button id="btnCloseAd" class="chip">İptal</button>
+      </div>
+      <div class="modal-body">
+        <div class="ad-viewport">
+          <div class="ad-frame" id="adFrame"></div>
+          <div class="ad-progress"><span id="adProgressFill"></span></div>
+          <div class="notice" id="adStatusText">Hazır.</div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
     import {
@@ -1099,7 +1167,16 @@
       viewHelp: $("viewHelp"),
       helpForm: $("helpForm"),
       helpTitleInput: $("helpTitleInput"),
-      helpBodyInput: $("helpBodyInput")
+      helpBodyInput: $("helpBodyInput"),
+      btnWatchAd: $("btnWatchAd"),
+      viewTasks: $("viewTasks"),
+      taskSummary: $("taskSummary"),
+      taskList: $("taskList"),
+      modalAd: $("modalAd"),
+      btnCloseAd: $("btnCloseAd"),
+      adFrame: $("adFrame"),
+      adProgressFill: $("adProgressFill"),
+      adStatusText: $("adStatusText")
     };
     const state = {
       user: null,
@@ -1122,13 +1199,24 @@
       promoUnlocked: false,
       promoCodes: [],
       unsubscribers: [],
-      listingDraftImages: []
+      listingDraftImages: [],
+      taskTicker: null,
+      adWatch: null,
+      lastTaskSyncDay: "",
+      lastSessionTickAt: 0
     };
     const DAY = 24 * 60 * 60 * 1000;
     const LISTING_LIFETIME = 15 * DAY;
     const CHAT_LIFETIME = 72 * 60 * 60 * 1000;
     const MANAGER_KEY = "alper9119bulut";
     const HELP_TARGET_NAME = "alper";
+    const SPONSOR_ADS = [
+      { brand: "Hepsiburada", headline: "Kampanya günleri", copy: "Elektronik, ev ve günlük ihtiyaçlarda öne çıkan fırsatlar.", pill: "Sponsor • Alışveriş" },
+      { brand: "Trendyol", headline: "Yeni sezon indirimi", copy: "Moda, ayakkabı ve aksesuar için örnek kampanya kartı.", pill: "Sponsor • Moda" },
+      { brand: "Migros", headline: "Haftalık market fırsatı", copy: "Sepet indirimi ve temel ihtiyaç ürünleri için vitrin.", pill: "Sponsor • Market" },
+      { brand: "Teknosa", headline: "Teknoloji önerileri", copy: "Telefon, kulaklık ve aksesuar odaklı sponsor alanı.", pill: "Sponsor • Teknoloji" },
+      { brand: "LC Waikiki", headline: "Aile indirimi", copy: "Giyim ve sezon fırsatları için örnek reklam kartı.", pill: "Sponsor • Giyim" }
+    ];
     function slugify(name){
       return String(name).trim().toLowerCase()
         .replace(/[^a-z0-9ğüşöçıİı\s-]/gi,"")
@@ -1200,6 +1288,7 @@
       refs.authScreen.classList.remove("hidden");
       refs.appScreen.classList.add("hidden");
       refs.btnOpenAdd.classList.add("hidden");
+      refs.btnWatchAd.classList.add("hidden");
       refs.btnLogout.classList.add("hidden");
       refs.whoami.classList.add("hidden");
       refs.adminMenu.classList.add("hidden");
@@ -1208,6 +1297,7 @@
       refs.authScreen.classList.add("hidden");
       refs.appScreen.classList.remove("hidden");
       refs.btnOpenAdd.classList.remove("hidden");
+      refs.btnWatchAd.classList.remove("hidden");
       refs.btnLogout.classList.remove("hidden");
       refs.whoami.classList.remove("hidden");
       refs.adminMenu.classList.toggle("hidden", !state.isAdmin);
@@ -1221,6 +1311,7 @@
         myads:["İlanlarım","Kendi ilanlarını düzenle, kapat, aç veya sil."],
         messages:["Mesajlar","İlan bazlı konuşmalar."],
         profile:["Profil","Hesap özetin."],
+        tasks:["Görevler","Günlük görev ilerlemeleri."],
         admin:["Yönetim","Tüm ilanlar ve son kayıtlar."],
         help:["Yardım","Sorununu Alper hesabına ilet."]
       };
@@ -1230,6 +1321,7 @@
       document.getElementById("viewMyAds").classList.toggle("hidden", view !== "myads");
       document.getElementById("viewMessages").classList.toggle("hidden", view !== "messages");
       document.getElementById("viewProfile").classList.toggle("hidden", view !== "profile");
+      document.getElementById("viewTasks").classList.toggle("hidden", view !== "tasks");
       document.getElementById("viewAdmin").classList.toggle("hidden", view !== "admin");
       document.getElementById("viewHelp").classList.toggle("hidden", view !== "help");
       renderAll();
@@ -1318,6 +1410,7 @@
           avatarUrl: user.photoURL || null,
           avatarDataUrl: null,
           coinBalance: 0,
+          taskState: defaultTaskState(),
           createdAt: serverTimestamp()
         });
       }else{
@@ -1325,7 +1418,8 @@
         await updateDoc(ref, {
           ...data,
           avatarUrl: existing.avatarUrl || null,
-          avatarDataUrl: existing.avatarDataUrl || null
+          avatarDataUrl: existing.avatarDataUrl || null,
+          taskState: existing.taskState || defaultTaskState()
         });
       }
       return { uid:user.uid, displayName, isAdmin: !!isAdmin };
@@ -1342,6 +1436,45 @@
     }
     function normalizeType(t){
       return t === "sell" ? "satış" : t === "swap" ? "takas" : "takasTL";
+    }
+    function dateKeyFromMs(ms = Date.now()){
+      return new Date(Number(ms || Date.now()) + (3 * 60 * 60 * 1000)).toISOString().slice(0, 10);
+    }
+    function shiftDateKey(key, deltaDays){
+      if (!key) return "";
+      const [y, m, d] = String(key).split("-").map(Number);
+      if (!y || !m || !d) return "";
+      const utc = Date.UTC(y, m - 1, d);
+      const next = new Date(utc + (deltaDays * 24 * 60 * 60 * 1000));
+      return next.toISOString().slice(0, 10);
+    }
+    function defaultTaskState(){
+      return {
+        dailyAdDate: "",
+        sessionMs: 0,
+        sessionRewarded: false,
+        loginStreak: 0,
+        loginLastDate: "",
+        loginRewarded: false,
+        listingsCreated: 0,
+        listingsRewarded: false,
+        browseMs: 0,
+        browseRewarded: false,
+        updatedAtMs: 0
+      };
+    }
+    function normalizeTaskState(value){
+      return {
+        ...defaultTaskState(),
+        ...(value && typeof value === "object" ? value : {})
+      };
+    }
+    function progressPercent(current, target){
+      if (!target || target <= 0) return 0;
+      return Math.max(0, Math.min(100, Math.round((Number(current || 0) / target) * 100)));
+    }
+    function rewardStatus(done){
+      return done ? "Tamamlandı" : "Devam ediyor";
     }
     function isPublished(item){
       return item?.status === "published";
@@ -1737,6 +1870,242 @@
       if (refs.promoManagerPanel) refs.promoManagerPanel.classList.toggle('hidden', !state.promoUnlocked);
       if (refs.promoManagerPanel && state.promoUnlocked) refs.promoManagerPanel.classList.remove('hidden');
     }
+    function renderTasks(){
+      if (!refs.taskList || !refs.taskSummary) return;
+      const p = normalizeTaskState(state.profile?.taskState);
+      const sessionTarget = 60 * 60 * 1000;
+      const browseTarget = 24 * 60 * 60 * 1000;
+      const loginTarget = 7;
+      const listingTarget = 15;
+      const adDone = p.dailyAdDate === dateKeyFromMs();
+      const sessionDone = !!p.sessionRewarded || p.sessionMs >= sessionTarget;
+      const browseDone = !!p.browseRewarded || p.browseMs >= browseTarget;
+      const loginDone = !!p.loginRewarded || p.loginStreak >= loginTarget;
+      const listingDone = !!p.listingsRewarded || p.listingsCreated >= listingTarget;
+      refs.taskSummary.innerHTML = `
+        <div class="stat"><b>${formatCoin(currentCoinBalance())}</b><span>Coin</span></div>
+        <div class="stat"><b>${adDone ? '1/1' : '0/1'}</b><span>Reklam</span></div>
+        <div class="stat"><b>${Math.min(Math.floor((p.sessionMs || 0) / 60000), 60)}/60 dk</b><span>Oturum</span></div>
+        <div class="stat"><b>${Math.min(p.loginStreak || 0, 7)}/7</b><span>Giriş serisi</span></div>
+      `;
+      refs.taskList.innerHTML = `
+        <div class="task-card">
+          <div class="task-head">
+            <strong>1 reklam izle</strong>
+            <span class="badge ${adDone ? 'ok' : 'wait'}">${adDone ? 'Tamam' : 'Bekliyor'}</span>
+          </div>
+          <div class="task-meta">+ butonuna bas. 60 saniye sonunda 1 Coin verilir.</div>
+          <div class="progress"><span class="progress-bar" style="width:${adDone ? 100 : 0}%"></span></div>
+        </div>
+        <div class="task-card">
+          <div class="task-head">
+            <strong>1 saat sitede kal</strong>
+            <span class="badge ${sessionDone ? 'ok' : 'wait'}">${sessionDone ? 'Tamam' : 'Devam'}</span>
+          </div>
+          <div class="task-meta">${Math.min(Math.floor((p.sessionMs || 0) / 60000), 60)}/60 dakika • Ödül: 1 Coin</div>
+          <div class="progress"><span class="progress-bar" style="width:${progressPercent(p.sessionMs || 0, sessionTarget)}%"></span></div>
+        </div>
+        <div class="task-card">
+          <div class="task-head">
+            <strong>7 gün üst üste giriş</strong>
+            <span class="badge ${loginDone ? 'ok' : 'wait'}">${loginDone ? 'Tamam' : 'Devam'}</span>
+          </div>
+          <div class="task-meta">${Math.min(p.loginStreak || 0, 7)}/7 gün • 1 gün atlanırsa sıfırlanır • Ödül: 1 Coin</div>
+          <div class="progress"><span class="progress-bar" style="width:${progressPercent(Math.min(p.loginStreak || 0, 7), loginTarget)}%"></span></div>
+        </div>
+        <div class="task-card">
+          <div class="task-head">
+            <strong>15 ilan ekle</strong>
+            <span class="badge ${listingDone ? 'ok' : 'wait'}">${listingDone ? 'Tamam' : 'Devam'}</span>
+          </div>
+          <div class="task-meta">${Math.min(p.listingsCreated || 0, 15)}/15 ilan • Ödül: 1 Coin</div>
+          <div class="progress"><span class="progress-bar" style="width:${progressPercent(Math.min(p.listingsCreated || 0, 15), listingTarget)}%"></span></div>
+        </div>
+        <div class="task-card">
+          <div class="task-head">
+            <strong>24 saat gezin</strong>
+            <span class="badge ${browseDone ? 'ok' : 'wait'}">${browseDone ? 'Tamam' : 'Devam'}</span>
+          </div>
+          <div class="task-meta">${Math.min(Math.floor((p.browseMs || 0) / 3600000), 24)}/24 saat • Ödül: 3 Coin</div>
+          <div class="progress"><span class="progress-bar" style="width:${progressPercent(p.browseMs || 0, browseTarget)}%"></span></div>
+        </div>
+      `;
+    }
+
+    async function mutateTaskState(mutator){
+      if (!state.user) return null;
+      const ref = doc(db, 'users', state.user.uid);
+      return runTransaction(db, async (tx) => {
+        const snap = await tx.get(ref);
+        if (!snap.exists()) throw new Error('Kullanıcı bulunamadı');
+        const data = snap.data() || {};
+        const taskState = normalizeTaskState(data.taskState);
+        const result = await mutator(taskState, data) || {};
+        const rewardCoins = Number(result.rewardCoins || 0);
+        const coinBalance = Number(data.coinBalance || 0) + rewardCoins;
+        tx.update(ref, {
+          coinBalance,
+          taskState,
+          updatedAt: serverTimestamp()
+        });
+        return { rewardCoins, taskState, coinBalance };
+      });
+    }
+    async function syncLoginTask(){
+      const today = dateKeyFromMs();
+      const yesterday = shiftDateKey(today, -1);
+      return mutateTaskState((taskState) => {
+        if (taskState.loginLastDate === today) return { rewardCoins: 0 };
+        const consecutive = taskState.loginLastDate === yesterday ? Number(taskState.loginStreak || 0) + 1 : 1;
+        taskState.loginLastDate = today;
+        taskState.loginStreak = consecutive;
+        let rewardCoins = 0;
+        if (!taskState.loginRewarded && consecutive >= 7){
+          taskState.loginRewarded = true;
+          rewardCoins = 1;
+        }
+        taskState.updatedAtMs = Date.now();
+        return { rewardCoins };
+      });
+    }
+    async function syncTimeTasks(deltaMs){
+      const amount = Math.max(0, Number(deltaMs || 0));
+      if (!amount) return null;
+      return mutateTaskState((taskState) => {
+        let rewardCoins = 0;
+        taskState.sessionMs = Number(taskState.sessionMs || 0) + amount;
+        taskState.browseMs = Number(taskState.browseMs || 0) + amount;
+        if (!taskState.sessionRewarded && taskState.sessionMs >= 60 * 60 * 1000){
+          taskState.sessionRewarded = true;
+          rewardCoins += 1;
+        }
+        if (!taskState.browseRewarded && taskState.browseMs >= 24 * 60 * 60 * 1000){
+          taskState.browseRewarded = true;
+          rewardCoins += 3;
+        }
+        taskState.updatedAtMs = Date.now();
+        return { rewardCoins };
+      });
+    }
+    function renderAdFrame(index = 0, remaining = 60){
+      if (!refs.adFrame) return;
+      const total = Math.max(1, SPONSOR_ADS.length);
+      const active = ((index % total) + total) % total;
+      const current = SPONSOR_ADS[active] || SPONSOR_ADS[0];
+      refs.adFrame.innerHTML = `
+        <div class="ad-kicker">Sponsor reklamları</div>
+        <div class="ad-carousel">
+          <div class="ad-feature active">
+            <div class="ad-pill">${escapeHtml(current.pill)}</div>
+            <div class="ad-brand">${escapeHtml(current.brand)}</div>
+            <div class="ad-headline">${escapeHtml(current.headline)}</div>
+            <div class="ad-copy">${escapeHtml(current.copy)}</div>
+            <div class="ad-actions">
+              <span class="ad-pill">Kalan: ${escapeHtml(String(remaining))} sn</span>
+              <span class="ad-pill">${escapeHtml(String(active + 1))}/${escapeHtml(String(total))} reklam</span>
+            </div>
+          </div>
+          <div class="ad-grid">
+            ${SPONSOR_ADS.map((ad, idx) => `
+              <div class="ad-card ${idx === active ? 'active' : ''}">
+                <strong>${escapeHtml(ad.brand)}</strong>
+                <span>${escapeHtml(ad.headline)}</span>
+              </div>
+            `).join('')}
+          </div>
+          <div class="ad-dots">
+            ${SPONSOR_ADS.map((_, idx) => `<span class="ad-dot ${idx === active ? 'active' : ''}"></span>`).join('')}
+          </div>
+        </div>
+        <div class="ad-count" id="adCountdown">${escapeHtml(String(remaining))}</div>
+        <div class="ad-note">Günde yalnızca 1 kez ödül alınır.</div>
+      `;
+    }
+
+    async function syncListingTask(){
+      return mutateTaskState((taskState) => {
+        taskState.listingsCreated = Number(taskState.listingsCreated || 0) + 1;
+        let rewardCoins = 0;
+        if (!taskState.listingsRewarded && taskState.listingsCreated >= 15){
+          taskState.listingsRewarded = true;
+          rewardCoins = 1;
+        }
+        taskState.updatedAtMs = Date.now();
+        return { rewardCoins };
+      });
+    }
+    function stopAdWatch(message){
+      if (state.adWatch?.timer) clearInterval(state.adWatch.timer);
+      state.adWatch = null;
+      if (refs.modalAd) hideModal(refs.modalAd);
+      if (message && refs.adStatusText) refs.adStatusText.textContent = message;
+    }
+    async function finishAdWatch(){
+      const today = dateKeyFromMs();
+      try{
+        const result = await mutateTaskState((taskState) => {
+          if (taskState.dailyAdDate === today) return { rewardCoins: 0 };
+          taskState.dailyAdDate = today;
+          taskState.updatedAtMs = Date.now();
+          return { rewardCoins: 1 };
+        });
+        stopAdWatch('Coin eklendi.');
+        if (result?.rewardCoins > 0) await logAction('Reklam ödülü', `${state.profile?.displayName || 'user'} +1 Coin`);
+        renderAll();
+        alert('Reklam tamamlandı. 1 Coin eklendi.');
+      }catch(err){
+        stopAdWatch('Ödül alınamadı.');
+        alert('Reklam ödülü verilemedi: ' + firebaseErrorMessage(err));
+      }
+    }
+    function startAdWatch(){
+      if (!state.user) return;
+      const p = normalizeTaskState(state.profile?.taskState);
+      const today = dateKeyFromMs();
+      if (p.dailyAdDate === today) return alert('Bugün reklam ödülünü zaten aldın.');
+      if (state.adWatch) return;
+      if (refs.modalAd) showModal(refs.modalAd);
+      let remaining = 60;
+      let index = 0;
+      renderAdFrame(index, remaining);
+      if (refs.adProgressFill) refs.adProgressFill.style.width = '0%';
+      if (refs.adStatusText) refs.adStatusText.textContent = 'Sponsor reklamlar gösteriliyor... Sekmeyi açık tut.';
+      const timer = setInterval(() => {
+        if (document.hidden || !document.hasFocus()){
+          clearInterval(timer);
+          state.adWatch = null;
+          hideModal(refs.modalAd);
+          alert('Reklam ödülü için sekme açık kalmalı.');
+          return;
+        }
+        remaining -= 1;
+        const newIndex = Math.min(SPONSOR_ADS.length - 1, Math.floor((60 - remaining) / 15));
+        renderAdFrame(newIndex, Math.max(remaining, 0));
+        if (refs.adProgressFill) refs.adProgressFill.style.width = `${Math.max(0, Math.min(100, ((60 - remaining) / 60) * 100))}%`;
+        if (remaining <= 0){
+          clearInterval(timer);
+          state.adWatch = null;
+          finishAdWatch();
+        }
+      }, 1000);
+      state.adWatch = { timer };
+    }
+    async function tickTaskTime(){
+      if (!state.user || document.hidden || !document.hasFocus()) return;
+      const now = Date.now();
+      const last = state.lastSessionTickAt || now;
+      state.lastSessionTickAt = now;
+      const delta = Math.min(60000, Math.max(0, now - last || 60000));
+      if (!delta) return;
+      try{
+        await syncTimeTasks(delta);
+        const currentDay = dateKeyFromMs();
+        if (state.lastTaskSyncDay && state.lastTaskSyncDay !== currentDay){
+          await syncLoginTask();
+        }
+        state.lastTaskSyncDay = currentDay;
+      }catch{}
+    }
     function renderAdminLog(){
       refs.adminLog.innerHTML = sortDescByDate(state.logs).slice(0, 25).map(x => `
         <div class="item">
@@ -1793,6 +2162,7 @@
       if (state.view === "myads") renderMyAds();
       if (state.view === "messages") renderConversations();
       if (state.view === "profile") { renderProfile(); renderPromoManager().catch(()=>{}); }
+      if (state.view === "tasks") renderTasks();
       if (state.view === "admin") {
         renderAdminListings();
         renderAdminLog();
@@ -2462,8 +2832,9 @@ Sorun: ${body}`;
       });
       const u3 = onSnapshot(doc(db, "users", state.user.uid), snap => {
         if (snap.exists()){
-          state.profile = { uid: state.user.uid, ...snap.data() };
-          state.isAdmin = !!snap.data().isAdmin;
+          const data = snap.data() || {};
+          state.profile = { uid: state.user.uid, ...data, taskState: normalizeTaskState(data.taskState) };
+          state.isAdmin = !!data.isAdmin;
           setAppScreen();
           refs.adminMenu.classList.toggle("hidden", !state.isAdmin);
           renderAll();
@@ -2767,6 +3138,7 @@ Sorun: ${body}`;
           await logAction("İlan düzenlendi", `${state.profile.displayName} → ${name}`);
         }else{
           await addDoc(collection(db, "listings"), payload);
+          await syncListingTask().catch(()=>{});
           await logAction("İlan eklendi", `${state.profile.displayName} → ${name}`);
         }
         refs.listingForm.reset();
@@ -3034,6 +3406,7 @@ Sorun: ${body}`;
     refs.btnRefresh.onclick = async () => { await cleanupExpired(); renderAll(); };
     refs.btnSendMessage.onclick = () => sendMessage();
     refs.btnDeleteConversation.onclick = deleteConversation;
+    refs.btnWatchAd.onclick = () => startAdWatch();
     refs.searchInput.oninput = renderAll;
     refs.messageSearchInput.oninput = renderAll;
     refs.filterType.onchange = renderAll;
@@ -3055,6 +3428,10 @@ Sorun: ${body}`;
     });
     refs.modalBuyOptions.addEventListener("click", (e) => {
       if (e.target === refs.modalBuyOptions) hideModal(refs.modalBuyOptions);
+    });
+    refs.btnCloseAd.onclick = () => stopAdWatch('İptal edildi.');
+    refs.modalAd.addEventListener("click", (e) => {
+      if (e.target === refs.modalAd) stopAdWatch('İptal edildi.');
     });
     refs.adImageFile.addEventListener("change", async () => {
       const files = Array.from(refs.adImageFile.files || []).slice(0, 5);
@@ -3117,6 +3494,9 @@ Sorun: ${body}`;
         state.isAdmin = false;
         state.currentConversationCache = null;
         state.currentConversationId = null;
+        state.lastTaskSyncDay = "";
+        if (state.adWatch?.timer) clearInterval(state.adWatch.timer);
+        state.adWatch = null;
         setAuthScreen();
         return;
       }
@@ -3127,6 +3507,11 @@ Sorun: ${body}`;
       setAppScreen();
       await touchActivity();
       await loadLiveData();
+      await syncLoginTask().catch(()=>{});
+      state.lastTaskSyncDay = dateKeyFromMs();
+      if (!state.taskTicker){
+        state.taskTicker = setInterval(() => { tickTaskTime().catch(()=>{}); }, 60000);
+      }
       setView("shop");
       await cleanupExpired();
     });
@@ -3153,9 +3538,14 @@ Sorun: ${body}`;
       }catch{}
     }, 10 * 60 * 1000);
     window.addEventListener("focus", () => { touchActivity().catch(() => {}); });
+    window.addEventListener("beforeunload", () => {
+      if (state.adWatch?.timer) clearInterval(state.adWatch.timer);
+    });
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         touchActivity().catch(() => {});
+      } else if (state.adWatch) {
+        stopAdWatch('Sekme gizlendi.');
       }
     });
   </script>
