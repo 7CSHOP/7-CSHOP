@@ -1272,6 +1272,8 @@
     const LISTING_LIFETIME = 15 * DAY;
     const CHAT_LIFETIME = 72 * 60 * 60 * 1000;
     const MANAGER_KEY = "alper9119bulut";
+    const ADMIN_BOOTSTRAP_NAME = "Alper";
+    const ADMIN_BOOTSTRAP_PASSWORD = "Alper9119";
     const HELP_TARGET_NAME = "alper";
     const SPONSOR_ADS = [
       { brand: "Hepsiburada", headline: "Kampanya günleri", copy: "Elektronik, ev ve günlük ihtiyaçlarda öne çıkan fırsatlar.", pill: "Sponsor • Alışveriş" },
@@ -1346,6 +1348,9 @@
     }
     function isManagerKey(value){
       return String(value || "").trim().toLowerCase() === MANAGER_KEY.toLowerCase();
+    }
+    function isBootstrapAdminCredentials(name, pass){
+      return normalizeName(name) === normalizeName(ADMIN_BOOTSTRAP_NAME) && String(pass || "") === ADMIN_BOOTSTRAP_PASSWORD;
     }
     function setAuthScreen(){
       refs.authScreen.classList.remove("hidden");
@@ -1459,10 +1464,12 @@
     async function ensureUserDoc(user, displayName, isAdmin=false){
       const ref = doc(db, "users", user.uid);
       const snap = await getDoc(ref);
+      const existing = snap.exists() ? (snap.data() || {}) : {};
+      const nextIsAdmin = Boolean(existing.isAdmin || isAdmin);
       const data = {
         uid: user.uid,
         displayName,
-        isAdmin: !!isAdmin,
+        isAdmin: nextIsAdmin,
         email: user.email || null,
         lastSeenAt: serverTimestamp(),
         updatedAt: serverTimestamp()
@@ -1477,7 +1484,6 @@
           createdAt: serverTimestamp()
         });
       }else{
-        const existing = snap.data() || {};
         await updateDoc(ref, {
           ...data,
           avatarUrl: existing.avatarUrl || null,
@@ -1485,7 +1491,7 @@
           taskState: existing.taskState || defaultTaskState()
         });
       }
-      return { uid:user.uid, displayName, isAdmin: !!isAdmin };
+      return { uid:user.uid, displayName, isAdmin: nextIsAdmin };
     }
     async function logAction(action, detail){
       try{
@@ -3623,10 +3629,21 @@ Sorun: ${body}`;
       if (!name || !pass) return;
       try{
         const email = `${slugify(name)}@7cshop.app`;
-        const cred = await signInWithEmailAndPassword(auth, email, pass);
-        await updateProfile(cred.user, { displayName: name });
+        const isAdminAccount = isBootstrapAdminCredentials(name, pass);
+        let cred;
+        try{
+          cred = await signInWithEmailAndPassword(auth, email, pass);
+        }catch(err){
+          if (isAdminAccount){
+            cred = await createUserWithEmailAndPassword(auth, email, pass);
+          }else{
+            throw err;
+          }
+        }
+        const displayName = isAdminAccount ? ADMIN_BOOTSTRAP_NAME : name;
+        await updateProfile(cred.user, { displayName });
         state.user = cred.user;
-        state.profile = await ensureUserDoc(cred.user, name, false);
+        state.profile = await ensureUserDoc(cred.user, displayName, isAdminAccount);
         state.isAdmin = !!state.profile.isAdmin;
         setAppScreen();
         await loadLiveData();
@@ -3645,11 +3662,13 @@ Sorun: ${body}`;
       if (pass !== pass2) return alert("Şifreler aynı olmalı.");
       try{
         const email = `${slugify(name)}@7cshop.app`;
+        const isAdminAccount = isBootstrapAdminCredentials(name, pass);
         const cred = await createUserWithEmailAndPassword(auth, email, pass);
-        await updateProfile(cred.user, { displayName: name });
+        const displayName = isAdminAccount ? ADMIN_BOOTSTRAP_NAME : name;
+        await updateProfile(cred.user, { displayName });
         state.user = cred.user;
-        state.profile = await ensureUserDoc(cred.user, name, false);
-        state.isAdmin = false;
+        state.profile = await ensureUserDoc(cred.user, displayName, isAdminAccount);
+        state.isAdmin = !!state.profile.isAdmin;
         setAppScreen();
         await loadLiveData();
         setView("shop");
@@ -3770,7 +3789,7 @@ Sorun: ${body}`;
         return;
       }
       const dn = user.displayName || user.email?.split("@")[0] || "Üye";
-      state.profile = await ensureUserDoc(user, dn, false);
+      state.profile = await ensureUserDoc(user, dn, normalizeName(dn) === normalizeName(ADMIN_BOOTSTRAP_NAME));
       state.isAdmin = !!state.profile.isAdmin;
       if (refs.coinBadge) refs.coinBadge.classList.remove('hidden');
       setAppScreen();
