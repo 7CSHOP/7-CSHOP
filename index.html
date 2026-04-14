@@ -473,6 +473,7 @@
               <div class="notice">
                 Görsel zorunludur. URL ile ya da küçük dosya yükleyerek ekleyebilirsin.
               </div>
+              <div id="timeGateNotice" class="dangerbox hidden" style="margin-top:12px"></div>
             </div>
           </div>
           <div class="panel">
@@ -1236,7 +1237,8 @@
       btnCloseAd: $("btnCloseAd"),
       adFrame: $("adFrame"),
       adProgressFill: $("adProgressFill"),
-      adStatusText: $("adStatusText")
+      adStatusText: $("adStatusText"),
+      timeGateNotice: $("timeGateNotice")
     };
     const state = {
       user: null,
@@ -1264,6 +1266,8 @@
       adWatch: null,
       lastTaskSyncDay: "",
       lastSessionTickAt: 0,
+      liveDataReady: false,
+      windowTicker: null,
       serverClock: { anchorServerMs: 0, anchorPerfMs: 0, synced: false, syncing: false },
       reviewCache: {},
       reviewLoadingId: ""
@@ -1352,22 +1356,40 @@
     function isBootstrapAdminCredentials(name, pass){
       return normalizeName(name) === normalizeName(ADMIN_BOOTSTRAP_NAME) && String(pass || "") === ADMIN_BOOTSTRAP_PASSWORD;
     }
+    function updateTimeGateUI(){
+      const open = isShopOpenNow();
+      if (refs.timeGateNotice){
+        refs.timeGateNotice.textContent = open ? "" : shopWindowText();
+        refs.timeGateNotice.classList.toggle("hidden", open);
+      }
+      if (refs.onlineBadge){
+        refs.onlineBadge.textContent = open ? "Açık 16:00–21:00" : "Kapalı 16:00–21:00";
+      }
+    }
     function setAuthScreen(){
+      updateTimeGateUI();
       refs.authScreen.classList.remove("hidden");
       refs.appScreen.classList.add("hidden");
       refs.btnOpenAdd.classList.add("hidden");
       refs.btnWatchAd.classList.add("hidden");
       refs.btnLogout.classList.add("hidden");
       refs.whoami.classList.add("hidden");
+      refs.coinBadge.classList.add("hidden");
       refs.adminMenu.classList.add("hidden");
     }
     function setAppScreen(){
+      if (!isShopOpenNow()){
+        setAuthScreen();
+        return;
+      }
+      updateTimeGateUI();
       refs.authScreen.classList.add("hidden");
       refs.appScreen.classList.remove("hidden");
       refs.btnOpenAdd.classList.remove("hidden");
       refs.btnWatchAd.classList.remove("hidden");
       refs.btnLogout.classList.remove("hidden");
       refs.whoami.classList.remove("hidden");
+      refs.coinBadge.classList.remove('hidden');
       refs.adminMenu.classList.toggle("hidden", !state.isAdmin);
       refs.whoami.textContent = `${state.profile?.displayName || "Üye"}${state.isAdmin ? " • Yönetici" : ""}`;
     }
@@ -1532,6 +1554,25 @@
       const utc = Date.UTC(y, m - 1, d);
       const next = new Date(utc + (deltaDays * 24 * 60 * 60 * 1000));
       return next.toISOString().slice(0, 10);
+    }
+    function timePartsIstanbul(ms = getRealNowMs()){
+      const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Europe/Istanbul",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      }).formatToParts(new Date(Number(ms || getRealNowMs())));
+      return {
+        hour: Number(parts.find(p => p.type === "hour")?.value || 0),
+        minute: Number(parts.find(p => p.type === "minute")?.value || 0)
+      };
+    }
+    function isShopOpenNow(ms = getRealNowMs()){
+      const { hour } = timePartsIstanbul(ms);
+      return hour >= 16 && hour < 21;
+    }
+    function shopWindowText(){
+      return "Mağaza yalnızca 16:00–21:00 arasında açık.";
     }
     function defaultTaskState(){
       return {
@@ -2416,6 +2457,7 @@
       renderConversation();
     }
     function renderAll(){
+      updateTimeGateUI();
       if (!state.user) return;
       const unreadTotal = totalUnreadCount();
       if (refs.messagesBadge){
@@ -3088,6 +3130,7 @@ Sorun: ${body}`;
       await touchActivity();
     }
     async function loadLiveData(){
+      if (!state.user || !isShopOpenNow()) return;
       clearListeners();
       const u1 = onSnapshot(collection(db, "listings"), snap => {
         state.listings = snap.docs.map(d => ({ id:d.id, ...d.data() }));
@@ -3772,9 +3815,46 @@ Sorun: ${body}`;
       renderStarButtons(Number(n || 5));
     };
     window.__submitReview = submitReview;
+    async function activateLoggedInUser(){
+      if (!state.user) return;
+      if (!isShopOpenNow()){
+        clearListeners();
+        state.liveDataReady = false;
+        if (state.taskTicker){
+          clearInterval(state.taskTicker);
+          state.taskTicker = null;
+        }
+        if (state.adWatch?.timer) clearInterval(state.adWatch.timer);
+        state.adWatch = null;
+        setAuthScreen();
+        return;
+      }
+      const dn = state.user.displayName || state.user.email?.split("@")[0] || "Üye";
+      state.profile = await ensureUserDoc(state.user, dn, normalizeName(dn) === normalizeName(ADMIN_BOOTSTRAP_NAME));
+      state.isAdmin = !!state.profile.isAdmin;
+      if (refs.coinBadge) refs.coinBadge.classList.remove('hidden');
+      setAppScreen();
+      if (!state.liveDataReady){
+        await touchActivity();
+        await loadLiveData();
+        state.liveDataReady = true;
+        await syncServerClock(true).catch(()=>{});
+        await syncLoginTask().catch(()=>{});
+        state.lastTaskSyncDay = dateKeyFromMs();
+        state.lastSessionTickAt = getRealNowMs();
+        if (!state.taskTicker){
+          state.taskTicker = setInterval(() => { tickTaskTime().catch(()=>{}); }, 60000);
+        }
+        setView("shop");
+        await cleanupExpired();
+      }else{
+        renderAll();
+      }
+    }
     onAuthStateChanged(auth, async (user) => {
       state.user = user || null;
       state.promoUnlocked = false;
+      state.liveDataReady = false;
       if (!user){
         state.profile = null;
         state.isAdmin = false;
@@ -3785,25 +3865,11 @@ Sorun: ${body}`;
         state.serverClock = { anchorServerMs: 0, anchorPerfMs: 0, synced: false, syncing: false };
         if (state.adWatch?.timer) clearInterval(state.adWatch.timer);
         state.adWatch = null;
+        clearListeners();
         setAuthScreen();
         return;
       }
-      const dn = user.displayName || user.email?.split("@")[0] || "Üye";
-      state.profile = await ensureUserDoc(user, dn, normalizeName(dn) === normalizeName(ADMIN_BOOTSTRAP_NAME));
-      state.isAdmin = !!state.profile.isAdmin;
-      if (refs.coinBadge) refs.coinBadge.classList.remove('hidden');
-      setAppScreen();
-      await touchActivity();
-      await loadLiveData();
-      await syncServerClock(true).catch(()=>{});
-      await syncLoginTask().catch(()=>{});
-      state.lastTaskSyncDay = dateKeyFromMs();
-      state.lastSessionTickAt = getRealNowMs();
-      if (!state.taskTicker){
-        state.taskTicker = setInterval(() => { tickTaskTime().catch(()=>{}); }, 60000);
-      }
-      setView("shop");
-      await cleanupExpired();
+      await activateLoggedInUser();
     });
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
@@ -3823,11 +3889,18 @@ Sorun: ${body}`;
     if (refs.coinBadge) refs.coinBadge.textContent = formatCoin(0);
     setInterval(async () => {
       try{
+        if (state.user){
+          await activateLoggedInUser();
+        }
+      }catch{}
+    }, 60 * 1000);
+    setInterval(async () => {
+      try{
         await cleanupExpired();
         await touchActivity();
       }catch{}
     }, 10 * 60 * 1000);
-    window.addEventListener("focus", () => { touchActivity().catch(() => {}); syncServerClock().catch(()=>{}); });
+    window.addEventListener("focus", () => { touchActivity().catch(() => {}); syncServerClock().catch(()=>{}); activateLoggedInUser().catch(()=>{}); });
     window.addEventListener("beforeunload", () => {
       if (state.adWatch?.timer) clearInterval(state.adWatch.timer);
     });
@@ -3835,6 +3908,7 @@ Sorun: ${body}`;
       if (document.visibilityState === "visible") {
         touchActivity().catch(() => {});
         syncServerClock().catch(()=>{});
+        activateLoggedInUser().catch(()=>{});
       } else if (state.adWatch) {
         stopAdWatch('Sekme gizlendi.');
       }
