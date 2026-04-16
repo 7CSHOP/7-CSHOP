@@ -381,7 +381,122 @@
     .order-card{border:1px solid #bfdbfe;background:#eff6ff;border-radius:18px;padding:14px;display:grid;gap:10px;margin-bottom:12px}
     .order-card .row{justify-content:flex-start}
     .order-status{font-size:12px;font-weight:900;color:#1d4ed8}
+    
     .help-banner{padding:14px 16px;border-radius:18px;background:#f8fafc;border:1px solid var(--line)}
+    .coin-hub-hero{
+      display:grid;
+      gap:12px;
+      padding:18px;
+      border-radius:24px;
+      border:1px solid #f59e0b;
+      background:linear-gradient(135deg,#fffbeb,#fff7ed);
+      box-shadow:0 18px 40px rgba(245,158,11,.16);
+    }
+    .coin-hub-title{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      font-size:22px;
+      font-weight:950;
+      color:#7c2d12;
+      letter-spacing:-.02em;
+    }
+    .coin-hub-sub{
+      color:#9a3412;
+      font-size:13px;
+      line-height:1.6;
+      max-width:56ch;
+    }
+    .coin-choice-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+    .coin-choice-card{
+      border-radius:22px;
+      border:1px solid #fed7aa;
+      background:#fff;
+      padding:16px;
+      box-shadow:0 12px 28px rgba(17,24,39,.06);
+      display:grid;
+      gap:10px;
+    }
+    .coin-choice-card.primary{
+      border-color:#f59e0b;
+      background:linear-gradient(180deg,#fff7ed,#fff);
+    }
+    .coin-choice-card.secondary{
+      border-color:#bfdbfe;
+      background:linear-gradient(180deg,#eff6ff,#fff);
+    }
+    .coin-choice-card strong{
+      font-size:16px;
+      font-weight:900;
+    }
+    .coin-choice-card .tiny{
+      font-size:12px;
+      line-height:1.5;
+    }
+    .coin-choice-card .btn{
+      width:100%;
+      padding:14px 16px;
+      border-radius:18px;
+      font-size:15px;
+      font-weight:900;
+    }
+    .coin-package-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+    .coin-package-card{
+      border-radius:22px;
+      border:1px solid #e5e7eb;
+      background:#fff;
+      padding:16px;
+      box-shadow:0 10px 24px rgba(17,24,39,.05);
+      display:grid;
+      gap:10px;
+    }
+    .coin-package-card.featured{
+      border-color:#f59e0b;
+      background:linear-gradient(135deg,#fff7ed,#ffffff);
+      box-shadow:0 16px 32px rgba(245,158,11,.16);
+      transform:translateY(-1px);
+    }
+    .coin-package-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      width:fit-content;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#fef3c7;
+      color:#92400e;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .coin-package-price{
+      font-size:28px;
+      font-weight:950;
+      line-height:1;
+      color:#111827;
+    }
+    .coin-package-coin{
+      font-size:15px;
+      font-weight:900;
+      color:#b45309;
+    }
+    .coin-package-card .btn{
+      width:100%;
+      padding:14px 16px;
+      border-radius:18px;
+      font-size:15px;
+      font-weight:900;
+    }
+
     @media (max-width:760px){
       .topbar-inner{align-items:stretch}
       .actions{width:100%}
@@ -1066,6 +1181,48 @@
       </div>
     </div>
   </div>
+  <div id="modalCoinHub" class="modal">
+    <div class="modal-card" style="width:min(760px,100%)">
+      <div class="modal-head">
+        <strong>Coin işlemleri</strong>
+        <button id="btnCloseCoinHub" class="chip">Kapat</button>
+      </div>
+      <div class="modal-body">
+        <div class="coin-hub-hero">
+          <div class="coin-hub-title">Coin almak için bir yöntem seç</div>
+          <div class="coin-hub-sub">TL ile paket satın alabilir veya günde 1 reklam izleyip 1 coin alabilirsin. TL seçeneği daha görünür ve güçlü olsun diye vurgulandı.</div>
+          <div class="coin-choice-grid">
+            <div class="coin-choice-card primary">
+              <strong>TL ile coin al</strong>
+              <div class="tiny">Hazır paketlerden birini seç. Seçimden sonra Alper hesabına sistem mesajı gider.</div>
+              <button id="btnOpenCoinPackages" class="btn" type="button">TL ile coin al</button>
+            </div>
+            <div class="coin-choice-card secondary">
+              <strong>Reklam ile coin kazan</strong>
+              <div class="tiny">Günde 1 reklam izleyip 1 coin al. Reklam akışı aynı kalır.</div>
+              <button id="btnOpenCoinAd" class="btn secondary" type="button">Günde 1 reklam izleyip 1 coin al</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="modalCoinPackages" class="modal">
+    <div class="modal-card" style="width:min(900px,100%)">
+      <div class="modal-head">
+        <strong>Coin paketleri</strong>
+        <button id="btnCloseCoinPackages" class="chip">Geri</button>
+      </div>
+      <div class="modal-body">
+        <div class="coin-hub-hero">
+          <div class="coin-hub-title">TL paketlerini seç</div>
+          <div class="coin-hub-sub">Seçtiğin paket doğrudan Alper hesabına sistem mesajı olarak düşer ve sana da satın alma isteği bildirimi çıkar.</div>
+        </div>
+        <div class="hr"></div>
+        <div id="coinPackageGrid" class="coin-package-grid"></div>
+      </div>
+    </div>
+  </div>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
     import {
@@ -1086,6 +1243,10 @@
       setDoc,
       getDoc,
       getDocs,
+      query,
+      where,
+      orderBy,
+      limit,
       onSnapshot,
       serverTimestamp,
       updateDoc,
@@ -1238,6 +1399,13 @@
       adFrame: $("adFrame"),
       adProgressFill: $("adProgressFill"),
       adStatusText: $("adStatusText"),
+      modalCoinHub: $("modalCoinHub"),
+      btnCloseCoinHub: $("btnCloseCoinHub"),
+      btnOpenCoinPackages: $("btnOpenCoinPackages"),
+      btnOpenCoinAd: $("btnOpenCoinAd"),
+      modalCoinPackages: $("modalCoinPackages"),
+      btnCloseCoinPackages: $("btnCloseCoinPackages"),
+      coinPackageGrid: $("coinPackageGrid"),
       timeGateNotice: $("timeGateNotice")
     };
     const state = {
@@ -1250,6 +1418,7 @@
       conversations: [],
       logs: [],
       users: [],
+      userCache: {},
       currentConversationId: null,
       currentListingId: null,
       currentSellerId: null,
@@ -1285,6 +1454,14 @@
       { brand: "Migros", headline: "Haftalık market fırsatı", copy: "Sepet indirimi ve temel ihtiyaç ürünleri için vitrin.", pill: "Sponsor • Market" },
       { brand: "Teknosa", headline: "Teknoloji önerileri", copy: "Telefon, kulaklık ve aksesuar odaklı sponsor alanı.", pill: "Sponsor • Teknoloji" },
       { brand: "LC Waikiki", headline: "Aile indirimi", copy: "Giyim ve sezon fırsatları için örnek reklam kartı.", pill: "Sponsor • Giyim" }
+    ];
+    const COIN_PACKAGES = [
+      { id: "p1", label: "30 TL 7 Coin", price: 30, coin: 7 },
+      { id: "p2", label: "50 TL 10 Coin", price: 50, coin: 10 },
+      { id: "p3", label: "100 TL 25 Coin", price: 100, coin: 25 },
+      { id: "p4", label: "200 TL 55 Coin", price: 200, coin: 55 },
+      { id: "p5", label: "400 TL 120 Coin", price: 400, coin: 120 },
+      { id: "p6", label: "800 TL 300 Coin", price: 800, coin: 300 }
     ];
     function slugify(name){
       return String(name).trim().toLowerCase()
@@ -1360,10 +1537,10 @@
       const open = isShopOpenNow();
       if (refs.timeGateNotice){
         refs.timeGateNotice.textContent = open ? "" : shopWindowText();
-        refs.timeGateNotice.classList.toggle("hidden", open);
+        refs.timeGateNotice.classList.add("hidden");
       }
       if (refs.onlineBadge){
-        refs.onlineBadge.textContent = open ? "Açık 16:00–21:00" : "Kapalı 16:00–21:00";
+        refs.onlineBadge.textContent = open ? "Açık 7/24" : "Açık 7/24";
       }
     }
     function setAuthScreen(){
@@ -1378,10 +1555,6 @@
       refs.adminMenu.classList.add("hidden");
     }
     function setAppScreen(){
-      if (!isShopOpenNow()){
-        setAuthScreen();
-        return;
-      }
       updateTimeGateUI();
       refs.authScreen.classList.add("hidden");
       refs.appScreen.classList.remove("hidden");
@@ -1396,6 +1569,8 @@
     function setView(view){
       state.view = view;
       document.querySelectorAll(".menu button").forEach(b => b.classList.toggle("active", b.dataset.view === view));
+      if (view === "admin") ensureAdminLogsLoaded().catch(()=>{});
+      if (view === "profile" && state.promoUnlocked) ensurePromoCodesLoaded().catch(()=>{});
       const map = {
         shop:["Dükkan","Yayınlanan ilanları görüntüle."],
         myads:["İlanlarım","Kendi ilanlarını düzenle, kapat, aç veya sil."],
@@ -1568,11 +1743,10 @@
       };
     }
     function isShopOpenNow(ms = getRealNowMs()){
-      const { hour } = timePartsIstanbul(ms);
-      return hour >= 16 && hour < 21;
+      return true;
     }
     function shopWindowText(){
-      return "Mağaza yalnızca 16:00–21:00 arasında açık.";
+      return "Mağaza 7/24 açık.";
     }
     function defaultTaskState(){
       return {
@@ -1643,12 +1817,13 @@
       return state.conversations.reduce((sum, conv) => sum + getUnreadCount(conv), 0);
     }
     function getUserById(uid){
-      return state.users.find(u => u.uid === uid) || null;
+      if (!uid) return null;
+      return state.userCache?.[uid] || (state.profile?.uid === uid ? state.profile : null);
     }
     function getUserAvatar(uid){
       if (!uid) return "";
       const user = getUserById(uid) || (state.user?.uid === uid ? state.profile : null);
-      return user?.avatarDataUrl || user?.avatarUrl || user?.photoURL || "";
+      return user?.avatarDataUrl || user?.avatarUrl || user?.photoURL || user?.profilePhotoURL || "";
     }
     function getAvatarMarkup(avatarUrl, label){
       const initials = String(label || "?").trim().slice(0, 2).toUpperCase() || "?";
@@ -2415,6 +2590,7 @@
       }catch{}
     }
     function renderAdminLog(){
+      if (!state.logs.length && state.isAdmin && state.view === "admin") ensureAdminLogsLoaded().catch(()=>{});
       refs.adminLog.innerHTML = sortDescByDate(state.logs).slice(0, 25).map(x => `
         <div class="item">
           <div class="item-head">
@@ -2492,6 +2668,7 @@
       if (!refs.promoManagerPanel) return;
       refs.promoManagerPanel.classList.toggle('hidden', !state.promoUnlocked);
       if (!state.promoUnlocked) return;
+      if (!state.promoCodes.length) await ensurePromoCodesLoaded();
       const items = sortDescByDate(state.promoCodes || []);
       refs.promoList.innerHTML = items.map(code => {
         const expires = code.expiresAtMs ? new Date(code.expiresAtMs).toLocaleDateString('tr-TR') : 'Süresiz';
@@ -2510,9 +2687,21 @@
           </div>`;
       }).join('') || `<div class="feed-item">Henüz promosyon kodu yok.</div>`;
     }
-    function findUserByDisplayName(name){
+    async function findUserByDisplayName(name){
       const n = String(name || '').trim().toLowerCase();
-      return state.users.find(u => String(u.displayName || '').trim().toLowerCase() === n) || null;
+      if (!n) return null;
+      const cached = Object.values(state.userCache || {}).find(u => String(u.displayName || '').trim().toLowerCase() === n);
+      if (cached) return cached;
+      if (state.profile && String(state.profile.displayName || '').trim().toLowerCase() === n) return state.profile;
+      try{
+        const snap = await getDocs(query(collection(db, "users"), where("displayName", "==", String(name || "").trim()), limit(1)));
+        if (!snap.empty){
+          const found = { uid: snap.docs[0].id, ...snap.docs[0].data() };
+          state.userCache = { ...(state.userCache || {}), [found.uid]: found };
+          return found;
+        }
+      }catch{}
+      return null;
     }
     async function saveCoinDelta(userId, delta){
       return runTransaction(db, async (tx) => {
@@ -2813,11 +3002,77 @@
         alert(`Onay tamamlanamadı: ${err?.message || err}`);
       }
     }
+    function renderCoinPackages(){
+      if (!refs.coinPackageGrid) return;
+      refs.coinPackageGrid.innerHTML = COIN_PACKAGES.map((pkg, index) => `
+        <div class="coin-package-card ${index === 2 ? 'featured' : ''}">
+          <div class="coin-package-badge">${index === 2 ? 'Önerilen' : 'Paket'}</div>
+          <strong>${escapeHtml(pkg.label)}</strong>
+          <div class="coin-package-price">${escapeHtml(String(pkg.price))} TL</div>
+          <div class="coin-package-coin">${escapeHtml(formatCoin(pkg.coin))}</div>
+          <div class="tiny">Bir sorun yaşanılmadığı süreç iade yoktur.</div>
+          <button class="btn" type="button" onclick="window.__buyCoinPackage('${pkg.id}')">Bu paketi seç</button>
+        </div>
+      `).join("");
+    }
+    function openCoinHub(){
+      if (refs.modalCoinHub) showModal(refs.modalCoinHub);
+    }
+    function openCoinPackages(){
+      if (refs.modalCoinHub) hideModal(refs.modalCoinHub);
+      renderCoinPackages();
+      if (refs.modalCoinPackages) showModal(refs.modalCoinPackages);
+    }
+    async function sendCoinPackageRequest(pkg){
+      const target = await findUserByDisplayName('Alper');
+      const buyerName = state.profile?.displayName || 'Kullanıcı';
+      const text = `${buyerName} isimli kullanıcı ${pkg.label} paketini almak istiyor.`;
+      if (!target) {
+        alert('Alper hesabı bulunamadı.');
+        return;
+      }
+      const existing = state.conversations.find(c => (c.members || []).includes(state.user.uid) && (c.members || []).includes(target.uid) && (c.listingId === 'coin-shop' || c.latestListingId === 'coin-shop'));
+      if (existing){
+        await updateDoc(doc(db, 'conversations', existing.id), {
+          messages: [...(existing.messages || []), { uid: 'system', name: 'Sistem', text, type: 'system', createdAt: new Date(getRealNowMs()).toISOString() }],
+          lastMessage: text,
+          unreadBy: { ...(existing.unreadBy || {}), [target.uid]: (Number(existing.unreadBy?.[target.uid]) || 0) + 1 },
+          updatedAt: serverTimestamp()
+        });
+        state.currentConversationId = existing.id;
+      }else{
+        const ref = await addDoc(collection(db, 'conversations'), {
+          listingId: 'coin-shop',
+          latestListingId: 'coin-shop',
+          latestListingName: 'Coin Satın Alım İsteği',
+          members: [state.user.uid, target.uid],
+          memberNames: Array.from(new Set([buyerName, target.displayName].filter(Boolean))),
+          messages: [{ uid: 'system', name: 'Sistem', text, type: 'system', createdAt: new Date(getRealNowMs()).toISOString() }],
+          lastMessage: text,
+          unreadBy: { [target.uid]: 1 },
+          readBy: { [state.user.uid]: getRealNowMs() },
+          createdAtMs: getRealNowMs(),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+        state.currentConversationId = ref.id;
+      }
+      await logAction('Coin satın alım isteği', `${buyerName} → ${pkg.label}`);
+      alert('Coin satın alım isteği gönderildi.');
+      setView('messages');
+      renderAll();
+    }
+    async function buyCoinPackage(packageId){
+      const pkg = COIN_PACKAGES.find(x => x.id === packageId);
+      if (!pkg) return;
+      hideModal(refs.modalCoinPackages);
+      await sendCoinPackageRequest(pkg);
+    }
     async function openHelpConversation(){
       const title = String(refs.helpTitleInput?.value || '').trim();
       const body = String(refs.helpBodyInput?.value || '').trim();
       if (!title || !body) return alert('Başlık ve sorun alanı gerekli.');
-      const target = findUserByDisplayName('Alper');
+      const target = await findUserByDisplayName('Alper');
       const text = `Yardım başlığı: ${title}
 Sorun: ${body}`;
       if (!target) {
@@ -3052,32 +3307,20 @@ Sorun: ${body}`;
     }
     async function cleanupExpired(){
       const now = Date.now();
-      const listingsSnap = await getDocs(collection(db, "listings"));
-      for (const d of listingsSnap.docs){
-        const data = d.data();
-        const created =
-          typeof data.createdAtMs === "number"
-            ? data.createdAtMs
-            : tsValue(data.createdAt);
-        if (!created) continue;
-        if (now - created > LISTING_LIFETIME){
+      try{
+        const listingsSnap = await getDocs(query(collection(db, "listings"), where("createdAtMs", "<", now - LISTING_LIFETIME)));
+        for (const d of listingsSnap.docs){
           await deleteDoc(doc(db, "listings", d.id));
-          await logAction("İlan süre doldu", data.name || d.id);
+          await logAction("İlan süre doldu", d.data()?.name || d.id);
         }
-      }
-      const convSnap = await getDocs(collection(db, "conversations"));
-      for (const d of convSnap.docs){
-        const data = d.data();
-        const created =
-          typeof data.createdAtMs === "number"
-            ? data.createdAtMs
-            : tsValue(data.createdAt);
-        if (!created) continue;
-        if (now - created > CHAT_LIFETIME){
+      }catch{}
+      try{
+        const convSnap = await getDocs(query(collection(db, "conversations"), where("createdAtMs", "<", now - CHAT_LIFETIME)));
+        for (const d of convSnap.docs){
           await deleteDoc(doc(db, "conversations", d.id));
           await logAction("Sohbet süre doldu", d.id);
         }
-      }
+      }catch{}
     }
     function clearListeners(){
       for (const u of state.unsubscribers) {
@@ -3085,6 +3328,70 @@ Sorun: ${body}`;
       }
       state.unsubscribers = [];
     }
+    function cacheUserDoc(docData){
+      if (!docData?.uid) return docData || null;
+      state.userCache = { ...(state.userCache || {}), [docData.uid]: docData };
+      return docData;
+    }
+
+    function collectListingOwnerIds(listings){
+      return Array.from(new Set((Array.isArray(listings) ? listings : [])
+        .map(item => item?.ownerId)
+        .filter(uid => uid && uid !== state.user?.uid)));
+    }
+
+    function collectConversationPeerIds(conversations){
+      return Array.from(new Set((Array.isArray(conversations) ? conversations : [])
+        .flatMap(conv => Array.isArray(conv?.members) ? conv.members : [])
+        .filter(uid => uid && uid !== state.user?.uid)));
+    }
+
+    async function warmUserCache(userIds = []){
+      const ids = Array.from(new Set((Array.isArray(userIds) ? userIds : [])
+        .map(uid => String(uid || "").trim())
+        .filter(Boolean)));
+      const missing = ids.filter(uid => !state.userCache?.[uid] && uid !== state.user?.uid);
+      if (!missing.length) return;
+      const batch = missing.slice(0, 20);
+      await Promise.all(batch.map(async uid => {
+        try{
+          const snap = await getDoc(doc(db, "users", uid));
+          if (snap.exists()){
+            cacheUserDoc({ uid, ...snap.data() });
+          }
+        }catch{}
+      }));
+    }
+
+    async function ensurePromoCodesLoaded(){
+      try{
+        const snap = await getDocs(query(collection(db, "promoCodes"), orderBy("createdAtMs", "desc")));
+        state.promoCodes = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      }catch{}
+      return state.promoCodes;
+    }
+
+    async function ensureAdminLogsLoaded(){
+      try{
+        const snap = await getDocs(query(collection(db, "logs"), orderBy("createdAt", "desc"), limit(25)));
+        state.logs = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      }catch{}
+      return state.logs;
+    }
+
+    async function loadCurrentUserProfile(){
+      if (!state.user) return;
+      try{
+        const snap = await getDoc(doc(db, "users", state.user.uid));
+        if (snap.exists()){
+          const data = snap.data() || {};
+          state.profile = { uid: state.user.uid, ...data, taskState: normalizeTaskState(data.taskState) };
+          state.isAdmin = !!data.isAdmin;
+          cacheUserDoc(state.profile);
+        }
+      }catch{}
+    }
+
     async function saveProfileUpdates({ displayName, avatarUrl, avatarDataUrl }){
       if (!state.user) return;
       const ref = doc(db, "users", state.user.uid);
@@ -3130,44 +3437,40 @@ Sorun: ${body}`;
       await touchActivity();
     }
     async function loadLiveData(){
-      if (!state.user || !isShopOpenNow()) return;
+      if (!state.user) return;
       clearListeners();
       const u1 = onSnapshot(collection(db, "listings"), snap => {
         state.listings = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         renderAll();
+        warmUserCache(collectListingOwnerIds(state.listings))
+          .then(() => renderAll())
+          .catch(() => {});
       });
-      const u2 = onSnapshot(collection(db, "logs"), snap => {
-        state.logs = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-        if (state.view === "admin") renderAdminLog();
-      });
-      const u3 = onSnapshot(doc(db, "users", state.user.uid), snap => {
+      const u2 = onSnapshot(doc(db, "users", state.user.uid), snap => {
         if (snap.exists()){
           const data = snap.data() || {};
           state.profile = { uid: state.user.uid, ...data, taskState: normalizeTaskState(data.taskState) };
           state.isAdmin = !!data.isAdmin;
+          cacheUserDoc(state.profile);
           setAppScreen();
           refs.adminMenu.classList.toggle("hidden", !state.isAdmin);
           renderAll();
         }
       });
-      const u4 = onSnapshot(collection(db, "conversations"), snap => {
-        state.conversations = snap.docs.map(d => ({ id:d.id, ...d.data() }))
-          .filter(c => (c.members || []).includes(state.user.uid));
+      const u3 = onSnapshot(query(collection(db, "conversations"), where("members", "array-contains", state.user.uid)), snap => {
+        state.conversations = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         if (state.currentConversationId){
           const selected = state.conversations.find(c => c.id === state.currentConversationId);
           if (selected) state.currentConversationCache = selected;
         }
         renderAll();
+        warmUserCache(collectConversationPeerIds(state.conversations))
+          .then(() => renderAll())
+          .catch(() => {});
       });
-      const u5 = onSnapshot(collection(db, "users"), snap => {
-        state.users = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-        renderAll();
-      });
-      const u6 = onSnapshot(collection(db, "promoCodes"), snap => {
-        state.promoCodes = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-        renderAll();
-      });
-      state.unsubscribers.push(u1,u2,u3,u4,u5,u6);
+      state.unsubscribers.push(u1, u2, u3);
+      if (state.view === "admin") ensureAdminLogsLoaded().then(() => renderAll()).catch(()=>{});
+      if (state.promoUnlocked) ensurePromoCodesLoaded().then(() => renderAll()).catch(()=>{});
     }
     async function openConversation(listingId){
       if (!state.user) return;
@@ -3542,6 +3845,7 @@ Sorun: ${body}`;
       const userSnap = await getDoc(doc(db, "users", userId));
       if (!userSnap.exists()) return;
       const seller = { uid: userId, ...userSnap.data() };
+      cacheUserDoc(seller);
       state.currentSellerId = userId;
       state.currentSeller = seller;
       state.currentListingId = listingId || null;
@@ -3687,6 +3991,7 @@ Sorun: ${body}`;
         await updateProfile(cred.user, { displayName });
         state.user = cred.user;
         state.profile = await ensureUserDoc(cred.user, displayName, isAdminAccount);
+        cacheUserDoc(state.profile);
         state.isAdmin = !!state.profile.isAdmin;
         setAppScreen();
         await loadLiveData();
@@ -3711,6 +4016,7 @@ Sorun: ${body}`;
         await updateProfile(cred.user, { displayName });
         state.user = cred.user;
         state.profile = await ensureUserDoc(cred.user, displayName, isAdminAccount);
+        cacheUserDoc(state.profile);
         state.isAdmin = !!state.profile.isAdmin;
         setAppScreen();
         await loadLiveData();
@@ -3730,7 +4036,7 @@ Sorun: ${body}`;
     refs.btnSendMessage.onclick = () => sendMessage();
     refs.btnDeleteConversation.onclick = deleteConversation;
     refs.btnSubmitReview.onclick = submitReview;
-    refs.btnWatchAd.onclick = startAdWatch;
+    refs.btnWatchAd.onclick = openCoinHub;
     refs.searchInput.oninput = renderAll;
     refs.messageSearchInput.oninput = renderAll;
     refs.filterType.onchange = renderAll;
@@ -3753,6 +4059,19 @@ Sorun: ${body}`;
     refs.modalBuyOptions.addEventListener("click", (e) => {
       if (e.target === refs.modalBuyOptions) hideModal(refs.modalBuyOptions);
     });
+    refs.modalCoinHub.addEventListener("click", (e) => {
+      if (e.target === refs.modalCoinHub) hideModal(refs.modalCoinHub);
+    });
+    refs.modalCoinPackages.addEventListener("click", (e) => {
+      if (e.target === refs.modalCoinPackages) hideModal(refs.modalCoinPackages);
+    });
+    refs.btnCloseCoinHub.onclick = () => hideModal(refs.modalCoinHub);
+    refs.btnOpenCoinPackages.onclick = openCoinPackages;
+    refs.btnOpenCoinAd.onclick = () => {
+      hideModal(refs.modalCoinHub);
+      startAdWatch();
+    };
+    refs.btnCloseCoinPackages.onclick = () => hideModal(refs.modalCoinPackages);
     refs.btnCloseAd.onclick = () => stopAdWatch('İptal edildi.');
     refs.modalAd.addEventListener("click", (e) => {
       if (e.target === refs.modalAd) stopAdWatch('İptal edildi.');
@@ -3805,6 +4124,7 @@ Sorun: ${body}`;
     window.__selectForAdmin = selectForAdmin;
     window.__openSeller = openSellerProfile;
     window.__buyListing = buyListing;
+    window.__buyCoinPackage = buyCoinPackage;
     window.__approveCoinOrder = approveCoinOrder;
     window.__openListingDetail = openListingDetail;
     window.__setDetailImage = setDetailImage;
@@ -3817,20 +4137,9 @@ Sorun: ${body}`;
     window.__submitReview = submitReview;
     async function activateLoggedInUser(){
       if (!state.user) return;
-      if (!isShopOpenNow()){
-        clearListeners();
-        state.liveDataReady = false;
-        if (state.taskTicker){
-          clearInterval(state.taskTicker);
-          state.taskTicker = null;
-        }
-        if (state.adWatch?.timer) clearInterval(state.adWatch.timer);
-        state.adWatch = null;
-        setAuthScreen();
-        return;
-      }
       const dn = state.user.displayName || state.user.email?.split("@")[0] || "Üye";
       state.profile = await ensureUserDoc(state.user, dn, normalizeName(dn) === normalizeName(ADMIN_BOOTSTRAP_NAME));
+      cacheUserDoc(state.profile);
       state.isAdmin = !!state.profile.isAdmin;
       if (refs.coinBadge) refs.coinBadge.classList.remove('hidden');
       setAppScreen();
@@ -3858,6 +4167,7 @@ Sorun: ${body}`;
       if (!user){
         state.profile = null;
         state.isAdmin = false;
+        state.userCache = {};
         state.currentConversationCache = null;
         state.currentConversationId = null;
         state.lastTaskSyncDay = "";
