@@ -292,6 +292,69 @@
     .achievement-card span{font-size:12px;color:var(--muted)}
     .achievement-progress{height:7px;background:#e5e7eb;border-radius:999px;overflow:hidden}
     .achievement-progress > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#2563eb,#7c3aed)}
+
+    .coin-hub-hero{
+      border:1px solid #dbeafe;
+      background:linear-gradient(135deg,#eff6ff,#ffffff);
+      border-radius:22px;
+      padding:16px;
+      display:grid;
+      gap:8px;
+      margin-bottom:14px;
+      box-shadow:0 12px 24px rgba(37,99,235,.08);
+    }
+    .coin-hub-hero strong{font-size:22px;line-height:1.1}
+    .coin-hub-hero span{color:var(--muted);font-size:13px;line-height:1.5}
+    .buy-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .buy-choice{
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:16px;
+      text-align:left;
+      background:#fff;
+      cursor:pointer;
+      display:grid;
+      gap:6px;
+      transition:.18s;
+      box-shadow:0 10px 20px rgba(17,24,39,.06);
+    }
+    .buy-choice:hover{transform:translateY(-1px);box-shadow:0 16px 30px rgba(17,24,39,.1)}
+    .buy-choice strong{font-size:18px}
+    .buy-choice span{font-size:13px;color:var(--muted);line-height:1.45}
+    .buy-choice-tl{background:linear-gradient(135deg,#eff6ff,#ffffff);border-color:#bfdbfe}
+    .buy-choice-coin{background:linear-gradient(135deg,#fff7ed,#ffffff);border-color:#fed7aa}
+    .coin-package-shell{display:grid;gap:12px}
+    .coin-package-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+    .coin-package{
+      border:1px solid #dbeafe;
+      border-radius:18px;
+      padding:14px;
+      background:linear-gradient(135deg,#f8fbff,#ffffff);
+      cursor:pointer;
+      text-align:left;
+      display:grid;
+      gap:6px;
+      box-shadow:0 10px 20px rgba(37,99,235,.07);
+      transition:.18s;
+    }
+    .coin-package:hover{transform:translateY(-1px);box-shadow:0 16px 26px rgba(37,99,235,.12)}
+    .coin-package strong{font-size:18px}
+    .coin-package span{font-size:13px;color:var(--muted)}
+    .coin-package .accent{font-size:12px;font-weight:900;color:#1d4ed8}
+    .coin-package-note{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.5;
+      padding:12px 14px;
+      border-radius:16px;
+      background:#f8fafc;
+      border:1px solid var(--line);
+    }
+
     @media (max-width:900px){
       .detail-top{grid-template-columns:1fr}
       .task-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -381,33 +444,7 @@
     .order-card{border:1px solid #bfdbfe;background:#eff6ff;border-radius:18px;padding:14px;display:grid;gap:10px;margin-bottom:12px}
     .order-card .row{justify-content:flex-start}
     .order-status{font-size:12px;font-weight:900;color:#1d4ed8}
-    
     .help-banner{padding:14px 16px;border-radius:18px;background:#f8fafc;border:1px solid var(--line)}
-    .coin-hub-hero{
-      display:grid;
-      gap:12px;
-      padding:18px;
-      border-radius:24px;
-      border:1px solid #f59e0b;
-      background:linear-gradient(135deg,#fffbeb,#fff7ed);
-      box-shadow:0 18px 40px rgba(245,158,11,.16);
-    }
-    .coin-hub-title{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-      font-size:22px;
-      font-weight:950;
-      color:#7c2d12;
-      letter-spacing:-.02em;
-    }
-    .coin-hub-sub{
-      color:#9a3412;
-      font-size:13px;
-      line-height:1.6;
-      max-width:56ch;
-    }
     .coin-choice-grid{
       display:grid;
       grid-template-columns:repeat(2,minmax(0,1fr));
@@ -444,11 +481,6 @@
       border-radius:18px;
       font-size:15px;
       font-weight:900;
-    }
-    .coin-package-grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:12px;
     }
     .coin-package-card{
       border-radius:22px;
@@ -1181,6 +1213,7 @@
       </div>
     </div>
   </div>
+
   <div id="modalCoinHub" class="modal">
     <div class="modal-card" style="width:min(760px,100%)">
       <div class="modal-head">
@@ -1222,6 +1255,7 @@
         <div id="coinPackageGrid" class="coin-package-grid"></div>
       </div>
     </div>
+  </div>
   </div>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
@@ -1355,6 +1389,14 @@
       btnEditProfile: $("btnEditProfile"),
       modalDetail: $("modalDetail"),
       modalBuyOptions: $("modalBuyOptions"),
+      modalCoinHub: $("modalCoinHub"),
+      btnCloseCoinHub: $("btnCloseCoinHub"),
+      btnOpenCoinPackages: $("btnOpenCoinPackages"),
+      btnOpenCoinAd: $("btnOpenCoinAd"),
+      modalCoinPackages: $("modalCoinPackages"),
+      btnCloseCoinPackages: $("btnCloseCoinPackages"),
+      coinPackageWrap: $("coinPackageWrap"),
+      coinPackageGrid: $("coinPackageGrid"),
       btnCloseDetail: $("btnCloseDetail"),
       btnCloseBuyOptions: $("btnCloseBuyOptions"),
       buyOptionInfo: $("buyOptionInfo"),
@@ -1399,13 +1441,6 @@
       adFrame: $("adFrame"),
       adProgressFill: $("adProgressFill"),
       adStatusText: $("adStatusText"),
-      modalCoinHub: $("modalCoinHub"),
-      btnCloseCoinHub: $("btnCloseCoinHub"),
-      btnOpenCoinPackages: $("btnOpenCoinPackages"),
-      btnOpenCoinAd: $("btnOpenCoinAd"),
-      modalCoinPackages: $("modalCoinPackages"),
-      btnCloseCoinPackages: $("btnCloseCoinPackages"),
-      coinPackageGrid: $("coinPackageGrid"),
       timeGateNotice: $("timeGateNotice")
     };
     const state = {
@@ -1442,7 +1477,7 @@
       reviewLoadingId: ""
     };
     const DAY = 24 * 60 * 60 * 1000;
-    const LISTING_LIFETIME = 20 * DAY;
+    const LISTING_LIFETIME = 15 * DAY;
     const CHAT_LIFETIME = 72 * 60 * 60 * 1000;
     const MANAGER_KEY = "alper9119bulut";
     const ADMIN_BOOTSTRAP_NAME = "Alper";
@@ -1456,12 +1491,12 @@
       { brand: "LC Waikiki", headline: "Aile indirimi", copy: "Giyim ve sezon fırsatları için örnek reklam kartı.", pill: "Sponsor • Giyim" }
     ];
     const COIN_PACKAGES = [
-      { id: "p1", label: "30 TL 7 Coin", price: 30, coin: 7 },
-      { id: "p2", label: "50 TL 10 Coin", price: 50, coin: 10 },
-      { id: "p3", label: "100 TL 25 Coin", price: 100, coin: 25 },
-      { id: "p4", label: "200 TL 55 Coin", price: 200, coin: 55 },
-      { id: "p5", label: "400 TL 120 Coin", price: 400, coin: 120 },
-      { id: "p6", label: "800 TL 300 Coin", price: 800, coin: 300 }
+      { id: "p1", label: "30 TL 7 Coin", price: 30, coin: 7, tl: 30 },
+      { id: "p2", label: "50 TL 10 Coin", price: 50, coin: 10, tl: 50 },
+      { id: "p3", label: "100 TL 25 Coin", price: 100, coin: 25, tl: 100 },
+      { id: "p4", label: "200 TL 55 Coin", price: 200, coin: 55, tl: 200 },
+      { id: "p5", label: "400 TL 120 Coin", price: 400, coin: 120, tl: 400 },
+      { id: "p6", label: "800 TL 300 Coin", price: 800, coin: 300, tl: 800 }
     ];
     function slugify(name){
       return String(name).trim().toLowerCase()
@@ -1806,23 +1841,6 @@
     function isPublished(item){
       return item?.status === "published";
     }
-    function getListingExpiresAtMs(item){
-      const explicit = Number(item?.expiresAtMs || 0);
-      if (explicit) return explicit;
-      const created = Number(item?.createdAtMs || 0);
-      return created ? (created + LISTING_LIFETIME) : 0;
-    }
-    function isListingExpired(item){
-      const expiresAt = getListingExpiresAtMs(item);
-      if (!expiresAt) return false;
-      return getRealNowMs() >= expiresAt;
-    }
-    function listingDaysLeft(item){
-      const expiresAt = getListingExpiresAtMs(item);
-      if (!expiresAt) return null;
-      const remaining = Math.max(0, expiresAt - getRealNowMs());
-      return Math.ceil(remaining / DAY);
-    }
     function sortDescByDate(arr, field="createdAt"){
       return [...arr].sort((a,b) => tsValue(b[field]) - tsValue(a[field]));
     }
@@ -1840,7 +1858,7 @@
     function getUserAvatar(uid){
       if (!uid) return "";
       const user = getUserById(uid) || (state.user?.uid === uid ? state.profile : null);
-      return user?.avatarDataUrl || user?.avatarUrl || user?.photoURL || user?.profilePhotoURL || "";
+      return user?.avatarDataUrl || user?.avatarUrl || user?.photoURL || "";
     }
     function getAvatarMarkup(avatarUrl, label){
       const initials = String(label || "?").trim().slice(0, 2).toUpperCase() || "?";
@@ -1884,7 +1902,7 @@
       const type = refs.filterType.value;
       const cat = refs.filterCategory.value;
       return list.filter(item => {
-        if (state.view === "shop" && (!isPublished(item) || isListingExpired(item))) return false;
+        if (state.view === "shop" && !isPublished(item)) return false;
         if (type !== "all" && item.type !== type) return false;
         if (cat !== "all" && item.category !== cat) return false;
         if (!q) return true;
@@ -1960,8 +1978,6 @@
     function renderListingCard(item, forMine=false){
       const owner = escapeHtml(item.ownerName || "Bilinmeyen");
       const isMine = state.user?.uid === item.ownerId;
-      const daysLeft = listingDaysLeft(item);
-      const remainingText = daysLeft === null ? "Süre yok" : (daysLeft > 0 ? `${daysLeft} gün kaldı` : "Bugün silinecek");
       const statusBadge =
         item.status === "published" ? `<span class="badge ok">Yayında</span>` :
         item.status === "closed" ? `<span class="badge closed">Kapalı</span>` :
@@ -1996,7 +2012,6 @@
               ${categoryBadge}
               ${isMine ? `<span class="badge mine">Senin ilan</span>` : ""}
             </div>
-            ${forMine ? `<div class="tiny">⏳ ${remainingText}</div>` : ""}
             <h4 style="cursor:pointer" title="${escapeHtml(item.name)}" onclick="window.__openListingDetail('${item.id}')">${escapeHtml(truncateText(item.name || "", 40))}</h4>
             <p>${escapeHtml(truncateText(item.description || "", 50))}</p>
             <div class="row">${tags}</div>
@@ -2489,6 +2504,74 @@
         return { rewardCoins };
       });
     }
+
+    function renderCoinPackages(){
+      if (!refs.coinPackageGrid) return;
+      refs.coinPackageGrid.innerHTML = COIN_PACKAGES.map((pkg, index) => `
+        <div class="coin-package-card ${index === 2 ? 'featured' : ''}">
+          <div class="coin-package-badge">${index === 2 ? 'Önerilen' : 'Paket'}</div>
+          <strong>${escapeHtml(pkg.label)}</strong>
+          <div class="coin-package-price">${escapeHtml(String(pkg.price))} TL</div>
+          <div class="coin-package-coin">${escapeHtml(formatCoin(pkg.coin))}</div>
+          <div class="tiny">Seçince Alper hesabına sistem mesajı gider.</div>
+          <button class="btn" type="button" onclick="window.__buyCoinPackage('${pkg.id}')">Bu paketi seç</button>
+        </div>
+      `).join("");
+    }
+    function openCoinHub(){
+      if (refs.modalCoinHub) showModal(refs.modalCoinHub);
+    }
+    function openCoinPackages(){
+      if (refs.modalCoinHub) hideModal(refs.modalCoinHub);
+      renderCoinPackages();
+      if (refs.modalCoinPackages) showModal(refs.modalCoinPackages);
+    }
+    async function sendCoinPackageRequest(pkg){
+      const target = await findUserByDisplayName('Alper');
+      const buyerName = state.profile?.displayName || 'Kullanıcı';
+      const text = `${buyerName} isimli kullanıcı ${pkg.label} paketini almak istiyor.`;
+      if (!target) {
+        alert('Alper hesabı bulunamadı.');
+        return;
+      }
+      const existing = state.conversations.find(c => (c.members || []).includes(state.user.uid) && (c.members || []).includes(target.uid) && (c.listingId === 'coin-shop' || c.latestListingId === 'coin-shop'));
+      if (existing){
+        await updateDoc(doc(db, 'conversations', existing.id), {
+          messages: [...(existing.messages || []), { uid: 'system', name: 'Sistem', text, type: 'system', createdAt: new Date(getRealNowMs()).toISOString() }],
+          lastMessage: text,
+          unreadBy: { ...(existing.unreadBy || {}), [target.uid]: (Number(existing.unreadBy?.[target.uid]) || 0) + 1 },
+          updatedAt: serverTimestamp()
+        });
+        state.currentConversationId = existing.id;
+      }else{
+        const ref = await addDoc(collection(db, 'conversations'), {
+          listingId: 'coin-shop',
+          latestListingId: 'coin-shop',
+          latestListingName: 'Coin Satın Alım İsteği',
+          members: [state.user.uid, target.uid],
+          memberNames: Array.from(new Set([buyerName, target.displayName].filter(Boolean))),
+          messages: [{ uid: 'system', name: 'Sistem', text, type: 'system', createdAt: new Date(getRealNowMs()).toISOString() }],
+          lastMessage: text,
+          unreadBy: { [target.uid]: 1 },
+          readBy: { [state.user.uid]: getRealNowMs() },
+          createdAtMs: getRealNowMs(),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+        state.currentConversationId = ref.id;
+      }
+      hideModal(refs.modalCoinPackages);
+      await logAction('Coin satın alım isteği', `${buyerName} → ${pkg.label}`);
+      alert('Coin satın alım isteği gönderildi.');
+      renderAll();
+    }
+    function buyCoinPackage(id){
+      const pkg = COIN_PACKAGES.find(x => x.id === id);
+      if (!pkg) return;
+      return sendCoinPackageRequest(pkg);
+    }
+
+
     function renderAdFrame(index = 0, remaining = 60){
       if (!refs.adFrame) return;
       const total = Math.max(1, SPONSOR_ADS.length);
@@ -3022,72 +3105,6 @@
         alert(`Onay tamamlanamadı: ${err?.message || err}`);
       }
     }
-    function renderCoinPackages(){
-      if (!refs.coinPackageGrid) return;
-      refs.coinPackageGrid.innerHTML = COIN_PACKAGES.map((pkg, index) => `
-        <div class="coin-package-card ${index === 2 ? 'featured' : ''}">
-          <div class="coin-package-badge">${index === 2 ? 'Önerilen' : 'Paket'}</div>
-          <strong>${escapeHtml(pkg.label)}</strong>
-          <div class="coin-package-price">${escapeHtml(String(pkg.price))} TL</div>
-          <div class="coin-package-coin">${escapeHtml(formatCoin(pkg.coin))}</div>
-          <div class="tiny">Seçince Alper hesabına sistem mesajı gider.</div>
-          <button class="btn" type="button" onclick="window.__buyCoinPackage('${pkg.id}')">Bu paketi seç</button>
-        </div>
-      `).join("");
-    }
-    function openCoinHub(){
-      if (refs.modalCoinHub) showModal(refs.modalCoinHub);
-    }
-    function openCoinPackages(){
-      if (refs.modalCoinHub) hideModal(refs.modalCoinHub);
-      renderCoinPackages();
-      if (refs.modalCoinPackages) showModal(refs.modalCoinPackages);
-    }
-    async function sendCoinPackageRequest(pkg){
-      const target = await findUserByDisplayName('Alper');
-      const buyerName = state.profile?.displayName || 'Kullanıcı';
-      const text = `${buyerName} isimli kullanıcı ${pkg.label} paketini almak istiyor.`;
-      if (!target) {
-        alert('Alper hesabı bulunamadı.');
-        return;
-      }
-      const existing = state.conversations.find(c => (c.members || []).includes(state.user.uid) && (c.members || []).includes(target.uid) && (c.listingId === 'coin-shop' || c.latestListingId === 'coin-shop'));
-      if (existing){
-        await updateDoc(doc(db, 'conversations', existing.id), {
-          messages: [...(existing.messages || []), { uid: 'system', name: 'Sistem', text, type: 'system', createdAt: new Date(getRealNowMs()).toISOString() }],
-          lastMessage: text,
-          unreadBy: { ...(existing.unreadBy || {}), [target.uid]: (Number(existing.unreadBy?.[target.uid]) || 0) + 1 },
-          updatedAt: serverTimestamp()
-        });
-        state.currentConversationId = existing.id;
-      }else{
-        const ref = await addDoc(collection(db, 'conversations'), {
-          listingId: 'coin-shop',
-          latestListingId: 'coin-shop',
-          latestListingName: 'Coin Satın Alım İsteği',
-          members: [state.user.uid, target.uid],
-          memberNames: Array.from(new Set([buyerName, target.displayName].filter(Boolean))),
-          messages: [{ uid: 'system', name: 'Sistem', text, type: 'system', createdAt: new Date(getRealNowMs()).toISOString() }],
-          lastMessage: text,
-          unreadBy: { [target.uid]: 1 },
-          readBy: { [state.user.uid]: getRealNowMs() },
-          createdAtMs: getRealNowMs(),
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        });
-        state.currentConversationId = ref.id;
-      }
-      await logAction('Coin satın alım isteği', `${buyerName} → ${pkg.label}`);
-      alert('Coin satın alım isteği gönderildi.');
-      setView('messages');
-      renderAll();
-    }
-    async function buyCoinPackage(packageId){
-      const pkg = COIN_PACKAGES.find(x => x.id === packageId);
-      if (!pkg) return;
-      hideModal(refs.modalCoinPackages);
-      await sendCoinPackageRequest(pkg);
-    }
     async function openHelpConversation(){
       const title = String(refs.helpTitleInput?.value || '').trim();
       const body = String(refs.helpBodyInput?.value || '').trim();
@@ -3326,24 +3343,14 @@ Sorun: ${body}`;
       return `${code}: ${message}`;
     }
     async function cleanupExpired(){
-      const now = getRealNowMs() || Date.now();
-      const expiredIds = new Set();
+      const now = Date.now();
       try{
-        const listingsByExpires = await getDocs(query(collection(db, "listings"), where("expiresAtMs", "<", now)));
-        listingsByExpires.docs.forEach(d => expiredIds.add(d.id));
+        const listingsSnap = await getDocs(query(collection(db, "listings"), where("createdAtMs", "<", now - LISTING_LIFETIME)));
+        for (const d of listingsSnap.docs){
+          await deleteDoc(doc(db, "listings", d.id));
+          await logAction("İlan süre doldu", d.data()?.name || d.id);
+        }
       }catch{}
-      try{
-        const listingsByCreated = await getDocs(query(collection(db, "listings"), where("createdAtMs", "<", now - LISTING_LIFETIME)));
-        listingsByCreated.docs.forEach(d => expiredIds.add(d.id));
-      }catch{}
-      for (const id of expiredIds){
-        try{
-          const snap = await getDoc(doc(db, "listings", id));
-          const data = snap.exists() ? snap.data() : null;
-          await deleteDoc(doc(db, "listings", id));
-          await logAction("İlan süre doldu", data?.name || id);
-        }catch{}
-      }
       try{
         const convSnap = await getDocs(query(collection(db, "conversations"), where("createdAtMs", "<", now - CHAT_LIFETIME)));
         for (const d of convSnap.docs){
@@ -3362,35 +3369,6 @@ Sorun: ${body}`;
       if (!docData?.uid) return docData || null;
       state.userCache = { ...(state.userCache || {}), [docData.uid]: docData };
       return docData;
-    }
-
-    function collectListingOwnerIds(listings){
-      return Array.from(new Set((Array.isArray(listings) ? listings : [])
-        .map(item => item?.ownerId)
-        .filter(uid => uid && uid !== state.user?.uid)));
-    }
-
-    function collectConversationPeerIds(conversations){
-      return Array.from(new Set((Array.isArray(conversations) ? conversations : [])
-        .flatMap(conv => Array.isArray(conv?.members) ? conv.members : [])
-        .filter(uid => uid && uid !== state.user?.uid)));
-    }
-
-    async function warmUserCache(userIds = []){
-      const ids = Array.from(new Set((Array.isArray(userIds) ? userIds : [])
-        .map(uid => String(uid || "").trim())
-        .filter(Boolean)));
-      const missing = ids.filter(uid => !state.userCache?.[uid] && uid !== state.user?.uid);
-      if (!missing.length) return;
-      const batch = missing.slice(0, 20);
-      await Promise.all(batch.map(async uid => {
-        try{
-          const snap = await getDoc(doc(db, "users", uid));
-          if (snap.exists()){
-            cacheUserDoc({ uid, ...snap.data() });
-          }
-        }catch{}
-      }));
     }
 
     async function ensurePromoCodesLoaded(){
@@ -3472,9 +3450,6 @@ Sorun: ${body}`;
       const u1 = onSnapshot(collection(db, "listings"), snap => {
         state.listings = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         renderAll();
-        warmUserCache(collectListingOwnerIds(state.listings))
-          .then(() => renderAll())
-          .catch(() => {});
       });
       const u2 = onSnapshot(doc(db, "users", state.user.uid), snap => {
         if (snap.exists()){
@@ -3494,9 +3469,6 @@ Sorun: ${body}`;
           if (selected) state.currentConversationCache = selected;
         }
         renderAll();
-        warmUserCache(collectConversationPeerIds(state.conversations))
-          .then(() => renderAll())
-          .catch(() => {});
       });
       state.unsubscribers.push(u1, u2, u3);
       if (state.view === "admin") ensureAdminLogsLoaded().then(() => renderAll()).catch(()=>{});
@@ -3741,7 +3713,6 @@ Sorun: ${body}`;
       let finalImages = await compactImageList(usableImages, 5);
       if (!finalImages.length) return alert("Fotoğraf işlenemedi.");
 
-      const existingCreatedAtMs = editId ? (state.listings.find(x => x.id === editId)?.createdAtMs || getRealNowMs()) : getRealNowMs();
       let payload = {
         ownerId: state.user.uid,
         ownerName: state.profile.displayName,
@@ -3759,8 +3730,7 @@ Sorun: ${body}`;
         images: finalImages,
         coverImage: finalImages[0] || "",
         status: "published",
-        createdAtMs: existingCreatedAtMs,
-        expiresAtMs: editId ? (state.listings.find(x => x.id === editId)?.expiresAtMs || (existingCreatedAtMs + LISTING_LIFETIME)) : (existingCreatedAtMs + LISTING_LIFETIME),
+        createdAtMs: editId ? (state.listings.find(x => x.id === editId)?.createdAtMs || Date.now()) : Date.now(),
         updatedAtMs: getRealNowMs(),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
@@ -4091,20 +4061,20 @@ Sorun: ${body}`;
     refs.modalBuyOptions.addEventListener("click", (e) => {
       if (e.target === refs.modalBuyOptions) hideModal(refs.modalBuyOptions);
     });
-    refs.modalCoinHub.addEventListener("click", (e) => {
-      if (e.target === refs.modalCoinHub) hideModal(refs.modalCoinHub);
-    });
-    refs.modalCoinPackages.addEventListener("click", (e) => {
-      if (e.target === refs.modalCoinPackages) hideModal(refs.modalCoinPackages);
-    });
-    refs.btnCloseCoinHub.onclick = () => hideModal(refs.modalCoinHub);
-    refs.btnOpenCoinPackages.onclick = openCoinPackages;
-    refs.btnOpenCoinAd.onclick = () => {
+    refs.btnCloseAd.onclick = () => stopAdWatch('İptal edildi.');
+    if (refs.btnCloseCoinHub) refs.btnCloseCoinHub.onclick = () => hideModal(refs.modalCoinHub);
+    if (refs.btnOpenCoinPackages) refs.btnOpenCoinPackages.onclick = openCoinPackages;
+    if (refs.btnOpenCoinAd) refs.btnOpenCoinAd.onclick = () => {
       hideModal(refs.modalCoinHub);
       startAdWatch();
     };
-    refs.btnCloseCoinPackages.onclick = () => hideModal(refs.modalCoinPackages);
-    refs.btnCloseAd.onclick = () => stopAdWatch('İptal edildi.');
+    if (refs.btnCloseCoinPackages) refs.btnCloseCoinPackages.onclick = () => hideModal(refs.modalCoinPackages);
+    if (refs.modalCoinHub) refs.modalCoinHub.addEventListener("click", (e) => {
+      if (e.target === refs.modalCoinHub) hideModal(refs.modalCoinHub);
+    });
+    if (refs.modalCoinPackages) refs.modalCoinPackages.addEventListener("click", (e) => {
+      if (e.target === refs.modalCoinPackages) hideModal(refs.modalCoinPackages);
+    });
     refs.modalAd.addEventListener("click", (e) => {
       if (e.target === refs.modalAd) stopAdWatch('İptal edildi.');
     });
