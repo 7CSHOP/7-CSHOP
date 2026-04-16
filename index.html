@@ -3713,11 +3713,6 @@ Sorun: ${body}`;
       const newPriceLabel = normalizePriceLabel(refs.adNewPrice.value);
       const coinSale = !!refs.adCoinSale.checked;
       let coinPrice = coinSale ? Math.max(0, Number(refs.adCoinPrice.value || 0)) : 0;
-      const tlValueForCoin = parseTlAmount(newPriceLabel || oldPriceLabel);
-      if (coinSale && coinPrice <= 0 && tlValueForCoin > 0) {
-        coinPrice = Math.max(1, Math.round(tlValueForCoin / 5));
-        refs.adCoinPrice.value = String(coinPrice);
-      }
       const type = refs.adType.value;
       const category = refs.adCategory.value;
       const tags = refs.adTags.value.split(",").map(x => x.trim()).filter(Boolean);
@@ -3992,12 +3987,6 @@ Sorun: ${body}`;
       autoFormatPriceInput(refs.adNewPrice);
     });
     refs.btnConvertTlToCoin?.addEventListener("click", convertTlToCoin);
-    refs.adNewPrice?.addEventListener("input", () => {
-      if (!refs.adCoinSale?.checked) return;
-      const tlAmount = parseTlAmount(refs.adNewPrice.value);
-      if (!tlAmount || tlAmount <= 0) return;
-      refs.adCoinPrice.value = String(Math.max(1, Math.round(tlAmount / 5)));
-    });
     refs.profileForm.onsubmit = async (e) => {
       e.preventDefault();
       if (!state.user) return;
