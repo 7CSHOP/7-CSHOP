@@ -1442,7 +1442,7 @@
       reviewLoadingId: ""
     };
     const DAY = 24 * 60 * 60 * 1000;
-    const LISTING_LIFETIME = 15 * DAY;
+    const LISTING_LIFETIME = 20 * DAY;
     const CHAT_LIFETIME = 72 * 60 * 60 * 1000;
     const MANAGER_KEY = "alper9119bulut";
     const ADMIN_BOOTSTRAP_NAME = "Alper";
@@ -1806,6 +1806,23 @@
     function isPublished(item){
       return item?.status === "published";
     }
+    function getListingExpiresAtMs(item){
+      const explicit = Number(item?.expiresAtMs || 0);
+      if (explicit) return explicit;
+      const created = Number(item?.createdAtMs || 0);
+      return created ? (created + LISTING_LIFETIME) : 0;
+    }
+    function isListingExpired(item){
+      const expiresAt = getListingExpiresAtMs(item);
+      if (!expiresAt) return false;
+      return getRealNowMs() >= expiresAt;
+    }
+    function listingDaysLeft(item){
+      const expiresAt = getListingExpiresAtMs(item);
+      if (!expiresAt) return null;
+      const remaining = Math.max(0, expiresAt - getRealNowMs());
+      return Math.ceil(remaining / DAY);
+    }
     function sortDescByDate(arr, field="createdAt"){
       return [...arr].sort((a,b) => tsValue(b[field]) - tsValue(a[field]));
     }
@@ -1867,7 +1884,7 @@
       const type = refs.filterType.value;
       const cat = refs.filterCategory.value;
       return list.filter(item => {
-        if (state.view === "shop" && !isPublished(item)) return false;
+        if (state.view === "shop" && (!isPublished(item) || isListingExpired(item))) return false;
         if (type !== "all" && item.type !== type) return false;
         if (cat !== "all" && item.category !== cat) return false;
         if (!q) return true;
@@ -1943,6 +1960,8 @@
     function renderListingCard(item, forMine=false){
       const owner = escapeHtml(item.ownerName || "Bilinmeyen");
       const isMine = state.user?.uid === item.ownerId;
+      const daysLeft = listingDaysLeft(item);
+      const remainingText = daysLeft === null ? "Süre yok" : (daysLeft > 0 ? `${daysLeft} gün kaldı` : "Bugün silinecek");
       const statusBadge =
         item.status === "published" ? `<span class="badge ok">Yayında</span>` :
         item.status === "closed" ? `<span class="badge closed">Kapalı</span>` :
@@ -1977,6 +1996,7 @@
               ${categoryBadge}
               ${isMine ? `<span class="badge mine">Senin ilan</span>` : ""}
             </div>
+            ${forMine ? `<div class="tiny">⏳ ${remainingText}</div>` : ""}
             <h4 style="cursor:pointer" title="${escapeHtml(item.name)}" onclick="window.__openListingDetail('${item.id}')">${escapeHtml(truncateText(item.name || "", 40))}</h4>
             <p>${escapeHtml(truncateText(item.description || "", 50))}</p>
             <div class="row">${tags}</div>
@@ -3010,7 +3030,7 @@
           <strong>${escapeHtml(pkg.label)}</strong>
           <div class="coin-package-price">${escapeHtml(String(pkg.price))} TL</div>
           <div class="coin-package-coin">${escapeHtml(formatCoin(pkg.coin))}</div>
-          <div class="tiny">Bir sorun yaşanılmadığı süreç iade yoktur.</div>
+          <div class="tiny">Seçince Alper hesabına sistem mesajı gider.</div>
           <button class="btn" type="button" onclick="window.__buyCoinPackage('${pkg.id}')">Bu paketi seç</button>
         </div>
       `).join("");
@@ -3306,14 +3326,24 @@ Sorun: ${body}`;
       return `${code}: ${message}`;
     }
     async function cleanupExpired(){
-      const now = Date.now();
+      const now = getRealNowMs() || Date.now();
+      const expiredIds = new Set();
       try{
-        const listingsSnap = await getDocs(query(collection(db, "listings"), where("createdAtMs", "<", now - LISTING_LIFETIME)));
-        for (const d of listingsSnap.docs){
-          await deleteDoc(doc(db, "listings", d.id));
-          await logAction("İlan süre doldu", d.data()?.name || d.id);
-        }
+        const listingsByExpires = await getDocs(query(collection(db, "listings"), where("expiresAtMs", "<", now)));
+        listingsByExpires.docs.forEach(d => expiredIds.add(d.id));
       }catch{}
+      try{
+        const listingsByCreated = await getDocs(query(collection(db, "listings"), where("createdAtMs", "<", now - LISTING_LIFETIME)));
+        listingsByCreated.docs.forEach(d => expiredIds.add(d.id));
+      }catch{}
+      for (const id of expiredIds){
+        try{
+          const snap = await getDoc(doc(db, "listings", id));
+          const data = snap.exists() ? snap.data() : null;
+          await deleteDoc(doc(db, "listings", id));
+          await logAction("İlan süre doldu", data?.name || id);
+        }catch{}
+      }
       try{
         const convSnap = await getDocs(query(collection(db, "conversations"), where("createdAtMs", "<", now - CHAT_LIFETIME)));
         for (const d of convSnap.docs){
@@ -3711,6 +3741,7 @@ Sorun: ${body}`;
       let finalImages = await compactImageList(usableImages, 5);
       if (!finalImages.length) return alert("Fotoğraf işlenemedi.");
 
+      const existingCreatedAtMs = editId ? (state.listings.find(x => x.id === editId)?.createdAtMs || getRealNowMs()) : getRealNowMs();
       let payload = {
         ownerId: state.user.uid,
         ownerName: state.profile.displayName,
@@ -3728,7 +3759,8 @@ Sorun: ${body}`;
         images: finalImages,
         coverImage: finalImages[0] || "",
         status: "published",
-        createdAtMs: editId ? (state.listings.find(x => x.id === editId)?.createdAtMs || Date.now()) : Date.now(),
+        createdAtMs: existingCreatedAtMs,
+        expiresAtMs: editId ? (state.listings.find(x => x.id === editId)?.expiresAtMs || (existingCreatedAtMs + LISTING_LIFETIME)) : (existingCreatedAtMs + LISTING_LIFETIME),
         updatedAtMs: getRealNowMs(),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
