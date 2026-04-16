@@ -1023,6 +1023,8 @@
             <div class="field">
               <label>Coin fiyatı</label>
               <input id="adCoinPrice" class="input" type="number" min="0" placeholder="Örn: 250" />
+              <button id="btnConvertTlToCoin" class="btn secondary" type="button" style="margin-top:10px">TL'yi coine çevir</button>
+              <div class="hint">5 TL = 1 Coin. Yeni fiyat 500 TL ise coin alanı 100 olur.</div>
             </div>
           </div>
           <div class="two">
@@ -1223,7 +1225,7 @@
       <div class="modal-body">
         <div class="coin-hub-hero">
           <div class="coin-hub-title">Coin almak için bir yöntem seç</div>
-          <div class="coin-hub-sub">TL ile paket satın alabilir veya günde 1 reklam izleyip 1 coin alabilirsin. TL seçeneği daha görünür ve güçlü olsun diye vurgulandı.</div>
+          <div class="coin-hub-sub">Sadece TL ile coin paketi alınır; coin'i TL'ye çevirme yok. Günde 1 reklam izleyip 1 coin de kazanabilirsin.</div>
           <div class="coin-choice-grid">
             <div class="coin-choice-card primary">
               <strong>TL ile coin al</strong>
@@ -1249,7 +1251,7 @@
       <div class="modal-body">
         <div class="coin-hub-hero">
           <div class="coin-hub-title">TL paketlerini seç</div>
-          <div class="coin-hub-sub">Seçtiğin paket doğrudan Alper hesabına sistem mesajı olarak düşer ve sana da satın alma isteği bildirimi çıkar.</div>
+          <div class="coin-hub-sub">Seçtiğin paket TL ile coin alımıdır; coin'i TL'ye çeviren bir akış yoktur. İstek Alper hesabına sistem mesajı olarak düşer.</div>
         </div>
         <div class="hr"></div>
         <div id="coinPackageGrid" class="coin-package-grid"></div>
@@ -1371,6 +1373,7 @@
       adOldPrice: $("adOldPrice"),
       adCoinSale: $("adCoinSale"),
       adCoinPrice: $("adCoinPrice"),
+      btnConvertTlToCoin: $("btnConvertTlToCoin"),
       adNewPrice: $("adNewPrice"),
       adImageUrls: $("adImageUrls"),
       adImageFile: $("adImageFile"),
@@ -1866,6 +1869,9 @@
         ? `<img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(label || "Avatar")}">`
         : `<span>${escapeHtml(initials)}</span>`;
     }
+    function getProfileAvatarSource(profile = state.profile){
+      return profile?.pendingAvatarDataUrl || profile?.avatarDataUrl || profile?.avatarUrl || profile?.photoURL || "";
+    }
     function getConversationPeer(conv){
       const otherId = (conv?.members || []).find(id => id && id !== state.user?.uid) || null;
       const user = otherId ? getUserById(otherId) : null;
@@ -2359,7 +2365,7 @@
       const mine = myListings();
       const openCount = mine.filter(x => x.status === "published").length;
       const closedCount = mine.filter(x => x.status === "closed").length;
-      const avatar = p.avatarDataUrl || p.avatarUrl || p.photoURL || "";
+      const avatar = getProfileAvatarSource(p);
       const initials = (p.displayName || "?").trim().slice(0,2).toUpperCase();
       refs.profileNameText.textContent = p.displayName || "-";
       refs.profileEmailText.textContent = p.email || "E-posta görünmüyor";
@@ -3370,6 +3376,21 @@ Sorun: ${body}`;
       state.userCache = { ...(state.userCache || {}), [docData.uid]: docData };
       return docData;
     }
+    async function prefetchConversationPeers(conversations = state.conversations){
+      const ids = new Set();
+      for (const conv of conversations || []){
+        for (const id of (conv?.members || [])){
+          if (id && id !== state.user?.uid && !state.userCache?.[id]) ids.add(id);
+        }
+      }
+      if (!ids.size) return;
+      await Promise.all(Array.from(ids).map(async (uid) => {
+        try{
+          const snap = await getDoc(doc(db, "users", uid));
+          if (snap.exists()) cacheUserDoc({ uid, ...snap.data() });
+        }catch{}
+      }));
+    }
 
     async function ensurePromoCodesLoaded(){
       try{
@@ -3433,15 +3454,19 @@ Sorun: ${body}`;
           };
           await updateDoc(ref, fallbackPayload);
           await updateProfile(state.user, { displayName: nextName, photoURL: fallbackPayload.avatarUrl || null });
-          state.profile = { ...(state.profile || {}), ...fallbackPayload, uid: state.user.uid };
+          state.profile = { ...(state.profile || {}), ...fallbackPayload, uid: state.user.uid, pendingAvatarDataUrl: null };
           state.user.displayName = nextName;
+          state.user.photoURL = fallbackPayload.avatarUrl || null;
+          cacheUserDoc(state.profile);
           return;
         }
         throw err;
       }
       await updateProfile(state.user, { displayName: nextName, photoURL: photo });
-      state.profile = { ...(state.profile || {}), ...payload, uid: state.user.uid };
+      state.profile = { ...(state.profile || {}), ...payload, uid: state.user.uid, pendingAvatarDataUrl: null };
       state.user.displayName = nextName;
+      state.user.photoURL = photo || null;
+      cacheUserDoc(state.profile);
       await touchActivity();
     }
     async function loadLiveData(){
@@ -3468,6 +3493,7 @@ Sorun: ${body}`;
           const selected = state.conversations.find(c => c.id === state.currentConversationId);
           if (selected) state.currentConversationCache = selected;
         }
+        prefetchConversationPeers(state.conversations).then(() => renderAll()).catch(() => renderAll());
         renderAll();
       });
       state.unsubscribers.push(u1, u2, u3);
@@ -3686,7 +3712,12 @@ Sorun: ${body}`;
       const oldPriceLabel = normalizePriceLabel(refs.adOldPrice.value);
       const newPriceLabel = normalizePriceLabel(refs.adNewPrice.value);
       const coinSale = !!refs.adCoinSale.checked;
-      const coinPrice = coinSale ? Math.max(0, Number(refs.adCoinPrice.value || 0)) : 0;
+      let coinPrice = coinSale ? Math.max(0, Number(refs.adCoinPrice.value || 0)) : 0;
+      const tlValueForCoin = parseTlAmount(newPriceLabel || oldPriceLabel);
+      if (coinSale && coinPrice <= 0 && tlValueForCoin > 0) {
+        coinPrice = Math.max(1, Math.round(tlValueForCoin / 5));
+        refs.adCoinPrice.value = String(coinPrice);
+      }
       const type = refs.adType.value;
       const category = refs.adCategory.value;
       const tags = refs.adTags.value.split(",").map(x => x.trim()).filter(Boolean);
@@ -3886,7 +3917,7 @@ Sorun: ${body}`;
       const p = state.profile || {};
       refs.profileNameInput.value = p.displayName || state.user?.displayName || "";
       refs.profileAvatarUrl.value = p.avatarUrl || p.photoURL || p.avatarDataUrl || "";
-      const avatar = p.avatarDataUrl || p.avatarUrl || p.photoURL || "";
+      const avatar = getProfileAvatarSource(p);
       if (avatar){
         refs.profileAvatarPreview.src = avatar;
         refs.profileAvatarPreview.classList.remove("hidden");
@@ -3904,7 +3935,8 @@ Sorun: ${body}`;
         await saveProfileUpdates({
           displayName: refs.profileNameInput.value.trim() || state.profile?.displayName || "Üye",
           avatarUrl: null,
-          avatarDataUrl: null
+          avatarDataUrl: null,
+          pendingAvatarDataUrl: null
         });
         await touchActivity();
         renderAll();
@@ -3919,14 +3951,20 @@ Sorun: ${body}`;
       refs.profileAvatarPreview.src = data;
       refs.profileAvatarPreview.classList.remove("hidden");
       refs.profileAvatarUrl.value = "";
+      state.profile = { ...(state.profile || {}), pendingAvatarDataUrl: data };
+      renderProfile();
     });
     refs.profileAvatarUrl.addEventListener("input", () => {
       const url = refs.profileAvatarUrl.value.trim();
       if (url){
         refs.profileAvatarPreview.src = url;
         refs.profileAvatarPreview.classList.remove("hidden");
+        state.profile = { ...(state.profile || {}), pendingAvatarDataUrl: url };
+        renderProfile();
       }else if (!refs.profileAvatarFile.files?.[0]){
         refs.profileAvatarPreview.classList.add("hidden");
+        state.profile = { ...(state.profile || {}), pendingAvatarDataUrl: null };
+        renderProfile();
       }
     });
     function autoFormatPriceInput(input){
@@ -3934,8 +3972,32 @@ Sorun: ${body}`;
       const formatted = normalizePriceLabel(input.value);
       if (formatted) input.value = formatted;
     }
+    function parseTlAmount(value){
+      const raw = String(value ?? "").replace(/\s+/g, " ").trim();
+      const match = raw.match(/(\d+(?:[.,]\d+)?)/);
+      return match ? Number(match[1].replace(",", ".")) : 0;
+    }
+    function convertTlToCoin(){
+      const tlAmount = parseTlAmount(refs.adNewPrice?.value || refs.adOldPrice?.value || "");
+      if (!tlAmount || tlAmount <= 0) {
+        alert("Önce yeni TL fiyatı yaz.");
+        return;
+      }
+      const coinValue = Math.max(1, Math.round(tlAmount / 5));
+      if (refs.adCoinSale) refs.adCoinSale.checked = true;
+      if (refs.adCoinPrice) refs.adCoinPrice.value = String(coinValue);
+    }
     refs.adOldPrice.addEventListener("blur", () => autoFormatPriceInput(refs.adOldPrice));
-    refs.adNewPrice.addEventListener("blur", () => autoFormatPriceInput(refs.adNewPrice));
+    refs.adNewPrice.addEventListener("blur", () => {
+      autoFormatPriceInput(refs.adNewPrice);
+    });
+    refs.btnConvertTlToCoin?.addEventListener("click", convertTlToCoin);
+    refs.adNewPrice?.addEventListener("input", () => {
+      if (!refs.adCoinSale?.checked) return;
+      const tlAmount = parseTlAmount(refs.adNewPrice.value);
+      if (!tlAmount || tlAmount <= 0) return;
+      refs.adCoinPrice.value = String(Math.max(1, Math.round(tlAmount / 5)));
+    });
     refs.profileForm.onsubmit = async (e) => {
       e.preventDefault();
       if (!state.user) return;
@@ -3952,6 +4014,7 @@ Sorun: ${body}`;
       }
       try{
         await saveProfileUpdates({ displayName: name, avatarUrl, avatarDataUrl });
+        if (state.profile) state.profile.pendingAvatarDataUrl = null;
         refs.modalProfileEdit.classList.remove("show");
         await touchActivity();
         renderAll();
@@ -4032,7 +4095,11 @@ Sorun: ${body}`;
     refs.btnEditProfile.onclick = openProfileEdit;
     refs.btnDeleteProfilePhoto.onclick = clearProfilePhoto;
     refs.btnCloseModal.onclick = () => refs.modalListing.classList.remove("show");
-    refs.btnCloseProfileEdit.onclick = () => refs.modalProfileEdit.classList.remove("show");
+    refs.btnCloseProfileEdit.onclick = () => {
+      if (state.profile) state.profile.pendingAvatarDataUrl = null;
+      refs.modalProfileEdit.classList.remove("show");
+      renderProfile();
+    };
     refs.btnLogout.onclick = async () => { await signOut(auth); };
     refs.btnRefresh.onclick = async () => { await cleanupExpired(); renderAll(); };
     refs.btnSendMessage.onclick = () => sendMessage();
@@ -4050,7 +4117,11 @@ Sorun: ${body}`;
       if (e.target === refs.modalSeller) refs.modalSeller.classList.remove("show");
     });
     refs.modalProfileEdit.addEventListener("click", (e) => {
-      if (e.target === refs.modalProfileEdit) refs.modalProfileEdit.classList.remove("show");
+      if (e.target === refs.modalProfileEdit) {
+        if (state.profile) state.profile.pendingAvatarDataUrl = null;
+        refs.modalProfileEdit.classList.remove("show");
+        renderProfile();
+      }
     });
     refs.modalDetail.addEventListener("click", (e) => {
       if (e.target === refs.modalDetail) {
