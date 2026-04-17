@@ -602,6 +602,10 @@
       line-height:1;
       color:#111827;
     }
+    .coin-package-price.compact{
+      font-size:18px;
+      line-height:1.3;
+    }
     .coin-package-coin{
       font-size:15px;
       font-weight:900;
@@ -1019,8 +1023,56 @@
                           <h3>Tüm ilanlar</h3>
                           <p>Yönetim işlemleri</p>
                         </div>
+                      </div>                      <div id="adminListings" class="list"></div>
+                      <div class="hr"></div>
+                      <div class="section-title">
+                        <div>
+                          <h3>Coin / TL paketleri</h3>
+                          <p>Paket ekle, düzenle, sil</p>
+                        </div>
                       </div>
-                      <div id="adminListings" class="list"></div>
+                      <div class="notice">Buradaki paketler aynı kart yapısıyla ana coin ekranında da görünür. Aynı koleksiyon kullanıldığı için Firestore şişmez.</div>
+                      <form id="coinPackageForm" class="form" style="margin-top:12px">
+                        <input id="coinPackageId" type="hidden" />
+                        <div class="two">
+                          <div class="field">
+                            <label>Paket adı</label>
+                            <input id="coinPackageLabel" class="input" placeholder="Örn: 100 TL 25 Coin" maxlength="60" />
+                          </div>
+                          <div class="field">
+                            <label>Coin miktarı</label>
+                            <input id="coinPackageCoin" class="input" type="number" min="1" placeholder="Örn: 25" />
+                          </div>
+                        </div>
+                        <div class="two">
+                          <div class="field">
+                            <label>TL fiyatı</label>
+                            <input id="coinPackagePrice" class="input" type="number" min="0" placeholder="Örn: 100" />
+                          </div>
+                          <div class="field">
+                            <label>İndirimli eski TL fiyatı</label>
+                            <input id="coinPackageOldPrice" class="input" type="number" min="0" placeholder="Örn: 120" />
+                          </div>
+                        </div>
+                        <div class="field">
+                          <label>TL açıklama / not</label>
+                          <textarea id="coinPackageDesc" class="input" maxlength="240" placeholder="Örn: TL ile ödeme yapılır, coin anında eklenir."></textarea>
+                        </div>
+                        <div class="two">
+                          <div class="field">
+                            <label><input id="coinPackageFeatured" type="checkbox" /> Öne çıkar</label>
+                          </div>
+                          <div class="field">
+                            <label><input id="coinPackageActive" type="checkbox" checked /> Aktif</label>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <button class="btn" type="submit">Kaydet</button>
+                          <button id="coinPackageReset" class="btn secondary" type="button">Temizle</button>
+                        </div>
+                      </form>
+                      <div class="hr"></div>
+                      <div id="adminCoinPackages" class="list"></div>
                     </div>
                   </div>
                   <div class="panel" style="box-shadow:none">
@@ -1392,7 +1444,7 @@
       <div class="modal-body">
         <div class="coin-hub-hero">
           <div class="coin-hub-title">Coin almak için bir yöntem seç</div>
-          <div class="coin-hub-sub">Sadece TL ile coin paketi alınır; coin'i TL'ye çevirme yok. Günde 1 reklam izleyip 1 coin de kazanabilirsin.</div>
+          <div class="coin-hub-sub">TL paketleri ana ekrandaki kartlarla aynı yapıdadır. İndirimli paket, TL açıklaması ve coin miktarı birlikte görünür.</div>
           <div class="coin-choice-grid">
             <div class="coin-choice-card primary">
               <strong>TL ile coin al</strong>
@@ -1418,7 +1470,7 @@
       <div class="modal-body">
         <div class="coin-hub-hero">
           <div class="coin-hub-title">TL paketlerini seç</div>
-          <div class="coin-hub-sub">Seçtiğin paket TL ile coin alımıdır; coin'i TL'ye çeviren bir akış yoktur.</div>
+          <div class="coin-hub-sub">Seçtiğin paket TL ile coin alımıdır. İndirim, eski fiyat ve TL notu desteklenir.</div>
         </div>
         <div class="hr"></div>
         <div id="coinPackageGrid" class="coin-package-grid"></div>
@@ -1528,6 +1580,17 @@
       adminUserSearch: $("adminUserSearch"),
       adminUsers: $("adminUsers"),
       adminListings: $("adminListings"),
+      adminCoinPackages: $("adminCoinPackages"),
+      coinPackageForm: $("coinPackageForm"),
+      coinPackageId: $("coinPackageId"),
+      coinPackageLabel: $("coinPackageLabel"),
+      coinPackageCoin: $("coinPackageCoin"),
+      coinPackagePrice: $("coinPackagePrice"),
+      coinPackageOldPrice: $("coinPackageOldPrice"),
+      coinPackageDesc: $("coinPackageDesc"),
+      coinPackageFeatured: $("coinPackageFeatured"),
+      coinPackageActive: $("coinPackageActive"),
+      coinPackageReset: $("coinPackageReset"),
       adminLog: $("adminLog"),
       modalListing: $("modalListing"),
       btnCloseModal: $("btnCloseModal"),
@@ -1651,6 +1714,7 @@
       pendingPurchaseListingId: null,
       promoUnlocked: false,
       promoCodes: [],
+      coinPackages: [],
       unsubscribers: [],
       listingDraftImages: [],
       taskTicker: null,
@@ -1678,13 +1742,13 @@
       { brand: "Teknosa", headline: "Teknoloji önerileri", copy: "Telefon, kulaklık ve aksesuar odaklı sponsor alanı.", pill: "Sponsor • Teknoloji" },
       { brand: "LC Waikiki", headline: "Aile indirimi", copy: "Giyim ve sezon fırsatları için örnek reklam kartı.", pill: "Sponsor • Giyim" }
     ];
-    const COIN_PACKAGES = [
-      { id: "p1", label: "30 TL 7 Coin", price: 30, coin: 7, tl: 30 },
-      { id: "p2", label: "50 TL 10 Coin", price: 50, coin: 10, tl: 50 },
-      { id: "p3", label: "100 TL 25 Coin", price: 100, coin: 25, tl: 100 },
-      { id: "p4", label: "200 TL 55 Coin", price: 200, coin: 55, tl: 200 },
-      { id: "p5", label: "400 TL 120 Coin", price: 400, coin: 120, tl: 400 },
-      { id: "p6", label: "800 TL 300 Coin", price: 800, coin: 300, tl: 800 }
+    const DEFAULT_COIN_PACKAGES = [
+      { id: "p1", label: "30 TL 7 Coin", price: 30, coin: 7, tl: 30, description: "TL öde, coin anında gelsin.", featured: false, active: true },
+      { id: "p2", label: "50 TL 10 Coin", price: 50, coin: 10, tl: 50, description: "Küçük paket", featured: false, active: true },
+      { id: "p3", label: "100 TL 25 Coin", price: 100, coin: 25, tl: 100, description: "Önerilen deneme paketi", featured: true, active: true },
+      { id: "p4", label: "200 TL 55 Coin", price: 200, coin: 55, tl: 200, description: "Daha avantajlı", featured: false, active: true },
+      { id: "p5", label: "400 TL 120 Coin", price: 400, coin: 120, tl: 400, description: "Büyük kullanım paketi", featured: false, active: true },
+      { id: "p6", label: "800 TL 300 Coin", price: 800, coin: 300, tl: 800, description: "En yüksek paket", featured: false, active: true }
     ];
     function slugify(name){
       return String(name).trim().toLowerCase()
@@ -1765,6 +1829,26 @@
       if (user?.isAdmin) return "Yönetici";
       return normalizeUserRole(user?.role) === "helper" ? "Yardımcı üye" : "Üye";
     }
+
+    function normalizeCoinPackage(pkg, fallbackId = ""){
+      const price = Math.max(0, Math.round(Number(pkg?.price ?? pkg?.tl ?? 0)));
+      const oldPrice = Math.max(0, Math.round(Number(pkg?.oldPrice || 0)));
+      const coin = Math.max(0, Math.round(Number(pkg?.coin || 0)));
+      const label = String(pkg?.label || `${price} TL ${coin} Coin`).trim();
+      const description = String(pkg?.description || pkg?.note || "").trim();
+      return {
+        id: String(pkg?.id || fallbackId || ""),
+        label,
+        price,
+        oldPrice: oldPrice > price ? oldPrice : 0,
+        coin,
+        description,
+        featured: !!pkg?.featured,
+        active: pkg?.active !== false,
+        createdAtMs: Number(pkg?.createdAtMs || 0),
+        updatedAtMs: Number(pkg?.updatedAtMs || 0)
+      };
+    }
     function daysLeftFromCreated(createdAtMs, lifetimeMs){
       const created = Number(createdAtMs || 0);
       const life = Number(lifetimeMs || 0);
@@ -1815,7 +1899,7 @@
       refs.whoami.classList.remove("hidden");
       refs.coinBadge.classList.remove('hidden');
       refs.adminMenu.classList.toggle("hidden", !state.isAdmin);
-      refs.whoami.textContent = `${state.profile?.displayName || "Üye"}${state.isAdmin ? " • Yönetici" : ""}`;
+      refs.whoami.textContent = `${state.profile?.displayName || "Üye"} • ${userRoleLabel(state.profile || {})}${state.isAdmin ? " • Yönetici" : ""}`;
     }
     function setView(view){
       state.view = view;
@@ -2775,18 +2859,137 @@
       });
     }
 
+    function getMergedCoinPackages(){
+      const base = (DEFAULT_COIN_PACKAGES || []).map((pkg, index) => normalizeCoinPackage(pkg, pkg.id || `default-${index}`));
+      const custom = (state.coinPackages || []).map((pkg, index) => normalizeCoinPackage(pkg, pkg.id || `pkg-${index}`));
+      const map = new Map();
+      for (const pkg of base) if (pkg.id) map.set(pkg.id, pkg);
+      for (const pkg of custom) if (pkg.id) map.set(pkg.id, { ...map.get(pkg.id), ...pkg });
+      return [...map.values()];
+    }
+    function getActiveCoinPackages(){
+      return getMergedCoinPackages()
+        .filter(pkg => pkg.active !== false)
+        .sort((a, b) => (Number(a.price) - Number(b.price)) || (Number(b.featured) - Number(a.featured)));
+    }
     function renderCoinPackages(){
       if (!refs.coinPackageGrid) return;
-      refs.coinPackageGrid.innerHTML = COIN_PACKAGES.map((pkg, index) => `
-        <div class="coin-package-card ${index === 2 ? 'featured' : ''}">
-          <div class="coin-package-badge">${index === 2 ? 'Önerilen' : 'Paket'}</div>
+      const items = getActiveCoinPackages();
+      refs.coinPackageGrid.innerHTML = items.map((pkg) => {
+        const discount = pkg.oldPrice > pkg.price;
+        return `
+        <div class="coin-package-card ${pkg.featured ? 'featured' : ''}">
+          <div class="coin-package-badge">${pkg.featured ? 'Önerilen' : 'Paket'}</div>
           <strong>${escapeHtml(pkg.label)}</strong>
-          <div class="coin-package-price">${escapeHtml(String(pkg.price))} TL</div>
+          ${discount ? `<div class="coin-package-price compact"><span style="text-decoration:line-through;opacity:.55">${escapeHtml(String(pkg.oldPrice))} TL</span> • ${escapeHtml(String(pkg.price))} TL</div>` : `<div class="coin-package-price">${escapeHtml(String(pkg.price))} TL</div>`}
           <div class="coin-package-coin">${escapeHtml(formatCoin(pkg.coin))}</div>
-          <div class="tiny">Sorun yaşanmadığı süreç iade yoktur.</div>
+          ${pkg.description ? `<div class="tiny">${escapeHtml(pkg.description)}</div>` : `<div class="tiny">TL ile ödeme yapılır, coin anında eklenir.</div>`}
+          ${discount ? `<div class="coin-package-badge" style="background:#dcfce7;color:#166534">İndirimli</div>` : ``}
           <button class="btn" type="button" onclick="window.__buyCoinPackage('${pkg.id}')">Bu paketi seç</button>
         </div>
-      `).join("");
+      `}).join("") || `<div class="feed-item">Paket yok.</div>`;
+    }
+    function renderAdminCoinPackages(){
+      if (!refs.adminCoinPackages) return;
+      const items = getMergedCoinPackages();
+      refs.adminCoinPackages.innerHTML = items.sort((a,b) => (Number(a.price)-Number(b.price)) || (Number(b.updatedAtMs)-Number(a.updatedAtMs))).map(pkg => {
+        const discount = pkg.oldPrice > pkg.price;
+        return `
+          <div class="coin-package-card ${pkg.featured ? 'featured' : ''}">
+            <div class="coin-package-badge">${pkg.featured ? 'Öne çıkan' : 'Paket'}</div>
+            <strong>${escapeHtml(pkg.label)}</strong>
+            ${discount ? `<div class="coin-package-coin"><span style="text-decoration:line-through;opacity:.55">${escapeHtml(String(pkg.oldPrice))} TL</span> • ${escapeHtml(String(pkg.price))} TL</div>` : `<div class="coin-package-price">${escapeHtml(String(pkg.price))} TL</div>`}
+            <div class="coin-package-coin">${escapeHtml(formatCoin(pkg.coin))}</div>
+            <div class="tiny">${escapeHtml(pkg.description || 'TL ile ödeme yapılır, coin anında eklenir.')}</div>
+            <div class="row">
+              <span class="pill">${pkg.active ? 'Aktif' : 'Pasif'}</span>
+              ${discount ? `<span class="pill">İndirimli</span>` : ``}
+            </div>
+            <div class="row">
+              <button class="btn secondary" type="button" onclick="window.__editCoinPackage('${pkg.id}')">Düzenle</button>
+              <button class="btn bad" type="button" onclick="window.__deleteCoinPackage('${pkg.id}')">Sil</button>
+            </div>
+          </div>
+        `;
+      }).join("") || `<div class="feed-item">Paket yok.</div>`;
+    }
+    function resetCoinPackageForm(){
+      if (!refs.coinPackageForm) return;
+      refs.coinPackageForm.reset();
+      if (refs.coinPackageId) refs.coinPackageId.value = "";
+      if (refs.coinPackageFeatured) refs.coinPackageFeatured.checked = false;
+      if (refs.coinPackageActive) refs.coinPackageActive.checked = true;
+    }
+    function fillCoinPackageForm(pkg){
+      if (!pkg) return;
+      if (refs.coinPackageId) refs.coinPackageId.value = pkg.id || "";
+      if (refs.coinPackageLabel) refs.coinPackageLabel.value = pkg.label || "";
+      if (refs.coinPackageCoin) refs.coinPackageCoin.value = pkg.coin || "";
+      if (refs.coinPackagePrice) refs.coinPackagePrice.value = pkg.price || "";
+      if (refs.coinPackageOldPrice) refs.coinPackageOldPrice.value = pkg.oldPrice || "";
+      if (refs.coinPackageDesc) refs.coinPackageDesc.value = pkg.description || "";
+      if (refs.coinPackageFeatured) refs.coinPackageFeatured.checked = !!pkg.featured;
+      if (refs.coinPackageActive) refs.coinPackageActive.checked = pkg.active !== false;
+    }
+    async function saveCoinPackageFromForm(){
+      const id = String(refs.coinPackageId?.value || "").trim();
+      const label = String(refs.coinPackageLabel?.value || "").trim();
+      const coin = Math.max(0, Math.round(Number(refs.coinPackageCoin?.value || 0)));
+      const price = Math.max(0, Math.round(Number(refs.coinPackagePrice?.value || 0)));
+      const oldPrice = Math.max(0, Math.round(Number(refs.coinPackageOldPrice?.value || 0)));
+      const description = String(refs.coinPackageDesc?.value || "").trim();
+      const featured = !!refs.coinPackageFeatured?.checked;
+      const active = !!refs.coinPackageActive?.checked;
+      if (!label) return alert("Paket adı gerekli.");
+      if (!coin) return alert("Coin miktarı gerekli.");
+      if (!price) return alert("TL fiyatı gerekli.");
+      if (oldPrice && oldPrice < price) return alert("Eski TL fiyatı yeni TL fiyatından küçük olamaz.");
+      const payload = {
+        label,
+        coin,
+        price,
+        oldPrice: oldPrice > price ? oldPrice : 0,
+        description,
+        featured,
+        active,
+        updatedAt: serverTimestamp(),
+        updatedAtMs: Date.now()
+      };
+      try{
+        if (id){
+          await updateDoc(doc(db, "coinPackages", id), payload);
+          await logAction("Coin paketi düzenlendi", `${state.profile.displayName} → ${label}`);
+        }else{
+          await addDoc(collection(db, "coinPackages"), {
+            ...payload,
+            createdAt: serverTimestamp(),
+            createdAtMs: Date.now()
+          });
+          await logAction("Coin paketi eklendi", `${state.profile.displayName} → ${label}`);
+        }
+        resetCoinPackageForm();
+        scheduleRender();
+      }catch(err){
+        alert("Paket kaydedilemedi: " + firebaseErrorMessage(err));
+      }
+    }
+    async function editCoinPackage(id){
+      const pkg = (state.coinPackages || []).find(x => x.id === id);
+      if (!pkg) return alert("Paket bulunamadı.");
+      fillCoinPackageForm(normalizeCoinPackage(pkg, id));
+      refs.coinPackageLabel?.focus();
+    }
+    async function deleteCoinPackage(id){
+      const pkg = (state.coinPackages || []).find(x => x.id === id);
+      if (!pkg) return alert("Paket bulunamadı.");
+      if (!confirm(`"${pkg.label || 'Paket'}" silinsin mi?`)) return;
+      try{
+        await deleteDoc(doc(db, "coinPackages", id));
+        await logAction("Coin paketi silindi", `${state.profile.displayName} → ${pkg.label || id}`);
+        scheduleRender();
+      }catch(err){
+        alert("Paket silinemedi: " + firebaseErrorMessage(err));
+      }
     }
     function openCoinHub(){
       if (refs.modalCoinHub) showModal(refs.modalCoinHub);
@@ -2836,7 +3039,7 @@
       scheduleRender();
     }
     function buyCoinPackage(id){
-      const pkg = COIN_PACKAGES.find(x => x.id === id);
+      const pkg = getActiveCoinPackages().find(x => x.id === id);
       if (!pkg) return;
       return sendCoinPackageRequest(pkg);
     }
@@ -3183,6 +3386,7 @@
       if (state.view === "admin") {
         renderAdminUsers();
         renderAdminListings();
+        renderAdminCoinPackages();
         renderAdminLog();
       }
       if (state.view === "help") renderHelp();
@@ -3949,7 +4153,11 @@ Sorun: ${body}`;
         prefetchConversationPeers(state.conversations).then(() => scheduleRender()).catch(() => scheduleRender());
         scheduleRender();
       });
-      state.unsubscribers.push(u1, u2, uBuy, u3);
+      const uCoins = onSnapshot(collection(db, "coinPackages"), snap => {
+        state.coinPackages = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        scheduleRender();
+      });
+      state.unsubscribers.push(u1, u2, uBuy, u3, uCoins);
       if (state.view === "admin") {
         ensureAdminLogsLoaded().then(() => scheduleRender()).catch(()=>{});
         ensureAdminUsersLoaded().then(() => scheduleRender()).catch(()=>{});
@@ -4759,6 +4967,11 @@ Sorun: ${body}`;
     refs.promoResetButton.onclick = clearPromoForm;
     refs.helpForm.onsubmit = async (e) => { e.preventDefault(); await openHelpConversation(); };
     refs.btnMessageSeller.onclick = messageSeller;
+    refs.coinPackageForm?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      saveCoinPackageFromForm();
+    });
+    refs.coinPackageReset?.addEventListener("click", () => resetCoinPackageForm());
     refs.adminUserSearch?.addEventListener("input", () => {
       if (state.view === "admin") scheduleRender();
     });
@@ -4771,6 +4984,8 @@ Sorun: ${body}`;
     window.__toggleListing = toggleListing;
     window.__editListing = editListing;
     window.__selectForAdmin = selectForAdmin;
+    window.__editCoinPackage = editCoinPackage;
+    window.__deleteCoinPackage = deleteCoinPackage;
     window.__setUserRole = setUserRole;
     window.__decreaseUserCoin = decreaseUserCoin;
     window.__deleteUserAccount = deleteUserAccount;
