@@ -1453,8 +1453,8 @@
             </div>
             <div class="coin-choice-card secondary">
               <strong>Reklam ile coin kazan</strong>
-              <div class="tiny">Günde 1 reklam izleyip 1 coin al. Reklam akışı aynı kalır.</div>
-              <button id="btnOpenCoinAd" class="btn secondary" type="button">Günde 1 reklam izleyip 1 coin al</button>
+              <div class="tiny">Haftada 1 reklam izleyip 2 coin al. Reklam akışı aynı kalır.</div>
+              <button id="btnOpenCoinAd" class="btn secondary" type="button">Haftada 1 reklam izleyip 2 coin al</button>
             </div>
           </div>
         </div>
@@ -2070,6 +2070,17 @@
       const next = new Date(utc + (deltaDays * 24 * 60 * 60 * 1000));
       return next.toISOString().slice(0, 10);
     }
+
+    function weekKeyFromMs(ms = getRealNowMs()){
+      const date = new Date(Number(ms || getRealNowMs()) + 3 * 60 * 60 * 1000);
+      const day = date.getUTCDay();
+      const diffToMonday = (day + 6) % 7;
+      date.setUTCDate(date.getUTCDate() - diffToMonday);
+      const year = String(date.getUTCFullYear()).padStart(4, "0");
+      const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+      const dayOfMonth = String(date.getUTCDate()).padStart(2, "0");
+      return `${year}-${month}-${dayOfMonth}`;
+    }
     function timePartsIstanbul(ms = getRealNowMs()){
       const parts = new Intl.DateTimeFormat("en-GB", {
         timeZone: "Europe/Istanbul",
@@ -2587,7 +2598,7 @@
         { key:"seven-login", title:"7 gün giriş", desc:"7 gün üst üste giriş yap", current: Math.min(p.loginStreak || 0, 7), target: 7 },
         { key:"one-hour", title:"1 saat aktif", desc:"Sitede 1 saat kal", current: p.sessionMs || 0, target: 60 * 60 * 1000 },
         { key:"twentyfour", title:"24 saat gezin", desc:"Toplam 24 saat gezin", current: p.browseMs || 0, target: 24 * 60 * 60 * 1000 },
-        { key:"ad", title:"Günün reklamı", desc:"Bugün 1 reklam izle", current: p.dailyAdDate === today ? 1 : 0, target: 1 }
+        { key:"ad", title:"Haftalık reklam", desc:"Bu hafta 1 reklam izle", current: p.dailyAdDate === weekKeyFromMs() ? 1 : 0, target: 1 }
       ];
     }
     function renderAchievements(){
@@ -2748,14 +2759,14 @@
       const browseTarget = 24 * 60 * 60 * 1000;
       const loginTarget = 7;
       const listingTarget = 15;
-      const adDone = p.dailyAdDate === dateKeyFromMs();
+      const adDone = p.dailyAdDate === weekKeyFromMs();
       const sessionDone = !!p.sessionRewarded || p.sessionMs >= sessionTarget;
       const browseDone = !!p.browseRewarded || p.browseMs >= browseTarget;
       const loginDone = !!p.loginRewarded || p.loginStreak >= loginTarget;
       const listingDone = !!p.listingsRewarded || p.listingsCreated >= listingTarget;
       refs.taskSummary.innerHTML = `
         <div class="stat"><b>${formatCoin(currentCoinBalance())}</b><span>Coin</span></div>
-        <div class="stat"><b>${adDone ? '1/1' : '0/1'}</b><span>Reklam</span></div>
+        <div class="stat"><b>${adDone ? '1/1' : '0/1'}</b><span>Haftalık reklam</span></div>
         <div class="stat"><b>${Math.min(Math.floor((p.sessionMs || 0) / 60000), 60)}/60 dk</b><span>Oturum</span></div>
         <div class="stat"><b>${Math.min(p.loginStreak || 0, 7)}/7</b><span>Giriş serisi</span></div>
       `;
@@ -2765,7 +2776,7 @@
             <strong>1 reklam izle</strong>
             <span class="badge ${adDone ? 'ok' : 'wait'}">${adDone ? 'Tamam' : 'Bekliyor'}</span>
           </div>
-          <div class="task-meta">+ butonuna bas. 60 saniye sonunda 1 Coin verilir.</div>
+          <div class="task-meta">+ butonuna bas. 60 saniye sonunda 2 Coin verilir. Haftada yalnızca 1 kez ödül alınır.</div>
           <div class="progress"><span class="progress-bar" style="width:${adDone ? 100 : 0}%"></span></div>
         </div>
         <div class="task-card">
@@ -3076,7 +3087,7 @@
           </div>
         </div>
         <div class="ad-count" id="adCountdown">${escapeHtml(String(remaining))}</div>
-        <div class="ad-note">Günde yalnızca 1 kez ödül alınır.</div>
+        <div class="ad-note">Haftada yalnızca 1 kez ödül alınır.</div>
       `;
     }
 
@@ -3099,18 +3110,18 @@
       if (message && refs.adStatusText) refs.adStatusText.textContent = message;
     }
     async function finishAdWatch(){
-      const today = dateKeyFromMs(getRealNowMs());
+      const weekKey = weekKeyFromMs(getRealNowMs());
       try{
         const result = await mutateTaskState((taskState) => {
-          if (taskState.dailyAdDate === today) return { rewardCoins: 0 };
-          taskState.dailyAdDate = today;
+          if (taskState.dailyAdDate === weekKey) return { rewardCoins: 0 };
+          taskState.dailyAdDate = weekKey;
           taskState.updatedAtMs = getRealNowMs();
-          return { rewardCoins: 1 };
+          return { rewardCoins: 2 };
         });
         stopAdWatch('Coin eklendi.');
-        if (result?.rewardCoins > 0) await logAction('Reklam ödülü', `${state.profile?.displayName || 'user'} +1 Coin`);
+        if (result?.rewardCoins > 0) await logAction('Reklam ödülü', `${state.profile?.displayName || 'user'} +2 Coin`);
         scheduleRender();
-        alert('Reklam tamamlandı. 1 Coin eklendi.');
+        alert('Reklam tamamlandı. 2 Coin eklendi.');
       }catch(err){
         stopAdWatch('Ödül alınamadı.');
         alert('Reklam ödülü verilemedi: ' + firebaseErrorMessage(err));
@@ -3120,7 +3131,7 @@
       if (!state.user) return;
       const p = normalizeTaskState(state.profile?.taskState);
       const today = dateKeyFromMs(getRealNowMs());
-      if (p.dailyAdDate === today) return alert('Bugün reklam ödülünü zaten aldın.');
+      if (p.dailyAdDate === weekKeyFromMs()) return alert('Bu hafta reklam ödülünü zaten aldın.');
       if (state.adWatch) return;
       if (refs.modalAd) showModal(refs.modalAd);
       let remaining = 60;
