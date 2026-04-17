@@ -26,19 +26,39 @@
       margin:0;
       font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(37,99,235,.08), transparent 30%),
-        radial-gradient(circle at top right, rgba(22,163,74,.08), transparent 28%),
-        var(--bg);
+        radial-gradient(circle at top left, rgba(37,99,235,.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(124,58,237,.10), transparent 26%),
+        radial-gradient(circle at bottom center, rgba(22,163,74,.08), transparent 24%),
+        linear-gradient(180deg,#fbfdff 0%, #f3f7ff 100%);
       color:var(--text);
+      position:relative;
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:-20% -10% auto -10%;
+      height:42vh;
+      background:linear-gradient(90deg, rgba(37,99,235,.08), rgba(124,58,237,.06), rgba(22,163,74,.06));
+      filter:blur(30px);
+      opacity:.55;
+      pointer-events:none;
+      animation:bgFloat 18s ease-in-out infinite alternate;
+      z-index:-1;
+    }
+    @keyframes bgFloat{
+      from{transform:translate3d(-1.5%,0,0) scale(1)}
+      to{transform:translate3d(1.5%,1%,0) scale(1.03)}
     }
     button,input,textarea,select{font:inherit}
     .hidden{display:none !important}
     .wrap{min-height:100%;display:flex;flex-direction:column}
     .topbar{
       position:sticky;top:0;z-index:30;
-      background:rgba(255,255,255,.88);
-      backdrop-filter:blur(12px);
-      border-bottom:1px solid rgba(229,231,235,.9);
+      background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.84));
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid rgba(191,219,254,.85);
+      box-shadow:0 8px 30px rgba(37,99,235,.06);
     }
     .topbar-inner{
       max-width:1440px;margin:0 auto;padding:16px 20px;
@@ -61,6 +81,7 @@
       font-weight:800;
     }
     .chip:hover{transform:translateY(-1px);box-shadow:0 14px 26px rgba(17,24,39,.12);border-color:#cbd5e1}
+    .chip:active{transform:translateY(0) scale(.99)}
     .chip.primary{background:var(--accent);border-color:var(--accent);color:#fff}
     .chip.primary:hover{background:var(--accent2)}
     .chip.good{background:var(--good);border-color:var(--good);color:#fff}
@@ -71,11 +92,17 @@
     .grid{display:grid;gap:18px}
     .auth-grid{grid-template-columns:1.05fr .95fr}
     .panel{
-      background:var(--card);
-      border:1px solid var(--line);
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(229,231,235,.92);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
       overflow:hidden;
+      backdrop-filter:blur(10px);
+      animation:panelEnter .45s ease both;
+    }
+    @keyframes panelEnter{
+      from{opacity:0;transform:translateY(10px) scale(.99)}
+      to{opacity:1;transform:translateY(0) scale(1)}
     }
     .panel-inner{padding:22px}
     .hero-copy h2{font-size:42px;margin:0 0 10px;letter-spacing:-.03em}
@@ -104,7 +131,8 @@
       background:var(--accent);color:#fff;transition:.2s;
       box-shadow:0 10px 20px rgba(37,99,235,.15);
     }
-    .btn:hover{transform:translateY(-1px);background:var(--accent2)}
+    .btn:hover{transform:translateY(-1px);background:var(--accent2);box-shadow:0 14px 24px rgba(37,99,235,.18)}
+    .btn:active{transform:translateY(0) scale(.99)}
     .btn.secondary{
       background:#fff;color:var(--text);border:1px solid #d1d5db;
       box-shadow:0 10px 20px rgba(17,24,39,.08);
@@ -127,8 +155,17 @@
     .section-title p{margin:0;color:var(--muted);font-size:13px}
     .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
     .card{
-      border:1px solid var(--line);border-radius:22px;background:#fff;overflow:hidden;box-shadow:var(--shadow)
+      border:1px solid rgba(229,231,235,.92);
+      border-radius:22px;
+      background:linear-gradient(180deg,#ffffff,#fbfdff);
+      overflow:hidden;
+      box-shadow:var(--shadow);
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      will-change:transform;
+      backface-visibility:hidden;
+      transform:translateZ(0);
     }
+    .card:hover{transform:translate3d(0,-3px,0);box-shadow:0 18px 36px rgba(17,24,39,.12);border-color:#cbd5e1}
     .card img{width:100%;height:220px;object-fit:cover;background:#f3f4f6}
     .card-body{padding:16px;display:grid;gap:10px}
     .meta{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px;color:var(--muted)}
@@ -353,6 +390,60 @@
       border-radius:16px;
       background:#f8fafc;
       border:1px solid var(--line);
+    }
+
+    .expiry-line{font-size:11px;color:var(--muted);line-height:1.35}
+    .request-card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      padding:14px;
+      display:grid;
+      gap:10px;
+      box-shadow:0 8px 16px rgba(17,24,39,.03);
+      position:relative;
+      overflow:hidden;
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      will-change:transform;
+      backface-visibility:hidden;
+      transform:translateZ(0);
+    }
+    .request-card::before{
+      content:"";
+      position:absolute;
+      inset:0 auto 0 0;
+      width:6px;
+      background:linear-gradient(180deg,#93c5fd,#2563eb);
+      opacity:.9;
+    }
+    .request-card.sale{
+      background:linear-gradient(135deg, rgba(239,246,255,.96), #fff 62%);
+      border-color:#bfdbfe;
+    }
+    .request-card.sale::before{background:linear-gradient(180deg,#60a5fa,#2563eb)}
+    .request-card.trade{
+      background:linear-gradient(135deg, rgba(236,253,245,.96), #fff 62%);
+      border-color:#bbf7d0;
+    }
+    .request-card.trade::before{background:linear-gradient(180deg,#34d399,#059669)}
+    .request-card.closed{opacity:.72;filter:saturate(.9)}
+    .request-card:hover{transform:translate3d(0,-2px,0);box-shadow:0 14px 28px rgba(17,24,39,.08)}
+    .request-headline{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .request-owner{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800;background:#f8fafc;border:1px solid var(--line)}
+    .request-owner.sale{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+    .request-owner.trade{background:#ecfdf5;border-color:#a7f3d0;color:#047857}
+    .request-kind{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:.01em}
+    .request-kind.sale{background:#dbeafe;color:#1d4ed8}
+    .request-kind.trade{background:#d1fae5;color:#047857}
+    .request-range{font-size:12px;color:#374151;font-weight:700}
+    .request-offer{font-size:12px;color:#0f172a;background:rgba(255,255,255,.78);border:1px dashed rgba(148,163,184,.45);padding:10px 12px;border-radius:14px}
+    .request-card .request-meta{font-size:12px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
+    .request-card .request-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .request-card .request-actions .btn{padding:10px 12px;border-radius:14px;font-size:13px}
+
+    @media (prefers-reduced-motion: reduce){
+      *{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+      .card,.request-card,.panel{transform:none !important}
     }
 
     @media (max-width:900px){
@@ -674,6 +765,7 @@
               </div>
               <div class="menu">
                 <button data-view="shop" class="active">Dükkan</button>
+                <button data-view="buyrequests">Alım istekleri</button>
                 <button data-view="myads">İlanlarım</button>
                 <button data-view="messages">Mesajlar <span id="messagesBadge" class="badge notify hidden" style="margin-left:8px">0</span></button>
                 <button data-view="profile">Profil</button>
@@ -726,6 +818,20 @@
                 </div>
                 <div class="hr"></div>
                 <div id="listingsGrid" class="cards"></div>
+              </div>
+              <div id="viewBuyRequests" class="hidden">
+                <div class="section-title">
+                  <div>
+                    <h3>Alım istekleri</h3>
+                    <p>İstenen ürünleri burada görürsün.</p>
+                  </div>
+                  <button id="btnOpenBuyRequest" class="btn">İstek ekle</button>
+                </div>
+                <div class="notice">
+                  Satış ve takas istekleri ayrı ayrı görünür. Kart rengi türü belli eder; mesaj atarak doğrudan konuşabilirsin.
+                </div>
+                <div class="hr"></div>
+                <div id="buyRequestsGrid" class="list"></div>
               </div>
               <div id="viewMyAds" class="hidden">
                 <div class="notice">
@@ -1048,6 +1154,60 @@
       </div>
     </div>
   </div>
+  <div id="modalBuyRequest" class="modal">
+    <div class="modal-card" style="width:min(760px,100%)">
+      <div class="modal-head">
+        <strong id="buyRequestModalTitle">Alım isteği ekle</strong>
+        <button id="btnCloseBuyRequest" class="chip">Kapat</button>
+      </div>
+      <div class="modal-body">
+        <form id="buyRequestForm" class="form">
+          <div class="two">
+            <div class="field">
+              <label>İstenen ürün</label>
+              <input id="buyRequestName" class="input" maxlength="60" placeholder="Örn: PlayStation kolu" />
+            </div>
+            <div class="field">
+              <label>İstek türü</label>
+              <select id="buyRequestType" class="input">
+                <option value="sale">Satış</option>
+                <option value="trade">Takas</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Açıklama</label>
+            <textarea id="buyRequestDesc" class="input" maxlength="500" placeholder="Ne aradığını ve hangi koşullarda alacağını yaz."></textarea>
+          </div>
+          <div class="field">
+            <label>Takas ise vereceğin eşyanın adı</label>
+            <input id="buyRequestOfferItem" class="input" maxlength="80" placeholder="Örn: Yeni kulaklık" />
+          </div>
+          <div class="two">
+            <div class="field">
+              <label>Ortalama fiyat alt sınırı</label>
+              <input id="buyRequestPriceMin" class="input" type="number" min="0" placeholder="Örn: 100" />
+            </div>
+            <div class="field">
+              <label>Ortalama fiyat üst sınırı</label>
+              <input id="buyRequestPriceMax" class="input" type="number" min="0" placeholder="Örn: 150" />
+            </div>
+          </div>
+          <div class="two">
+            <div class="field">
+              <label>Coin alt sınırı</label>
+              <input id="buyRequestCoinMin" class="input" type="number" min="0" placeholder="Örn: 20" />
+            </div>
+            <div class="field">
+              <label>Coin üst sınırı</label>
+              <input id="buyRequestCoinMax" class="input" type="number" min="0" placeholder="Örn: 30" />
+            </div>
+          </div>
+          <div class="hint">Satış ilanında fiyat aralığı ve coin aralığı görünür. Takasta eşya adı öne çıkar.</div>
+          <button class="btn" type="submit">Kaydet</button></form>
+      </div>
+    </div>
+  </div>
   <div id="modalSeller" class="modal">
     <div class="modal-card" style="width:min(720px,100%)">
       <div class="modal-head">
@@ -1229,7 +1389,7 @@
           <div class="coin-choice-grid">
             <div class="coin-choice-card primary">
               <strong>TL ile coin al</strong>
-              <div class="tiny">Hazır paketlerden birini seç. Seçimden sonra Alper hesabına sistem mesajı gider.</div>
+              <div class="tiny">Hazır paketlerden birini seç.</div>
               <button id="btnOpenCoinPackages" class="btn" type="button">TL ile coin al</button>
             </div>
             <div class="coin-choice-card secondary">
@@ -1251,7 +1411,7 @@
       <div class="modal-body">
         <div class="coin-hub-hero">
           <div class="coin-hub-title">TL paketlerini seç</div>
-          <div class="coin-hub-sub">Seçtiğin paket TL ile coin alımıdır; coin'i TL'ye çeviren bir akış yoktur. İstek Alper hesabına sistem mesajı olarak düşer.</div>
+          <div class="coin-hub-sub">Seçtiğin paket TL ile coin alımıdır; coin'i TL'ye çeviren bir akış yoktur.</div>
         </div>
         <div class="hr"></div>
         <div id="coinPackageGrid" class="coin-package-grid"></div>
@@ -1444,7 +1604,21 @@
       adFrame: $("adFrame"),
       adProgressFill: $("adProgressFill"),
       adStatusText: $("adStatusText"),
-      timeGateNotice: $("timeGateNotice")
+      timeGateNotice: $("timeGateNotice"),
+      modalBuyRequest: $("modalBuyRequest"),
+      btnOpenBuyRequest: $("btnOpenBuyRequest"),
+      btnCloseBuyRequest: $("btnCloseBuyRequest"),
+      buyRequestForm: $("buyRequestForm"),
+      buyRequestModalTitle: $("buyRequestModalTitle"),
+      buyRequestName: $("buyRequestName"),
+      buyRequestType: $("buyRequestType"),
+      buyRequestDesc: $("buyRequestDesc"),
+      buyRequestOfferItem: $("buyRequestOfferItem"),
+      buyRequestPriceMin: $("buyRequestPriceMin"),
+      buyRequestPriceMax: $("buyRequestPriceMax"),
+      buyRequestCoinMin: $("buyRequestCoinMin"),
+      buyRequestCoinMax: $("buyRequestCoinMax"),
+      buyRequestsGrid: $("buyRequestsGrid")
     };
     const state = {
       user: null,
@@ -1454,6 +1628,7 @@
       lastViewBeforeModal: "shop",
       listings: [],
       conversations: [],
+      buyRequests: [],
       logs: [],
       users: [],
       userCache: {},
@@ -1480,8 +1655,9 @@
       reviewLoadingId: ""
     };
     const DAY = 24 * 60 * 60 * 1000;
-    const LISTING_LIFETIME = 15 * DAY;
-    const CHAT_LIFETIME = 72 * 60 * 60 * 1000;
+    const LISTING_LIFETIME = 20 * DAY;
+    const CHAT_LIFETIME = 3 * DAY;
+    const BUY_REQUEST_LIFETIME = 15 * DAY;
     const MANAGER_KEY = "alper9119bulut";
     const ADMIN_BOOTSTRAP_NAME = "Alper";
     const ADMIN_BOOTSTRAP_PASSWORD = "Alper9119";
@@ -1571,6 +1747,25 @@
     function isBootstrapAdminCredentials(name, pass){
       return normalizeName(name) === normalizeName(ADMIN_BOOTSTRAP_NAME) && String(pass || "") === ADMIN_BOOTSTRAP_PASSWORD;
     }
+    function daysLeftFromCreated(createdAtMs, lifetimeMs){
+      const created = Number(createdAtMs || 0);
+      const life = Number(lifetimeMs || 0);
+      if (!created || !life) return 0;
+      return Math.max(0, Math.ceil((created + life - getRealNowMs()) / DAY));
+    }
+    function daysLeftLabel(createdAtMs, lifetimeMs){
+      const days = daysLeftFromCreated(createdAtMs, lifetimeMs);
+      return `${days} gün kaldı`;
+    }
+    function requestRangeText(item){
+      const priceMin = Number(item?.priceMin || 0);
+      const priceMax = Number(item?.priceMax || 0);
+      const coinMin = Number(item?.coinMin || 0);
+      const coinMax = Number(item?.coinMax || 0);
+      const priceText = (priceMin || priceMax) ? `${priceMin || 0}-${priceMax || 0} TL` : "Fiyat aralığı yok";
+      const coinText = (coinMin || coinMax) ? `${coinMin || 0}-${coinMax || 0} Coin` : "Coin aralığı yok";
+      return { priceText, coinText };
+    }
     function updateTimeGateUI(){
       const open = isShopOpenNow();
       if (refs.timeGateNotice){
@@ -1611,6 +1806,7 @@
       if (view === "profile" && state.promoUnlocked) ensurePromoCodesLoaded().catch(()=>{});
       const map = {
         shop:["Dükkan","Yayınlanan ilanları görüntüle."],
+        buyrequests:["Alım istekleri","Alım taleplerini görüntüle."],
         myads:["İlanlarım","Kendi ilanlarını düzenle, kapat, aç veya sil."],
         messages:["Mesajlar","İlan bazlı konuşmalar."],
         profile:["Profil","Hesap özetin."],
@@ -1621,6 +1817,7 @@
       refs.viewTitle.textContent = map[view][0];
       refs.viewDesc.textContent = map[view][1];
       document.getElementById("viewShop").classList.toggle("hidden", view !== "shop");
+      document.getElementById("viewBuyRequests").classList.toggle("hidden", view !== "buyrequests");
       document.getElementById("viewMyAds").classList.toggle("hidden", view !== "myads");
       document.getElementById("viewMessages").classList.toggle("hidden", view !== "messages");
       document.getElementById("viewProfile").classList.toggle("hidden", view !== "profile");
@@ -1981,6 +2178,50 @@
       if (!readAt) return false;
       return tsValue(readAt) >= tsValue(message.createdAt);
     }
+    function renderBuyRequestCard(item){
+      const owner = escapeHtml(item.requesterName || "Bilinmeyen");
+      const range = requestRangeText(item);
+      const daysText = daysLeftLabel(item.createdAtMs, BUY_REQUEST_LIFETIME);
+      const mine = state.user?.uid === item.requesterId;
+      const kind = item.requestType === "trade" ? "trade" : "sale";
+      const kindLabel = kind === "trade" ? "Takas isteği" : "Satış isteği";
+      const kindBadge = `<span class="request-kind ${kind}">${kindLabel}</span>`;
+      const ownerBadge = `<span class="request-owner ${kind}">${owner}</span>`;
+      const statusBadge = item.status === "closed"
+        ? `<span class="badge closed">Kapalı</span>`
+        : `<span class="badge ok">Açık</span>`;
+      const offerText = kind === "trade"
+        ? `<div class="request-offer"><strong>Vereceği eşya:</strong> ${escapeHtml(item.offeredItem || "Yazılmamış")}</div>`
+        : `<div class="request-offer"><strong>İstenen aralık:</strong> ${escapeHtml(range.priceText)} • ${escapeHtml(range.coinText)}</div>`;
+      return `
+        <div class="request-card ${kind} ${item.status === "closed" ? "closed" : ""}">
+          <div class="request-headline">
+            <strong>${escapeHtml(item.name || "Alım isteği")}</strong>
+            <div class="row">${kindBadge}${statusBadge}</div>
+          </div>
+          <div class="request-meta">
+            ${ownerBadge}
+            <span>${escapeHtml(formatDate(item.createdAt))}</span>
+          </div>
+          <div class="request-range">${escapeHtml(item.description || "Açıklama yok")}</div>
+          ${offerText}
+          <div class="expiry-line">${escapeHtml(daysText)}</div>
+          <div class="request-actions">
+            <button class="btn" type="button" onclick="window.__messageBuyRequest('${item.id}')">Mesaj at</button>
+            ${mine ? `<button class="btn bad" type="button" onclick="window.__removeBuyRequest('${item.id}')">Sil</button>` : ''}
+          </div>
+        </div>
+      `;
+    }
+    function renderBuyRequests(){
+      if (!refs.buyRequestsGrid) return;
+      const q = (refs.searchInput?.value || "").trim().toLowerCase();
+      const items = sortDescByDate(state.buyRequests || []).filter(x => {
+        const hay = [x.name, x.description, x.requesterName, x.requestType, x.offeredItem, String(x.priceMin || ""), String(x.priceMax || ""), String(x.coinMin || ""), String(x.coinMax || "")].join(" ").toLowerCase();
+        return !q || hay.includes(q);
+      });
+      refs.buyRequestsGrid.innerHTML = items.map(renderBuyRequestCard).join("") || `<div class="people-list-empty">Henüz alım isteği yok.</div>`;
+    }
     function renderListingCard(item, forMine=false){
       const owner = escapeHtml(item.ownerName || "Bilinmeyen");
       const isMine = state.user?.uid === item.ownerId;
@@ -2000,6 +2241,7 @@
               <span>${owner}</span>
               <span>${formatDate(item.createdAt)}</span>
             </div>
+            <div class="expiry-line">${escapeHtml(daysLeftLabel(item.createdAtMs, LISTING_LIFETIME))}</div>
             <div class="seller-box">
               <div class="seller-identity">
                 <div class="mini-avatar">${getAvatarMarkup(getUserAvatar(item.ownerId), item.ownerName || owner)}</div>
@@ -2103,6 +2345,7 @@
       if (refs.reviewComment) refs.reviewComment.value = '';
       refs.btnDetailMessage.onclick = async () => {
         refs.modalDetail.classList.remove("show");
+        hideModal(refs.modalBuyRequest);
         document.body.style.overflow = "";
         await openConversation(item.id);
       };
@@ -2519,7 +2762,7 @@
           <strong>${escapeHtml(pkg.label)}</strong>
           <div class="coin-package-price">${escapeHtml(String(pkg.price))} TL</div>
           <div class="coin-package-coin">${escapeHtml(formatCoin(pkg.coin))}</div>
-          <div class="tiny">Seçince Alper hesabına sistem mesajı gider.</div>
+          <div class="tiny">Sorun yaşanmadığı süreç iade yoktur.</div>
           <button class="btn" type="button" onclick="window.__buyCoinPackage('${pkg.id}')">Bu paketi seç</button>
         </div>
       `).join("");
@@ -2753,6 +2996,7 @@
         refs.coinBadge.textContent = formatCoin(currentCoinBalance());
       }
       if (state.view === "shop") renderShop();
+      if (state.view === "buyrequests") renderBuyRequests();
       if (state.view === "myads") renderMyAds();
       if (state.view === "messages") renderConversations();
       if (state.view === "profile") { renderProfile(); renderPromoManager().catch(()=>{}); }
@@ -3349,7 +3593,7 @@ Sorun: ${body}`;
       return `${code}: ${message}`;
     }
     async function cleanupExpired(){
-      const now = Date.now();
+      const now = getRealNowMs();
       try{
         const listingsSnap = await getDocs(query(collection(db, "listings"), where("createdAtMs", "<", now - LISTING_LIFETIME)));
         for (const d of listingsSnap.docs){
@@ -3358,10 +3602,35 @@ Sorun: ${body}`;
         }
       }catch{}
       try{
-        const convSnap = await getDocs(query(collection(db, "conversations"), where("createdAtMs", "<", now - CHAT_LIFETIME)));
+        const requestSnap = await getDocs(query(collection(db, "buyRequests"), where("createdAtMs", "<", now - BUY_REQUEST_LIFETIME)));
+        for (const d of requestSnap.docs){
+          await deleteDoc(doc(db, "buyRequests", d.id));
+          await logAction("Alım isteği süre doldu", d.data()?.name || d.id);
+        }
+      }catch{}
+      try{
+        const convSnap = await getDocs(collection(db, "conversations"));
         for (const d of convSnap.docs){
-          await deleteDoc(doc(db, "conversations", d.id));
-          await logAction("Sohbet süre doldu", d.id);
+          const data = d.data() || {};
+          const messages = Array.isArray(data.messages) ? data.messages : [];
+          const cutoff = now - CHAT_LIFETIME;
+          const kept = messages.filter(m => Math.max(tsValue(m?.createdAt), Number(m?.createdAtMs || 0)) >= cutoff);
+          if (kept.length !== messages.length){
+            if (kept.length){
+              await updateDoc(doc(db, "conversations", d.id), {
+                messages: kept,
+                updatedAt: serverTimestamp()
+              });
+            }else if (now - Number(data.createdAtMs || 0) >= CHAT_LIFETIME){
+              await deleteDoc(doc(db, "conversations", d.id));
+              await logAction("Sohbet süre doldu", d.id);
+            }else{
+              await updateDoc(doc(db, "conversations", d.id), {
+                messages: [],
+                updatedAt: serverTimestamp()
+              });
+            }
+          }
         }
       }catch{}
     }
@@ -3487,6 +3756,10 @@ Sorun: ${body}`;
           renderAll();
         }
       });
+      const uBuy = onSnapshot(query(collection(db, "buyRequests"), orderBy("createdAtMs", "desc")), snap => {
+        state.buyRequests = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        renderAll();
+      });
       const u3 = onSnapshot(query(collection(db, "conversations"), where("members", "array-contains", state.user.uid)), snap => {
         state.conversations = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         if (state.currentConversationId){
@@ -3496,9 +3769,129 @@ Sorun: ${body}`;
         prefetchConversationPeers(state.conversations).then(() => renderAll()).catch(() => renderAll());
         renderAll();
       });
-      state.unsubscribers.push(u1, u2, u3);
+      state.unsubscribers.push(u1, u2, uBuy, u3);
       if (state.view === "admin") ensureAdminLogsLoaded().then(() => renderAll()).catch(()=>{});
       if (state.promoUnlocked) ensurePromoCodesLoaded().then(() => renderAll()).catch(()=>{});
+    }
+    function toggleBuyRequestFields(){
+      if (!refs.buyRequestType) return;
+      const kind = refs.buyRequestType.value || "sale";
+      const trade = kind === "trade";
+      const offerWrap = refs.buyRequestOfferItem?.closest(".field");
+      const priceMinWrap = refs.buyRequestPriceMin?.closest(".field");
+      const priceMaxWrap = refs.buyRequestPriceMax?.closest(".field");
+      const coinMinWrap = refs.buyRequestCoinMin?.closest(".field");
+      const coinMaxWrap = refs.buyRequestCoinMax?.closest(".field");
+      if (offerWrap) offerWrap.classList.toggle("hidden", !trade);
+      if (priceMinWrap) priceMinWrap.classList.toggle("hidden", trade);
+      if (priceMaxWrap) priceMaxWrap.classList.toggle("hidden", trade);
+      if (coinMinWrap) coinMinWrap.classList.toggle("hidden", trade);
+      if (coinMaxWrap) coinMaxWrap.classList.toggle("hidden", trade);
+    }
+    function openBuyRequestModal(){
+      if (!refs.buyRequestForm) return;
+      refs.buyRequestForm.reset();
+      refs.buyRequestForm.dataset.editId = "";
+      if (refs.buyRequestModalTitle) refs.buyRequestModalTitle.textContent = "Alım isteği ekle";
+      if (refs.buyRequestType) refs.buyRequestType.value = "sale";
+      if (refs.buyRequestOfferItem) refs.buyRequestOfferItem.value = "";
+      toggleBuyRequestFields();
+      showModal(refs.modalBuyRequest);
+    }
+    async function saveBuyRequest(e){
+      e.preventDefault();
+      const editId = refs.buyRequestForm.dataset.editId || "";
+      const name = String(refs.buyRequestName.value || "").trim();
+      const description = String(refs.buyRequestDesc.value || "").trim();
+      const requestType = refs.buyRequestType?.value === "trade" ? "trade" : "sale";
+      const offeredItem = String(refs.buyRequestOfferItem?.value || "").trim();
+      const priceMin = Math.max(0, Number(refs.buyRequestPriceMin.value || 0));
+      const priceMax = Math.max(0, Number(refs.buyRequestPriceMax.value || 0));
+      const coinMin = Math.max(0, Number(refs.buyRequestCoinMin.value || 0));
+      const coinMax = Math.max(0, Number(refs.buyRequestCoinMax.value || 0));
+      if (!name || !description) return alert("İsim ve açıklama gerekli.");
+      if (requestType === "trade" && !offeredItem) return alert("Takas için vereceğin eşyanın ismini yaz.");
+      if (requestType === "sale"){
+        if (priceMin && priceMax && priceMin > priceMax) return alert("Fiyat aralığı yanlış.");
+        if (coinMin && coinMax && coinMin > coinMax) return alert("Coin aralığı yanlış.");
+      }
+      const payload = {
+        requesterId: state.user.uid,
+        requesterName: state.profile.displayName,
+        name,
+        description,
+        requestType,
+        offeredItem,
+        priceMin: requestType === "sale" ? priceMin : 0,
+        priceMax: requestType === "sale" ? priceMax : 0,
+        coinMin: requestType === "sale" ? coinMin : 0,
+        coinMax: requestType === "sale" ? coinMax : 0,
+        status: "open",
+        createdAtMs: editId ? (state.buyRequests.find(x => x.id === editId)?.createdAtMs || Date.now()) : Date.now(),
+        updatedAtMs: getRealNowMs(),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+      if (editId){
+        await updateDoc(doc(db, "buyRequests", editId), payload);
+        await logAction("Alım isteği düzenlendi", `${state.profile.displayName} → ${name}`);
+      }else{
+        await addDoc(collection(db, "buyRequests"), payload);
+        await logAction("Alım isteği eklendi", `${state.profile.displayName} → ${name}`);
+      }
+      hideModal(refs.modalBuyRequest);
+      renderAll();
+    }
+    async function removeBuyRequest(id){
+      const item = state.buyRequests.find(x => x.id === id);
+      if (!item) return;
+      if (item.requesterId !== state.user?.uid && !state.isAdmin) return;
+      if (!confirm(`"${item.name || 'Alım isteği'}" silinsin mi?`)) return;
+      await deleteDoc(doc(db, "buyRequests", id));
+      await logAction("Alım isteği silindi", `${state.profile?.displayName || "user"} → ${item.name || id}`);
+      renderAll();
+    }
+    async function messageBuyRequest(id){
+      const item = state.buyRequests.find(x => x.id === id);
+      if (!item || !state.user) return;
+      if (item.requesterId === state.user.uid) {
+        alert("Bu istek sana ait.");
+        return;
+      }
+      const target = await findUserByDisplayName(item.requesterName);
+      if (!target) return alert("İstek sahibi bulunamadı.");
+      const subjectId = `buy-request:${id}`;
+      const subjectName = item.name || "Alım isteği";
+      let conv = findConversationByPeer(target.uid);
+      if (!conv){
+        const ref = await addDoc(collection(db, "conversations"), {
+          listingId: subjectId,
+          latestListingId: subjectId,
+          latestListingName: subjectName,
+          members: [state.user.uid, target.uid],
+          memberNames: Array.from(new Set([state.profile.displayName, target.displayName].filter(Boolean))),
+          messages: [],
+          lastMessage: "",
+          unreadBy: {},
+          readBy: { [state.user.uid]: getRealNowMs() },
+          createdAtMs: getRealNowMs(),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+        conv = { id: ref.id, listingId: subjectId, latestListingId: subjectId, latestListingName: subjectName, members: [state.user.uid, target.uid], memberNames: [state.profile.displayName, target.displayName], messages: [] };
+      }else{
+        await updateDoc(doc(db, "conversations", conv.id), {
+          listingId: subjectId,
+          latestListingId: subjectId,
+          latestListingName: subjectName,
+          updatedAt: serverTimestamp()
+        }).catch(()=>{});
+      }
+      state.currentConversationId = conv.id;
+      state.currentConversationCache = conv;
+      setView("messages");
+      await markConversationRead(conv.id);
+      renderAll();
     }
     async function openConversation(listingId){
       if (!state.user) return;
@@ -4093,6 +4486,11 @@ Sorun: ${body}`;
     refs.btnRefresh.onclick = async () => { await cleanupExpired(); renderAll(); };
     refs.btnSendMessage.onclick = () => sendMessage();
     refs.btnDeleteConversation.onclick = deleteConversation;
+    if (refs.btnOpenBuyRequest) refs.btnOpenBuyRequest.onclick = openBuyRequestModal;
+    if (refs.buyRequestType) refs.buyRequestType.onchange = toggleBuyRequestFields;
+    toggleBuyRequestFields();
+    if (refs.btnCloseBuyRequest) refs.btnCloseBuyRequest.onclick = () => hideModal(refs.modalBuyRequest);
+    if (refs.buyRequestForm) refs.buyRequestForm.onsubmit = saveBuyRequest;
     refs.btnSubmitReview.onclick = submitReview;
     refs.btnWatchAd.onclick = openCoinHub;
     refs.searchInput.oninput = renderAll;
@@ -4120,6 +4518,9 @@ Sorun: ${body}`;
     });
     refs.modalBuyOptions.addEventListener("click", (e) => {
       if (e.target === refs.modalBuyOptions) hideModal(refs.modalBuyOptions);
+    });
+    refs.modalBuyRequest.addEventListener("click", (e) => {
+      if (e.target === refs.modalBuyRequest) hideModal(refs.modalBuyRequest);
     });
     refs.btnCloseAd.onclick = () => stopAdWatch('İptal edildi.');
     if (refs.btnCloseCoinHub) refs.btnCloseCoinHub.onclick = () => hideModal(refs.modalCoinHub);
@@ -4187,6 +4588,8 @@ Sorun: ${body}`;
     window.__openSeller = openSellerProfile;
     window.__buyListing = buyListing;
     window.__buyCoinPackage = buyCoinPackage;
+    window.__messageBuyRequest = messageBuyRequest;
+    window.__removeBuyRequest = removeBuyRequest;
     window.__approveCoinOrder = approveCoinOrder;
     window.__openListingDetail = openListingDetail;
     window.__setDetailImage = setDetailImage;
@@ -4230,6 +4633,7 @@ Sorun: ${body}`;
         state.profile = null;
         state.isAdmin = false;
         state.userCache = {};
+        state.buyRequests = [];
         state.currentConversationCache = null;
         state.currentConversationId = null;
         state.lastTaskSyncDay = "";
@@ -4249,6 +4653,7 @@ Sorun: ${body}`;
         refs.modalSeller.classList.remove("show");
         refs.modalProfileEdit.classList.remove("show");
         refs.modalDetail.classList.remove("show");
+        hideModal(refs.modalBuyRequest);
         document.body.style.overflow = "";
       }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
