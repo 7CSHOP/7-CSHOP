@@ -1004,6 +1004,18 @@
                     <div class="panel-inner">
                       <div class="section-title">
                         <div>
+                          <h3>Hesaplar</h3>
+                          <p>Coin gör, azalt, hesabı sil</p>
+                        </div>
+                      </div>
+                      <div class="message-search" style="margin-bottom:12px">
+                        <input id="adminUserSearch" class="input" placeholder="Kullanıcı ara..." />
+                        <div class="hint">İsim, e-posta, uid veya coin değerine göre filtrelenir.</div>
+                      </div>
+                      <div id="adminUsers" class="list"></div>
+                      <div class="hr"></div>
+                      <div class="section-title">
+                        <div>
                           <h3>Tüm ilanlar</h3>
                           <p>Yönetim işlemleri</p>
                         </div>
@@ -1513,6 +1525,8 @@
       profilePhotoPill: $("profilePhotoPill"),
       adminMenu: $("adminMenu"),
       helpMenu: $("helpMenu"),
+      adminUserSearch: $("adminUserSearch"),
+      adminUsers: $("adminUsers"),
       adminListings: $("adminListings"),
       adminLog: $("adminLog"),
       modalListing: $("modalListing"),
@@ -2948,6 +2962,55 @@
         </div>
       `).join("") || `<div class="feed-item">Kayıt yok.</div>`;
     }
+
+    async function ensureAdminUsersLoaded(){
+      try{
+        const snap = await getDocs(collection(db, "users"));
+        state.users = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+        for (const user of state.users){
+          cacheUserDoc(user);
+        }
+      }catch{}
+      return state.users;
+    }
+
+    function adminUserSearchText(user){
+      return [
+        user?.displayName || "",
+        user?.email || "",
+        user?.uid || "",
+        String(user?.coinBalance || 0)
+      ].join(" ").toLowerCase();
+    }
+
+    function renderAdminUsers(){
+      if (!refs.adminUsers) return;
+      if (!state.users.length && state.isAdmin && state.view === "admin"){
+        ensureAdminUsersLoaded().then(() => renderAll()).catch(()=>{});
+      }
+      const q = String(refs.adminUserSearch?.value || "").trim().toLowerCase();
+      const items = sortDescByDate([...(state.users || [])], "updatedAt")
+        .filter(u => u?.uid !== state.user?.uid)
+        .filter(u => !q || adminUserSearchText(u).includes(q));
+      refs.adminUsers.innerHTML = items.map(user => {
+        const coin = Number(user.coinBalance || 0);
+        const name = user.displayName || "Bilinmeyen";
+        return `
+          <div class="item">
+            <div class="item-head">
+              <strong>${escapeHtml(name)}</strong>
+              <span>${escapeHtml(formatCoin(coin))}${user.isAdmin ? " • Yönetici" : ""}</span>
+            </div>
+            <div class="tiny">${escapeHtml(user.email || "E-posta yok")} • ${escapeHtml(user.uid || "")}</div>
+            <div class="item-actions">
+              <button class="btn warn" type="button" onclick="window.__decreaseUserCoin('${user.uid}')">Coin azalt</button>
+              <button class="btn bad" type="button" onclick="window.__deleteUserAccount('${user.uid}')">Hesabı sil</button>
+            </div>
+          </div>
+        `;
+      }).join("") || `<div class="feed-item">Kayıt yok.</div>`;
+    }
+
     function renderAdminListings(){
       refs.adminListings.innerHTML = sortDescByDate(state.listings).map(item => `
         <div class="item">
@@ -2962,6 +3025,71 @@
           </div>
         </div>
       `).join("") || `<div class="feed-item">Kayıt yok.</div>`;
+    }
+
+    async function decreaseUserCoin(userId){
+      const user = (state.users || []).find(u => u.uid === userId);
+      if (!user) return alert("Kullanıcı bulunamadı.");
+      const raw = prompt(`${user.displayName || "Kullanıcı"} için düşülecek coin miktarı:`, "1");
+      const amount = Math.max(0, Math.floor(Number(raw || 0)));
+      if (!amount) return;
+      if (!confirm(`${user.displayName || "Kullanıcı"} hesabından ${amount} Coin düşülsün mü?`)) return;
+      try{
+        const next = await saveCoinDelta(userId, -amount);
+        await logAction("Coin azaltıldı", `${state.profile.displayName} → ${user.displayName || userId} (-${amount})`);
+        await ensureAdminUsersLoaded();
+        renderAll();
+        alert(`Yeni bakiye: ${formatCoin(next)}`);
+      }catch(err){
+        alert("Coin düşürülemedi: " + firebaseErrorMessage(err));
+      }
+    }
+
+    async function deleteUserAccount(userId){
+      const user = (state.users || []).find(u => u.uid === userId);
+      if (!user) return alert("Kullanıcı bulunamadı.");
+      if (userId === state.user?.uid) return alert("Kendi hesabını buradan silemezsin.");
+      const ok = confirm(`${user.displayName || "Bu hesap"} ve ilgili ilanları silinsin mi? Bu işlem geri alınmaz.`);
+      if (!ok) return;
+      try{
+        const listingSnap = await getDocs(collection(db, "listings"));
+        const userListings = listingSnap.docs.filter(d => d.data()?.ownerId === userId);
+        for (const d of userListings){
+          try{
+            const reviewSnap = await getDocs(collection(db, "listings", d.id, "reviews"));
+            for (const r of reviewSnap.docs){
+              await deleteDoc(doc(db, "listings", d.id, "reviews", r.id));
+            }
+          }catch{}
+          await deleteDoc(doc(db, "listings", d.id));
+        }
+
+        const buySnap = await getDocs(collection(db, "buyRequests"));
+        for (const d of buySnap.docs){
+          const data = d.data() || {};
+          if (data.fromUid === userId || data.ownerId === userId){
+            await deleteDoc(doc(db, "buyRequests", d.id));
+          }
+        }
+
+        const convSnap = await getDocs(collection(db, "conversations"));
+        for (const d of convSnap.docs){
+          const data = d.data() || {};
+          if ((data.members || []).includes(userId)){
+            await deleteDoc(doc(db, "conversations", d.id));
+          }
+        }
+
+        await deleteDoc(doc(db, "users", userId));
+        state.users = (state.users || []).filter(u => u.uid !== userId);
+        if (state.userCache) delete state.userCache[userId];
+        await logAction("Hesap silindi", `${state.profile.displayName} → ${user.displayName || userId}`);
+        await ensureAdminUsersLoaded();
+        renderAll();
+        alert("Hesap silindi.");
+      }catch(err){
+        alert("Hesap silinemedi: " + firebaseErrorMessage(err));
+      }
     }
     function renderMyAds(){
       const mine = myListings();
@@ -2997,6 +3125,7 @@
       if (state.view === "profile") { renderProfile(); renderPromoManager().catch(()=>{}); }
       if (state.view === "tasks") renderTasks();
       if (state.view === "admin") {
+        renderAdminUsers();
         renderAdminListings();
         renderAdminLog();
       }
@@ -3765,7 +3894,10 @@ Sorun: ${body}`;
         renderAll();
       });
       state.unsubscribers.push(u1, u2, uBuy, u3);
-      if (state.view === "admin") ensureAdminLogsLoaded().then(() => renderAll()).catch(()=>{});
+      if (state.view === "admin") {
+        ensureAdminLogsLoaded().then(() => renderAll()).catch(()=>{});
+        ensureAdminUsersLoaded().then(() => renderAll()).catch(()=>{});
+      }
       if (state.promoUnlocked) ensurePromoCodesLoaded().then(() => renderAll()).catch(()=>{});
     }
     function toggleBuyRequestFields(){
@@ -4571,6 +4703,9 @@ Sorun: ${body}`;
     refs.promoResetButton.onclick = clearPromoForm;
     refs.helpForm.onsubmit = async (e) => { e.preventDefault(); await openHelpConversation(); };
     refs.btnMessageSeller.onclick = messageSeller;
+    refs.adminUserSearch?.addEventListener("input", () => {
+      if (state.view === "admin") renderAll();
+    });
     document.querySelectorAll(".menu button").forEach(btn => {
       btn.onclick = () => setView(btn.dataset.view);
     });
@@ -4580,6 +4715,8 @@ Sorun: ${body}`;
     window.__toggleListing = toggleListing;
     window.__editListing = editListing;
     window.__selectForAdmin = selectForAdmin;
+    window.__decreaseUserCoin = decreaseUserCoin;
+    window.__deleteUserAccount = deleteUserAccount;
     window.__openSeller = openSellerProfile;
     window.__buyListing = buyListing;
     window.__buyCoinPackage = buyCoinPackage;
