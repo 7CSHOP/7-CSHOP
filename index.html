@@ -161,11 +161,13 @@
       overflow:hidden;
       box-shadow:var(--shadow);
       transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-      will-change:transform;
-      backface-visibility:hidden;
-      transform:translateZ(0);
+      animation:cardEnter .45s ease both;
     }
-    .card:hover{transform:translate3d(0,-3px,0);box-shadow:0 18px 36px rgba(17,24,39,.12);border-color:#cbd5e1}
+    @keyframes cardEnter{
+      from{opacity:0;transform:translateY(12px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+    .card:hover{transform:translateY(-3px);box-shadow:0 18px 36px rgba(17,24,39,.12);border-color:#cbd5e1}
     .card img{width:100%;height:220px;object-fit:cover;background:#f3f4f6}
     .card-body{padding:16px;display:grid;gap:10px}
     .meta{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px;color:var(--muted)}
@@ -263,34 +265,6 @@
     .preview{
       margin-top:8px;width:100%;max-height:180px;border-radius:16px;border:1px dashed var(--line);
       object-fit:cover;background:#f8fafc
-    }
-    .ad-video{
-      width:100%;
-      aspect-ratio:16/9;
-      border-radius:18px;
-      border:1px solid rgba(253,224,71,.45);
-      background:#000;
-      object-fit:cover;
-      display:block;
-      pointer-events:none;
-      user-select:none;
-    }
-    .ad-mini-video{
-      width:100%;
-      max-height:180px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:#000;
-      object-fit:cover;
-      display:block;
-    }
-    .admin-two{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:16px;
-    }
-    @media (max-width:900px){
-      .admin-two{grid-template-columns:1fr}
     }
     .price-wrap{display:grid;gap:6px;align-items:start}
     .price-old{
@@ -432,9 +406,7 @@
       position:relative;
       overflow:hidden;
       transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-      will-change:transform;
-      backface-visibility:hidden;
-      transform:translateZ(0);
+      animation:cardEnter .45s ease both;
     }
     .request-card::before{
       content:"";
@@ -455,7 +427,7 @@
     }
     .request-card.trade::before{background:linear-gradient(180deg,#34d399,#059669)}
     .request-card.closed{opacity:.72;filter:saturate(.9)}
-    .request-card:hover{transform:translate3d(0,-2px,0);box-shadow:0 14px 28px rgba(17,24,39,.08)}
+    .request-card:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(17,24,39,.08)}
     .request-headline{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
     .request-owner{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800;background:#f8fafc;border:1px solid var(--line)}
     .request-owner.sale{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
@@ -468,11 +440,6 @@
     .request-card .request-meta{font-size:12px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
     .request-card .request-actions{display:flex;gap:8px;flex-wrap:wrap}
     .request-card .request-actions .btn{padding:10px 12px;border-radius:14px;font-size:13px}
-
-    @media (prefers-reduced-motion: reduce){
-      *{animation:none !important;transition:none !important;scroll-behavior:auto !important}
-      .card,.request-card,.panel{transform:none !important}
-    }
 
     @media (max-width:900px){
       .detail-top{grid-template-columns:1fr}
@@ -1056,80 +1023,6 @@
                     </div>
                   </div>
                 </div>
-
-                <div class="panel" style="box-shadow:none;margin-top:16px">
-                  <div class="panel-inner">
-                    <div class="section-title">
-                      <div>
-                        <h3>Video reklam ve rol yönetimi</h3>
-                        <p>3 günde en fazla 3 video reklam yükle, kullanıcı rolünü düzenle</p>
-                      </div>
-                    </div>
-                    <div class="admin-two">
-                      <div class="panel" style="box-shadow:none">
-                        <div class="panel-inner">
-                          <div class="section-title">
-                            <div>
-                              <h3>Video reklam ekle</h3>
-                              <p>Yüklenen video kullanıcıya gösterilir</p>
-                            </div>
-                          </div>
-                          <form id="adminAdForm" class="form">
-                            <div class="two">
-                              <div class="field">
-                                <label>Reklam başlığı</label>
-                                <input id="adminAdBrandInput" class="input" maxlength="30" placeholder="Örn: Yaz kampanyası" />
-                              </div>
-                              <div class="field">
-                                <label>Kısa metin</label>
-                                <input id="adminAdTitleInput" class="input" maxlength="60" placeholder="Örn: Yeni ürün tanıtımı" />
-                              </div>
-                            </div>
-                            <div class="field">
-                              <label>Açıklama</label>
-                              <textarea id="adminAdCopyInput" class="input" maxlength="240" placeholder="Kısa açıklama yaz"></textarea>
-                            </div>
-                            <div class="field">
-                              <label>Video dosyası</label>
-                              <input id="adminAdVideoFile" class="input" type="file" accept="video/*" />
-                              <div class="hint">Video Firestore'a yazılmaz; tarayıcıdaki yerel depolamaya kaydedilir. 50 MB'a kadar desteklenir.</div>
-                            </div>
-                            <div class="field">
-                              <label>Önizleme</label>
-                              <video id="adminAdPreview" class="ad-mini-video hidden" muted playsinline controls></video>
-                            </div>
-                            <div class="field">
-                              <label><input id="adminAdActiveInput" type="checkbox" checked /> Aktif</label>
-                            </div>
-                            <div class="row">
-                              <button class="btn" type="submit">Kaydet</button>
-                              <button id="adminAdResetButton" class="btn secondary" type="button">Temizle</button>
-                            </div>
-                          </form>
-                        </div>
-                      </div>
-                      <div class="panel" style="box-shadow:none">
-                        <div class="panel-inner">
-                          <div class="section-title">
-                            <div>
-                              <h3>Kullanıcı rolü</h3>
-                              <p>Üye veya işçi yap</p>
-                            </div>
-                          </div>
-                          <div id="adminUsers" class="list"></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="hr"></div>
-                    <div class="section-title">
-                      <div>
-                        <h3>Yüklenen video reklamlar</h3>
-                        <p>Buradan tüm eklenen reklamları görür, düzenler ve silersin</p>
-                      </div>
-                    </div>
-                    <div id="adminAds" class="list"></div>
-                  </div>
-                </div>
               </div>
               <div id="viewHelp" class="hidden">
                 <div class="panel" style="box-shadow:none">
@@ -1465,8 +1358,8 @@
   <div id="modalAd" class="modal">
     <div class="modal-card" style="width:min(760px,100%)">
       <div class="modal-head">
-        <strong>Reklam ile coin kazan</strong>
-        <span class="tiny" aria-hidden="true">Reklam bitene kadar bekle.</span>
+        <strong>Reklam izle ve coin kazan</strong>
+        <button id="btnCloseAd" class="chip">İptal</button>
       </div>
       <div class="modal-body">
         <div class="ad-viewport">
@@ -1487,7 +1380,7 @@
       <div class="modal-body">
         <div class="coin-hub-hero">
           <div class="coin-hub-title">Coin almak için bir yöntem seç</div>
-          <div class="coin-hub-sub">Sadece TL ile coin paketi alınır; coin'i TL'ye çevirme yok. Reklamla +1 coin kazanabilirsin.</div>
+          <div class="coin-hub-sub">Sadece TL ile coin paketi alınır; coin'i TL'ye çevirme yok. Günde 1 reklam izleyip 1 coin de kazanabilirsin.</div>
           <div class="coin-choice-grid">
             <div class="coin-choice-card primary">
               <strong>TL ile coin al</strong>
@@ -1496,11 +1389,10 @@
             </div>
             <div class="coin-choice-card secondary">
               <strong>Reklam ile coin kazan</strong>
-              <div class="tiny">Günde 1 reklam izleyip 1 coin al.</div>
-              <button id="btnOpenCoinAd" class="btn secondary" type="button">Reklamı izle</button>
+              <div class="tiny">Günde 1 reklam izleyip 1 coin al. Reklam akışı aynı kalır.</div>
+              <button id="btnOpenCoinAd" class="btn secondary" type="button">Günde 1 reklam izleyip 1 coin al</button>
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -1623,16 +1515,6 @@
       helpMenu: $("helpMenu"),
       adminListings: $("adminListings"),
       adminLog: $("adminLog"),
-      adminAdForm: $("adminAdForm"),
-      adminAdBrandInput: $("adminAdBrandInput"),
-      adminAdTitleInput: $("adminAdTitleInput"),
-      adminAdCopyInput: $("adminAdCopyInput"),
-      adminAdVideoFile: $("adminAdVideoFile"),
-      adminAdPreview: $("adminAdPreview"),
-      adminAdActiveInput: $("adminAdActiveInput"),
-      adminAdResetButton: $("adminAdResetButton"),
-      adminUsers: $("adminUsers"),
-      adminAds: $("adminAds"),
       modalListing: $("modalListing"),
       btnCloseModal: $("btnCloseModal"),
       listingForm: $("listingForm"),
@@ -1666,7 +1548,6 @@
       modalDetail: $("modalDetail"),
       modalBuyOptions: $("modalBuyOptions"),
       modalCoinHub: $("modalCoinHub"),
-      coinHubAdPreview: $("coinHubAdPreview"),
       btnCloseCoinHub: $("btnCloseCoinHub"),
       btnOpenCoinPackages: $("btnOpenCoinPackages"),
       btnOpenCoinAd: $("btnOpenCoinAd"),
@@ -1745,12 +1626,6 @@
       buyRequests: [],
       logs: [],
       users: [],
-      videoAds: [],
-      activeAdWatchAd: null,
-      adminAdDraftVideo: "",
-      adminAdDraftFile: null,
-      adminAdDraftVideoBlobId: "",
-      videoAdObjectUrlCache: {},
       userCache: {},
       currentConversationId: null,
       currentListingId: null,
@@ -1778,7 +1653,6 @@
     const LISTING_LIFETIME = 20 * DAY;
     const CHAT_LIFETIME = 3 * DAY;
     const BUY_REQUEST_LIFETIME = 15 * DAY;
-    const VIDEO_AD_WINDOW = 3 * DAY;
     const MANAGER_KEY = "alper9119bulut";
     const ADMIN_BOOTSTRAP_NAME = "Alper";
     const ADMIN_BOOTSTRAP_PASSWORD = "Alper9119";
@@ -1918,12 +1792,12 @@
       refs.whoami.classList.remove("hidden");
       refs.coinBadge.classList.remove('hidden');
       refs.adminMenu.classList.toggle("hidden", !state.isAdmin);
-      refs.whoami.textContent = `${state.profile?.displayName || "Üye"} • ${roleLabel(state.profile?.role || "member", state.isAdmin)}`;
+      refs.whoami.textContent = `${state.profile?.displayName || "Üye"}${state.isAdmin ? " • Yönetici" : ""}`;
     }
     function setView(view){
       state.view = view;
       document.querySelectorAll(".menu button").forEach(b => b.classList.toggle("active", b.dataset.view === view));
-      if (view === "admin") { ensureAdminLogsLoaded().then(()=>renderAll()).catch(()=>{}); ensureAdminUsersLoaded().then(()=>renderAll()).catch(()=>{}); ensureVideoAdsLoaded().then(()=>renderAll()).catch(()=>{}); }
+      if (view === "admin") ensureAdminLogsLoaded().catch(()=>{});
       if (view === "profile" && state.promoUnlocked) ensurePromoCodesLoaded().catch(()=>{});
       const map = {
         shop:["Dükkan","Yayınlanan ilanları görüntüle."],
@@ -2023,7 +1897,6 @@
         uid: user.uid,
         displayName,
         isAdmin: nextIsAdmin,
-        role: normalizeRole(existing.role || "member"),
         email: user.email || null,
         lastSeenAt: serverTimestamp(),
         updatedAt: serverTimestamp()
@@ -2059,13 +1932,6 @@
     }
     function normalizeType(t){
       return t === "sell" ? "satış" : t === "swap" ? "takas" : "takasTL";
-    }
-    function normalizeRole(role){
-      return role === "worker" ? "worker" : "member";
-    }
-    function roleLabel(role, isAdmin = false){
-      if (isAdmin) return "Yönetici";
-      return normalizeRole(role) === "worker" ? "İşçi" : "Üye";
     }
     function getRealNowMs(){
       if (state.serverClock?.anchorServerMs && state.serverClock?.anchorPerfMs){
@@ -2611,7 +2477,7 @@
         { key:"seven-login", title:"7 gün giriş", desc:"7 gün üst üste giriş yap", current: Math.min(p.loginStreak || 0, 7), target: 7 },
         { key:"one-hour", title:"1 saat aktif", desc:"Sitede 1 saat kal", current: p.sessionMs || 0, target: 60 * 60 * 1000 },
         { key:"twentyfour", title:"24 saat gezin", desc:"Toplam 24 saat gezin", current: p.browseMs || 0, target: 24 * 60 * 60 * 1000 },
-        { key:"ad", title:"Reklam görevi", desc:"Bugün 1 reklam izle", current: p.dailyAdDate === today ? 1 : 0, target: 1 }
+        { key:"ad", title:"Günün reklamı", desc:"Bugün 1 reklam izle", current: p.dailyAdDate === today ? 1 : 0, target: 1 }
       ];
     }
     function renderAchievements(){
@@ -2741,14 +2607,14 @@
       const initials = (p.displayName || "?").trim().slice(0,2).toUpperCase();
       refs.profileNameText.textContent = p.displayName || "-";
       refs.profileEmailText.textContent = p.email || "E-posta görünmüyor";
-      refs.profileRolePill.textContent = roleLabel(p.role || "member", state.isAdmin);
+      refs.profileRolePill.textContent = state.isAdmin ? "Yönetici" : "Üye";
       refs.profilePhotoPill.textContent = avatar ? "PP yüklü" : "PP yok";
       refs.profileAvatarBox.innerHTML = avatar
         ? `<img src="${escapeHtml(avatar)}" alt="Profil fotoğrafı">`
         : `<span class="avatar-fallback">${escapeHtml(initials)}</span>`;
       refs.profileBox.innerHTML = `
         <div class="item"><div class="item-head"><strong>İsim</strong></div><span>${escapeHtml(p.displayName || "")}</span></div>
-        <div class="item"><div class="item-head"><strong>Rol</strong></div><span>${roleLabel(p.role || "member", state.isAdmin)}</span></div>
+        <div class="item"><div class="item-head"><strong>Rol</strong></div><span>${state.isAdmin ? "Yönetici" : "Üye"}</span></div>
         <div class="item"><div class="item-head"><strong>Kullanıcı ID</strong></div><span>${escapeHtml(p.uid || "")}</span></div>
         <div class="item"><div class="item-head"><strong>PP durumu</strong></div><span>${avatar ? "Yüklü" : "Yok"}</span></div>
         <div class="item"><div class="item-head"><strong>Son aktif</strong></div><span>${escapeHtml(formatLastSeen(p.lastSeenAt))}</span></div>
@@ -2896,11 +2762,7 @@
         </div>
       `).join("");
     }
-    async function renderCoinHubPreview(){
-      return;
-    }
-    async function openCoinHub(){
-      await renderCoinHubPreview();
+    function openCoinHub(){
       if (refs.modalCoinHub) showModal(refs.modalCoinHub);
     }
     function openCoinPackages(){
@@ -2956,47 +2818,6 @@
 
     function renderAdFrame(index = 0, remaining = 60){
       if (!refs.adFrame) return;
-      const currentVideoAd = state.activeAdWatchAd || null;
-      if (currentVideoAd){
-        const title = formatVideoAdTitle(currentVideoAd);
-        refs.adFrame.innerHTML = `
-          <div class="ad-kicker">Video reklam</div>
-          <div class="ad-carousel">
-            <div class="ad-feature active">
-              <div class="ad-pill">${escapeHtml(currentVideoAd.active === false ? "Pasif" : "Sponsor • Video")}</div>
-              <div class="ad-brand">${escapeHtml(currentVideoAd.brand || "Reklam")}</div>
-              <div class="ad-headline">${escapeHtml(currentVideoAd.headline || currentVideoAd.title || title)}</div>
-              <div class="ad-copy">${escapeHtml(currentVideoAd.copy || "")}</div>
-              <video class="ad-video" data-video-ad-id="${escapeHtml(currentVideoAd.id || "")}" playsinline preload="auto" disablepictureinpicture controlslist="nodownload noplaybackrate noremoteplayback nofullscreen"></video>
-              <div class="ad-actions">
-                <span class="ad-pill">Kalan: ${escapeHtml(String(remaining))} sn</span>
-                <span class="ad-pill">${escapeHtml(title)}</span>
-              </div>
-            </div>
-          </div>
-          <div class="ad-count" id="adCountdown">${escapeHtml(String(remaining))}</div>
-          <div class="ad-note">Video bitene kadar açık bırak.</div>
-        `;
-        hydrateVideoAdVideos(refs.adFrame).then(() => {
-          const video = refs.adFrame?.querySelector('video[data-video-ad-id]');
-          if (video && !video.src) {
-            refs.adFrame.innerHTML = `
-              <div class="ad-kicker">Video reklam</div>
-              <div class="ad-carousel">
-                <div class="ad-feature active">
-                  <div class="ad-pill">Sponsor • Video</div>
-                  <div class="ad-brand">${escapeHtml(currentVideoAd.brand || "Reklam")}</div>
-                  <div class="ad-headline">${escapeHtml(currentVideoAd.headline || currentVideoAd.title || title)}</div>
-                  <div class="ad-copy">Video kaynağı bu cihazda okunamadı. Sponsor reklam gösteriliyor.</div>
-                </div>
-              </div>
-              <div class="ad-count" id="adCountdown">${escapeHtml(String(remaining))}</div>
-              <div class="ad-note">Video bitene kadar açık bırak.</div>
-            `;
-          }
-        }).catch(()=>{});
-        return;
-      }
       const total = Math.max(1, SPONSOR_ADS.length);
       const active = ((index % total) + total) % total;
       const current = SPONSOR_ADS[active] || SPONSOR_ADS[0];
@@ -3045,7 +2866,6 @@
     function stopAdWatch(message){
       if (state.adWatch?.timer) clearInterval(state.adWatch.timer);
       state.adWatch = null;
-      state.activeAdWatchAd = null;
       if (refs.modalAd) hideModal(refs.modalAd);
       if (message && refs.adStatusText) refs.adStatusText.textContent = message;
     }
@@ -3058,108 +2878,22 @@
           taskState.updatedAtMs = getRealNowMs();
           return { rewardCoins: 1 };
         });
-        stopAdWatch(result?.rewardCoins > 0 ? 'Coin eklendi.' : 'Bugün ödül zaten alınmış.');
+        stopAdWatch('Coin eklendi.');
         if (result?.rewardCoins > 0) await logAction('Reklam ödülü', `${state.profile?.displayName || 'user'} +1 Coin`);
-        await loadCurrentUserProfile().catch(()=>{});
         renderAll();
-        if (result?.rewardCoins > 0) {
-          alert('Reklam tamamlandı. 1 Coin eklendi.');
-        } else {
-          alert('Bugün reklam ödülünü zaten almışsın.');
-        }
+        alert('Reklam tamamlandı. 1 Coin eklendi.');
       }catch(err){
         stopAdWatch('Ödül alınamadı.');
         alert('Reklam ödülü verilemedi: ' + firebaseErrorMessage(err));
       }
     }
-    async function startAdWatch(){
+    function startAdWatch(){
       if (!state.user) return;
       const p = normalizeTaskState(state.profile?.taskState);
       const today = dateKeyFromMs(getRealNowMs());
       if (p.dailyAdDate === today) return alert('Bugün reklam ödülünü zaten aldın.');
       if (state.adWatch) return;
-      if (!Array.isArray(state.videoAds) || !state.videoAds.length){
-        await ensureVideoAdsLoaded().catch(()=>{});
-      }
-      state.activeAdWatchAd = pickRandomVideoAd();
       if (refs.modalAd) showModal(refs.modalAd);
-
-      const currentVideoAd = state.activeAdWatchAd;
-      if (currentVideoAd){
-        renderAdFrame(0, 0);
-        await hydrateVideoAdVideos(refs.adFrame).catch(()=>{});
-        const video = refs.adFrame?.querySelector('video[data-video-ad-id]');
-        let finished = false;
-        let timer = null;
-        const finishOnce = async () => {
-          if (finished) return;
-          finished = true;
-          if (timer) clearInterval(timer);
-          if (refs.adProgressFill) refs.adProgressFill.style.width = '100%';
-          state.adWatch = null;
-          await finishAdWatch();
-        };
-        const syncProgress = () => {
-          if (!video || !Number.isFinite(video.duration) || video.duration <= 0) return;
-          const total = Math.max(1, Math.ceil(video.duration));
-          const remaining = Math.max(0, Math.ceil(video.duration - (video.currentTime || 0)));
-          if (refs.adStatusText) refs.adStatusText.textContent = `Video reklam gösteriliyor... Kalan ${remaining} sn.`;
-          if (refs.adFrame) {
-            const count = refs.adFrame.querySelector('#adCountdown');
-            if (count) count.textContent = String(remaining);
-            const note = refs.adFrame.querySelector('.ad-note');
-            if (note) note.textContent = 'Video bitene kadar açık bırak.';
-          }
-          if (refs.adProgressFill) {
-            const progress = Math.max(0, Math.min(100, ((video.currentTime || 0) / total) * 100));
-            refs.adProgressFill.style.width = `${progress}%`;
-          }
-        };
-        if (video){
-          prepareLockedAdVideo(video, finishOnce);
-          const startPlayback = async () => {
-            try { video.currentTime = 0; } catch {}
-            try { await video.play(); } catch {}
-          };
-          video.addEventListener('timeupdate', syncProgress);
-          video.addEventListener('ended', finishOnce, { once: true });
-          syncProgress();
-          if (video.readyState >= 2) {
-            await startPlayback();
-          } else {
-            await new Promise((resolve) => {
-              const onReady = async () => {
-                video.removeEventListener('loadedmetadata', onReady);
-                video.removeEventListener('canplay', onReady);
-                await startPlayback();
-                resolve();
-              };
-              video.addEventListener('loadedmetadata', onReady, { once: true });
-              video.addEventListener('canplay', onReady, { once: true });
-              setTimeout(onReady, 1200);
-            });
-          }
-          timer = setInterval(() => {
-            if (document.hidden || !document.hasFocus()){
-              clearInterval(timer);
-              state.adWatch = null;
-              state.activeAdWatchAd = null;
-              hideModal(refs.modalAd);
-              alert('Reklam ödülü için sekme açık kalmalı.');
-              return;
-            }
-            if (video.ended) {
-              clearInterval(timer);
-              return;
-            }
-            syncProgress();
-          }, 250);
-          state.adWatch = { timer, adId: currentVideoAd.id || null };
-          if (refs.adStatusText) refs.adStatusText.textContent = 'Video reklam yükleniyor... Ses açık kalacak.';
-          return;
-        }
-      }
-
       let remaining = 60;
       let index = 0;
       renderAdFrame(index, remaining);
@@ -3169,7 +2903,6 @@
         if (document.hidden || !document.hasFocus()){
           clearInterval(timer);
           state.adWatch = null;
-          state.activeAdWatchAd = null;
           hideModal(refs.modalAd);
           alert('Reklam ödülü için sekme açık kalmalı.');
           return;
@@ -3184,7 +2917,7 @@
           finishAdWatch();
         }
       }, 1000);
-      state.adWatch = { timer, adId: null };
+      state.adWatch = { timer };
     }
     async function tickTaskTime(){
       if (!state.user || document.hidden || !document.hasFocus()) return;
@@ -3230,55 +2963,6 @@
         </div>
       `).join("") || `<div class="feed-item">Kayıt yok.</div>`;
     }
-    function renderAdminUsers(){
-      if (!refs.adminUsers) return;
-      const users = (state.users || []).slice().sort((a, b) => String(a.displayName || "").localeCompare(String(b.displayName || ""), "tr"));
-      refs.adminUsers.innerHTML = users.map(user => {
-        const isMe = user.uid === state.user?.uid;
-        const role = normalizeRole(user.role || "member");
-        const locked = !!user.isAdmin;
-        return `
-          <div class="item">
-            <div class="item-head">
-              <strong>${escapeHtml(user.displayName || "Kullanıcı")}</strong>
-              <span>${escapeHtml(user.email || "")}</span>
-            </div>
-            <div class="tiny">Rol: ${escapeHtml(roleLabel(role, locked))}${locked ? " • Yönetici" : ""}</div>
-            <div class="item-actions">
-              <select class="input" style="max-width:180px" data-role-user="${escapeHtml(user.uid)}" ${locked ? "disabled" : ""}>
-                <option value="member" ${role === "member" ? "selected" : ""}>Üye</option>
-                <option value="worker" ${role === "worker" ? "selected" : ""}>İşçi</option>
-              </select>
-              <button class="btn secondary" type="button" onclick="window.__saveUserRole('${user.uid}')" ${locked ? "disabled" : ""}>Kaydet</button>
-              ${isMe ? '<span class="badge mine">Sen</span>' : ""}
-            </div>
-          </div>
-        `;
-      }).join("") || `<div class="feed-item">Kullanıcı yok.</div>`;
-    }
-    function renderAdminAds(){
-      if (!refs.adminAds) return;
-      const activeSet = new Set(activeVideoAds().map(x => x.id));
-      refs.adminAds.innerHTML = sortDescByDate(state.videoAds || []).map(ad => {
-        const expires = ad.createdAtMs ? new Date(Number(ad.createdAtMs) + VIDEO_AD_WINDOW).toLocaleString("tr-TR", { dateStyle:"short", timeStyle:"short" }) : "-";
-        return `
-          <div class="item">
-            <div class="item-head">
-              <strong>${escapeHtml(formatVideoAdTitle(ad))}</strong>
-              <span>${activeSet.has(ad.id) ? '<span class="badge ok">Aktif</span>' : '<span class="badge closed">Süresi doldu</span>'}</span>
-            </div>
-            <div class="tiny">${escapeHtml(ad.copy || "")}</div>
-            ${(ad.videoDataUrl || ad.videoBlobId) ? `<video class="ad-mini-video" data-video-ad-id="${escapeHtml(ad.id || "")}" ${ad.videoDataUrl ? `src="${escapeHtml(ad.videoDataUrl)}"` : ""} muted playsinline controls></video>` : ""}
-            <div class="tiny">Bitiş: ${escapeHtml(expires)} • Oluşturan: ${escapeHtml(ad.createdByName || "")}</div>
-            <div class="item-actions">
-              <button class="btn secondary" type="button" onclick="window.__editVideoAd('${ad.id}')">Düzenle</button>
-              <button class="btn bad" type="button" onclick="window.__deleteVideoAd('${ad.id}')">Sil</button>
-            </div>
-          </div>
-        `;
-      }).join("") || `<div class="feed-item">Video reklam yok.</div>`;
-      hydrateVideoAdVideos(refs.adminAds).catch(()=>{});
-    }
     function renderMyAds(){
       const mine = myListings();
       refs.myAdsList.innerHTML = mine.map(x => renderListingCard(x, true)).join("") || `<div class="feed-item">Henüz ilan yok.</div>`;
@@ -3315,8 +2999,6 @@
       if (state.view === "admin") {
         renderAdminListings();
         renderAdminLog();
-        renderAdminUsers();
-        renderAdminAds();
       }
       if (state.view === "help") renderHelp();
       if (state.view !== "messages") renderConversation();
@@ -3503,117 +3185,6 @@
       await logAction(editId ? 'Promosyon düzenlendi' : 'Promosyon eklendi', code);
       renderAll();
     }
-    async function saveAdminVideoAd(data, editId = ""){
-      if (!state.isAdmin) return;
-      const brand = String(data.brand || "").trim();
-      const headline = String(data.headline || "").trim();
-      const copy = String(data.copy || "").trim();
-      const active = !!data.active;
-      const existing = editId ? (state.videoAds || []).find(x => x.id === editId) : null;
-      const videoBlobId = String(data.videoBlobId || existing?.videoBlobId || "").trim();
-      const videoDataUrl = String(data.videoDataUrl || existing?.videoDataUrl || "").trim();
-      if (!brand || !headline || !copy || (!videoBlobId && !videoDataUrl)) throw new Error("Alanlar eksik.");
-      if (!editId && countRecentVideoAdsByUser(state.user.uid) >= 3) {
-        throw new Error("3 gün içinde en fazla 3 video reklam yükleyebilirsin.");
-      }
-      const createdAtMs = Number(data.createdAtMs || existing?.createdAtMs || getRealNowMs());
-      const payload = {
-        brand,
-        headline,
-        copy,
-        videoBlobId: videoBlobId || null,
-        videoDataUrl: videoBlobId ? null : (videoDataUrl || null),
-        videoMime: String(data.videoMime || existing?.videoMime || "").trim() || null,
-        videoName: String(data.videoName || existing?.videoName || "").trim() || null,
-        videoSize: Number(data.videoSize || existing?.videoSize || 0) || null,
-        active,
-        createdBy: existing?.createdBy || state.user.uid,
-        createdByName: existing?.createdByName || state.profile?.displayName || "Yönetici",
-        createdAtMs,
-        expiresAtMs: Number(data.expiresAtMs || existing?.expiresAtMs || (createdAtMs + VIDEO_AD_WINDOW)),
-        updatedAtMs: getRealNowMs(),
-        createdAt: data.createdAt || existing?.createdAt || serverTimestamp(),
-        updatedAt: serverTimestamp()
-      };
-      if (editId){
-        await updateDoc(doc(db, "videoAds", editId), payload);
-      }else{
-        await addDoc(collection(db, "videoAds"), payload);
-      }
-      await ensureVideoAdsLoaded();
-    }
-    function clearAdminAdForm(){
-      refs.adminAdForm?.reset();
-      if (refs.adminAdActiveInput) refs.adminAdActiveInput.checked = true;
-      if (refs.adminAdPreview){
-        refs.adminAdPreview.removeAttribute("src");
-        try { refs.adminAdPreview.load(); } catch {}
-        refs.adminAdPreview.classList.add("hidden");
-      }
-      if (refs.adminAdForm) refs.adminAdForm.dataset.editId = "";
-      if (refs.adminAdBrandInput) refs.adminAdBrandInput.value = "";
-      if (refs.adminAdTitleInput) refs.adminAdTitleInput.value = "";
-      if (refs.adminAdCopyInput) refs.adminAdCopyInput.value = "";
-      if (refs.adminAdVideoFile) refs.adminAdVideoFile.value = "";
-      if (state.adminAdDraftVideo && String(state.adminAdDraftVideo).startsWith("blob:")) {
-        try { URL.revokeObjectURL(state.adminAdDraftVideo); } catch {}
-      }
-      state.adminAdDraftVideo = "";
-      state.adminAdDraftFile = null;
-      state.adminAdDraftVideoBlobId = "";
-    }
-    function editVideoAd(id){
-      const ad = (state.videoAds || []).find(x => x.id === id);
-      if (!ad) return;
-      if (refs.adminAdForm) refs.adminAdForm.dataset.editId = id;
-      if (refs.adminAdBrandInput) refs.adminAdBrandInput.value = ad.brand || "";
-      if (refs.adminAdTitleInput) refs.adminAdTitleInput.value = ad.headline || "";
-      if (refs.adminAdCopyInput) refs.adminAdCopyInput.value = ad.copy || "";
-      if (refs.adminAdActiveInput) refs.adminAdActiveInput.checked = ad.active !== false;
-      state.adminAdDraftVideoBlobId = String(ad.videoBlobId || "").trim();
-      state.adminAdDraftFile = null;
-      if (refs.adminAdPreview){
-        refs.adminAdPreview.classList.remove("hidden");
-        if (ad.videoDataUrl){
-          refs.adminAdPreview.src = ad.videoDataUrl;
-          state.adminAdDraftVideo = ad.videoDataUrl;
-        } else {
-          resolveVideoAdSource(ad).then(src => {
-            if (src && refs.adminAdForm?.dataset.editId === id) {
-              refs.adminAdPreview.src = src;
-              state.adminAdDraftVideo = src;
-            }
-          }).catch(()=>{});
-        }
-      }
-      const viewAdmin = document.getElementById("viewAdmin");
-      if (viewAdmin) viewAdmin.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-    async function deleteVideoAd(id){
-      const ad = (state.videoAds || []).find(x => x.id === id);
-      if (!ad) return;
-      if (!confirm("Video reklam silinsin mi?")) return;
-      await deleteDoc(doc(db, "videoAds", id));
-      if (ad.videoBlobId) await deleteVideoBlobRecord(ad.videoBlobId);
-      await ensureVideoAdsLoaded();
-      renderAll();
-    }
-    async function saveUserRole(uid){
-      if (!state.isAdmin || !uid) return;
-      const select = document.querySelector(`[data-role-user="${CSS.escape(uid)}"]`);
-      const role = normalizeRole(select?.value || "member");
-      try{
-        await updateDoc(doc(db, "users", uid), { role, updatedAt: serverTimestamp() });
-        if (uid === state.user.uid && state.profile){
-          state.profile.role = role;
-        }
-        await ensureAdminUsersLoaded();
-        renderAll();
-      }catch(err){
-        alert("Rol kaydedilemedi: " + firebaseErrorMessage(err));
-      }
-    }
-
     async function manualPurchaseFromModal(){
       const listingId = state.pendingPurchaseListingId;
       if (!listingId) return;
@@ -4101,189 +3672,13 @@ Sorun: ${body}`;
       return state.logs;
     }
 
-    async function ensureAdminUsersLoaded(){
-      try{
-        const snap = await getDocs(query(collection(db, "users")));
-        state.users = snap.docs.map(d => ({ id:d.id, ...d.data() }))
-          .sort((a, b) => String(a.displayName || "").localeCompare(String(b.displayName || ""), "tr"));
-        state.users.forEach(cacheUserDoc);
-      }catch{}
-      return state.users;
-    }
-
-    async function ensureVideoAdsLoaded(){
-      try{
-        const snap = await getDocs(query(collection(db, "videoAds"), orderBy("createdAtMs", "desc")));
-        state.videoAds = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-      }catch{}
-      return state.videoAds;
-    }
-
-
-    const VIDEO_AD_DB_NAME = "7c_shop_video_ads";
-    const VIDEO_AD_DB_VERSION = 1;
-    let videoAdDbPromise = null;
-
-    function openVideoAdDb(){
-      if (videoAdDbPromise) return videoAdDbPromise;
-      if (!('indexedDB' in window)) return Promise.reject(new Error('Tarayıcı yerel depolamayı desteklemiyor.'));
-      videoAdDbPromise = new Promise((resolve, reject) => {
-        const req = indexedDB.open(VIDEO_AD_DB_NAME, VIDEO_AD_DB_VERSION);
-        req.onupgradeneeded = () => {
-          const db = req.result;
-          if (!db.objectStoreNames.contains('videos')) {
-            db.createObjectStore('videos', { keyPath: 'id' });
-          }
-        };
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error || new Error('Video deposu açılamadı.'));
-      });
-      return videoAdDbPromise;
-    }
-
-    async function saveVideoBlobRecord(file){
-      if (!file) throw new Error('Video dosyası bulunamadı.');
-      const db = await openVideoAdDb();
-      const id = (crypto?.randomUUID ? crypto.randomUUID() : `video-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
-      await new Promise((resolve, reject) => {
-        const tx = db.transaction('videos', 'readwrite');
-        tx.objectStore('videos').put({
-          id,
-          blob: file,
-          name: file.name || '',
-          type: file.type || '',
-          size: file.size || 0,
-          createdAtMs: getRealNowMs()
-        });
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => reject(tx.error || new Error('Video kaydedilemedi.'));
-      });
-      return { videoBlobId: id, videoMime: file.type || '', videoName: file.name || '', videoSize: file.size || 0 };
-    }
-
-    async function getVideoBlobRecord(id){
-      if (!id) return null;
-      const db = await openVideoAdDb();
-      return await new Promise((resolve, reject) => {
-        const tx = db.transaction('videos', 'readonly');
-        const req = tx.objectStore('videos').get(id);
-        req.onsuccess = () => resolve(req.result || null);
-        req.onerror = () => reject(req.error || new Error('Video okunamadı.'));
-      });
-    }
-
-    async function deleteVideoBlobRecord(id){
-      if (!id) return;
-      try{
-        const db = await openVideoAdDb();
-        await new Promise((resolve, reject) => {
-          const tx = db.transaction('videos', 'readwrite');
-          tx.objectStore('videos').delete(id);
-          tx.oncomplete = () => resolve();
-          tx.onerror = () => reject(tx.error || new Error('Video silinemedi.'));
-        });
-      }catch{}
-      const cached = state.videoAdObjectUrlCache?.[id];
-      if (cached){
-        try { URL.revokeObjectURL(cached); } catch {}
-        delete state.videoAdObjectUrlCache[id];
-      }
-    }
-
-    async function resolveVideoAdSource(ad){
-      if (!ad) return '';
-      if (ad.videoDataUrl) return ad.videoDataUrl;
-      const id = String(ad.videoBlobId || '').trim();
-      if (!id) return '';
-      if (state.videoAdObjectUrlCache[id]) return state.videoAdObjectUrlCache[id];
-      try{
-        const record = await getVideoBlobRecord(id);
-        if (!record?.blob) return '';
-        const url = URL.createObjectURL(record.blob);
-        state.videoAdObjectUrlCache[id] = url;
-        return url;
-      }catch{
-        return '';
-      }
-    }
-
-    async function hydrateVideoAdVideos(root = document){
-      if (!root || !root.querySelectorAll) return;
-      const videos = Array.from(root.querySelectorAll('video[data-video-ad-id]'));
-      for (const video of videos){
-        const adId = video.dataset.videoAdId;
-        const ad = (state.videoAds || []).find(x => x.id === adId);
-        if (!ad) continue;
-        const src = await resolveVideoAdSource(ad);
-        if (src && video.dataset.loadedSrc !== src){
-          video.src = src;
-          video.dataset.loadedSrc = src;
-          try { video.load(); } catch {}
-        }
-        if (root?.id === "adFrame" || root?.closest?.("#modalAd")) {
-          prepareLockedAdVideo(video);
-        }
-      }
-    }
-
-    function activeVideoAds(){
-      const now = getRealNowMs();
-      return (state.videoAds || []).filter(ad => {
-        if (!ad || ad.active === false) return false;
-        const created = Number(ad.createdAtMs || 0);
-        return !!created && (now - created < VIDEO_AD_WINDOW);
-      });
-    }
-
-    function pickRandomVideoAd(){
-      const pool = activeVideoAds();
-      if (!pool.length) return null;
-      return pool[Math.floor(Math.random() * pool.length)];
-    }
-
-    function countRecentVideoAdsByUser(uid){
-      const now = getRealNowMs();
-      return (state.videoAds || []).filter(ad => {
-        if (!ad || ad.createdBy !== uid) return false;
-        const created = Number(ad.createdAtMs || 0);
-        return !!created && (now - created < VIDEO_AD_WINDOW);
-      }).length;
-    }
-
-    function formatVideoAdTitle(ad){
-      return [ad?.brand, ad?.headline].filter(Boolean).join(" • ") || "Video reklam";
-    }
-
-    function prepareLockedAdVideo(video, onEnd){
-      if (!video || video.dataset.lockedAdReady === "1") return;
-      video.dataset.lockedAdReady = "1";
-      video.controls = false;
-      video.loop = false;
-      video.muted = false;
-      video.volume = 1;
-      video.playsInline = true;
-      try { video.disablePictureInPicture = true; } catch {}
-      try { video.setAttribute("playsinline", ""); } catch {}
-      try { video.setAttribute("webkit-playsinline", ""); } catch {}
-      try { video.setAttribute("preload", "metadata"); } catch {}
-      try { video.setAttribute("controlsList", "nodownload noplaybackrate noremoteplayback nofullscreen"); } catch {}
-      try { video.style.pointerEvents = "none"; } catch {}
-      let ending = false;
-      video.addEventListener("ended", () => {
-        if (ending) return;
-        ending = true;
-        if (typeof onEnd === "function") onEnd();
-      }, { once: true });
-    }
-
     async function loadCurrentUserProfile(){
       if (!state.user) return;
       try{
         const snap = await getDoc(doc(db, "users", state.user.uid));
         if (snap.exists()){
           const data = snap.data() || {};
-          state.profile = { uid: state.user.uid, ...data, role: normalizeRole(data.role || "member"), taskState: normalizeTaskState(data.taskState) };
-          state.profile.role = normalizeRole(state.profile.role || "member");
+          state.profile = { uid: state.user.uid, ...data, taskState: normalizeTaskState(data.taskState) };
           state.isAdmin = !!data.isAdmin;
           cacheUserDoc(state.profile);
         }
@@ -4306,7 +3701,6 @@ Sorun: ${body}`;
         avatarDataUrl: null,
         email: state.user.email || state.profile?.email || null,
         isAdmin: !!state.profile?.isAdmin,
-        role: normalizeRole(state.profile?.role || "member"),
         updatedAt: serverTimestamp()
       };
       try{
@@ -4320,7 +3714,6 @@ Sorun: ${body}`;
             avatarDataUrl: null,
             email: state.user.email || state.profile?.email || null,
             isAdmin: !!state.profile?.isAdmin,
-            role: normalizeRole(state.profile?.role || "member"),
             updatedAt: serverTimestamp()
           };
           await updateDoc(ref, fallbackPayload);
@@ -4350,8 +3743,7 @@ Sorun: ${body}`;
       const u2 = onSnapshot(doc(db, "users", state.user.uid), snap => {
         if (snap.exists()){
           const data = snap.data() || {};
-          state.profile = { uid: state.user.uid, ...data, role: normalizeRole(data.role || "member"), taskState: normalizeTaskState(data.taskState) };
-          state.profile.role = normalizeRole(state.profile.role || "member");
+          state.profile = { uid: state.user.uid, ...data, taskState: normalizeTaskState(data.taskState) };
           state.isAdmin = !!data.isAdmin;
           cacheUserDoc(state.profile);
           setAppScreen();
@@ -4363,10 +3755,6 @@ Sorun: ${body}`;
         state.buyRequests = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         renderAll();
       });
-      const uVideoAds = onSnapshot(query(collection(db, "videoAds"), orderBy("createdAtMs", "desc")), snap => {
-        state.videoAds = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-        renderAll();
-      });
       const u3 = onSnapshot(query(collection(db, "conversations"), where("members", "array-contains", state.user.uid)), snap => {
         state.conversations = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         if (state.currentConversationId){
@@ -4376,7 +3764,7 @@ Sorun: ${body}`;
         prefetchConversationPeers(state.conversations).then(() => renderAll()).catch(() => renderAll());
         renderAll();
       });
-      state.unsubscribers.push(u1, u2, uBuy, uVideoAds, u3);
+      state.unsubscribers.push(u1, u2, uBuy, u3);
       if (state.view === "admin") ensureAdminLogsLoaded().then(() => renderAll()).catch(()=>{});
       if (state.promoUnlocked) ensurePromoCodesLoaded().then(() => renderAll()).catch(()=>{});
     }
@@ -5129,11 +4517,12 @@ Sorun: ${body}`;
     refs.modalBuyRequest.addEventListener("click", (e) => {
       if (e.target === refs.modalBuyRequest) hideModal(refs.modalBuyRequest);
     });
-        if (refs.btnCloseCoinHub) refs.btnCloseCoinHub.onclick = () => hideModal(refs.modalCoinHub);
+    refs.btnCloseAd.onclick = () => stopAdWatch('İptal edildi.');
+    if (refs.btnCloseCoinHub) refs.btnCloseCoinHub.onclick = () => hideModal(refs.modalCoinHub);
     if (refs.btnOpenCoinPackages) refs.btnOpenCoinPackages.onclick = openCoinPackages;
-    if (refs.btnOpenCoinAd) refs.btnOpenCoinAd.onclick = async () => {
+    if (refs.btnOpenCoinAd) refs.btnOpenCoinAd.onclick = () => {
       hideModal(refs.modalCoinHub);
-      await startAdWatch();
+      startAdWatch();
     };
     if (refs.btnCloseCoinPackages) refs.btnCloseCoinPackages.onclick = () => hideModal(refs.modalCoinPackages);
     if (refs.modalCoinHub) refs.modalCoinHub.addEventListener("click", (e) => {
@@ -5143,10 +4532,7 @@ Sorun: ${body}`;
       if (e.target === refs.modalCoinPackages) hideModal(refs.modalCoinPackages);
     });
     refs.modalAd.addEventListener("click", (e) => {
-      if (e.target === refs.modalAd) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
+      if (e.target === refs.modalAd) stopAdWatch('İptal edildi.');
     });
     refs.adImageFile.addEventListener("change", async () => {
       const files = Array.from(refs.adImageFile.files || []).slice(0, 5);
@@ -5171,76 +4557,7 @@ Sorun: ${body}`;
         renderSelectedImagePreviews(state.listingDraftImages);
       }
     });
-    refs.adminAdVideoFile?.addEventListener("change", async () => {
-      const file = refs.adminAdVideoFile.files?.[0];
-      if (!file) return;
-      if (!String(file.type || "").startsWith("video/")) {
-        alert("Sadece video yükle.");
-        refs.adminAdVideoFile.value = "";
-        return;
-      }
-      if (file.size > 50 * 1024 * 1024) {
-        alert("Video çok büyük. 50 MB sınırını geçiyor.");
-        refs.adminAdVideoFile.value = "";
-        return;
-      }
-      if (state.adminAdDraftVideo && String(state.adminAdDraftVideo).startsWith("blob:")) {
-        try { URL.revokeObjectURL(state.adminAdDraftVideo); } catch {}
-      }
-      state.adminAdDraftFile = file;
-      state.adminAdDraftVideoBlobId = "";
-      const previewUrl = URL.createObjectURL(file);
-      state.adminAdDraftVideo = previewUrl;
-      if (refs.adminAdPreview){
-        refs.adminAdPreview.src = previewUrl;
-        refs.adminAdPreview.classList.remove("hidden");
-      }
-    });
     refs.listingForm.onsubmit = addListing;
-    refs.adminAdForm.onsubmit = async (e) => {
-      e.preventDefault();
-      if (!state.isAdmin) return;
-      const editId = refs.adminAdForm.dataset.editId || "";
-      const existing = editId ? (state.videoAds || []).find(x => x.id === editId) : null;
-      let videoBlobId = existing?.videoBlobId || "";
-      let videoMime = existing?.videoMime || "";
-      let videoName = existing?.videoName || "";
-      let videoSize = existing?.videoSize || 0;
-      if (state.adminAdDraftFile){
-        const stored = await saveVideoBlobRecord(state.adminAdDraftFile);
-        videoBlobId = stored.videoBlobId;
-        videoMime = stored.videoMime;
-        videoName = stored.videoName;
-        videoSize = stored.videoSize;
-      }
-      const oldBlobId = existing?.videoBlobId || "";
-      try{
-        await saveAdminVideoAd({
-          brand: refs.adminAdBrandInput.value,
-          headline: refs.adminAdTitleInput.value,
-          copy: refs.adminAdCopyInput.value,
-          videoBlobId,
-          videoMime,
-          videoName,
-          videoSize,
-          active: !!refs.adminAdActiveInput.checked,
-          createdAtMs: editId ? (existing?.createdAtMs || getRealNowMs()) : getRealNowMs(),
-          createdAt: editId ? (existing?.createdAt || serverTimestamp()) : serverTimestamp()
-        }, editId);
-        if (oldBlobId && oldBlobId !== videoBlobId && state.adminAdDraftFile){
-          await deleteVideoBlobRecord(oldBlobId);
-        }
-        await logAction(editId ? "Video reklam düzenlendi" : "Video reklam eklendi", refs.adminAdBrandInput.value || "Reklam");
-        clearAdminAdForm();
-        await renderAll();
-        alert("Kaydedildi.");
-      }catch(err){
-        alert("Video reklam kaydedilemedi: " + (err?.message || err));
-      }
-    };
-    refs.adminAdResetButton?.addEventListener("click", () => {
-      clearAdminAdForm();
-    });
     refs.btnCloseSeller.onclick = () => refs.modalSeller.classList.remove("show");
     refs.btnCloseDetail.onclick = () => {
       refs.modalDetail.classList.remove("show");
@@ -5273,9 +4590,6 @@ Sorun: ${body}`;
     window.__setDetailImage = setDetailImage;
     window.__editPromoCode = setPromoEdit;
     window.__deletePromoCode = deletePromoCode;
-    window.__editVideoAd = editVideoAd;
-    window.__deleteVideoAd = deleteVideoAd;
-    window.__saveUserRole = saveUserRole;
     window.__setReviewRating = (n) => {
       if (!refs.reviewStars) return;
       renderStarButtons(Number(n || 5));
@@ -5320,10 +4634,6 @@ Sorun: ${body}`;
         state.lastTaskSyncDay = "";
         state.lastSessionTickAt = 0;
         state.serverClock = { anchorServerMs: 0, anchorPerfMs: 0, synced: false, syncing: false };
-        state.videoAds = [];
-        state.users = [];
-        state.activeAdWatchAd = null;
-        state.adminAdDraftVideo = "";
         if (state.adWatch?.timer) clearInterval(state.adWatch.timer);
         state.adWatch = null;
         clearListeners();
