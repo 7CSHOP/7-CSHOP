@@ -26,9 +26,9 @@
       margin:0;
       font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(37,99,235,.12), transparent 28%),
-        radial-gradient(circle at top right, rgba(124,58,237,.10), transparent 26%),
-        radial-gradient(circle at bottom center, rgba(22,163,74,.08), transparent 24%),
+        radial-gradient(circle at top left, rgba(37,99,235,.08), transparent 28%),
+        radial-gradient(circle at top right, rgba(124,58,237,.06), transparent 26%),
+        radial-gradient(circle at bottom center, rgba(22,163,74,.05), transparent 24%),
         linear-gradient(180deg,#fbfdff 0%, #f3f7ff 100%);
       color:var(--text);
       position:relative;
@@ -40,10 +40,10 @@
       inset:-20% -10% auto -10%;
       height:42vh;
       background:linear-gradient(90deg, rgba(37,99,235,.08), rgba(124,58,237,.06), rgba(22,163,74,.06));
-      filter:blur(30px);
+      filter:blur(12px);
       opacity:.55;
       pointer-events:none;
-      animation:bgFloat 18s ease-in-out infinite alternate;
+      
       z-index:-1;
     }
     @keyframes bgFloat{
@@ -56,7 +56,7 @@
     .topbar{
       position:sticky;top:0;z-index:30;
       background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.84));
-      backdrop-filter:blur(14px);
+      
       border-bottom:1px solid rgba(191,219,254,.85);
       box-shadow:0 8px 30px rgba(37,99,235,.06);
     }
@@ -80,7 +80,7 @@
       box-shadow:0 10px 22px rgba(17,24,39,.08);
       font-weight:800;
     }
-    .chip:hover{transform:translateY(-1px);box-shadow:0 14px 26px rgba(17,24,39,.12);border-color:#cbd5e1}
+    .chip:hover{box-shadow:0 10px 20px rgba(17,24,39,.10);border-color:#cbd5e1}
     .chip:active{transform:translateY(0) scale(.99)}
     .chip.primary{background:var(--accent);border-color:var(--accent);color:#fff}
     .chip.primary:hover{background:var(--accent2)}
@@ -97,8 +97,8 @@
       border-radius:var(--radius);
       box-shadow:var(--shadow);
       overflow:hidden;
-      backdrop-filter:blur(10px);
-      animation:panelEnter .45s ease both;
+      
+      
     }
     @keyframes panelEnter{
       from{opacity:0;transform:translateY(10px) scale(.99)}
@@ -161,13 +161,13 @@
       overflow:hidden;
       box-shadow:var(--shadow);
       transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-      animation:cardEnter .45s ease both;
+      
     }
     @keyframes cardEnter{
       from{opacity:0;transform:translateY(12px)}
       to{opacity:1;transform:translateY(0)}
     }
-    .card:hover{transform:translateY(-3px);box-shadow:0 18px 36px rgba(17,24,39,.12);border-color:#cbd5e1}
+    .card:hover{box-shadow:0 12px 24px rgba(17,24,39,.10);border-color:#cbd5e1}
     .card img{width:100%;height:220px;object-fit:cover;background:#f3f4f6}
     .card-body{padding:16px;display:grid;gap:10px}
     .meta{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px;color:var(--muted)}
@@ -357,7 +357,7 @@
       transition:.18s;
       box-shadow:0 10px 20px rgba(17,24,39,.06);
     }
-    .buy-choice:hover{transform:translateY(-1px);box-shadow:0 16px 30px rgba(17,24,39,.1)}
+    .buy-choice:hover{box-shadow:0 12px 24px rgba(17,24,39,.08)}
     .buy-choice strong{font-size:18px}
     .buy-choice span{font-size:13px;color:var(--muted);line-height:1.45}
     .buy-choice-tl{background:linear-gradient(135deg,#eff6ff,#ffffff);border-color:#bfdbfe}
@@ -380,7 +380,7 @@
       box-shadow:0 10px 20px rgba(37,99,235,.07);
       transition:.18s;
     }
-    .coin-package:hover{transform:translateY(-1px);box-shadow:0 16px 26px rgba(37,99,235,.12)}
+    .coin-package:hover{box-shadow:0 12px 22px rgba(37,99,235,.08)}
     .coin-package strong{font-size:18px}
     .coin-package span{font-size:13px;color:var(--muted)}
     .coin-package .accent{font-size:12px;font-weight:900;color:#1d4ed8}
@@ -406,7 +406,7 @@
       position:relative;
       overflow:hidden;
       transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-      animation:cardEnter .45s ease both;
+      
     }
     .request-card::before{
       content:"";
@@ -1756,6 +1756,15 @@
     function isBootstrapAdminCredentials(name, pass){
       return normalizeName(name) === normalizeName(ADMIN_BOOTSTRAP_NAME) && String(pass || "") === ADMIN_BOOTSTRAP_PASSWORD;
     }
+    function normalizeUserRole(value){
+      const v = String(value || "").trim().toLowerCase();
+      if (v === "yardımcı üye" || v === "yardimci uye" || v === "helper" || v === "assistant" || v === "assistant_member") return "helper";
+      return "member";
+    }
+    function userRoleLabel(user){
+      if (user?.isAdmin) return "Yönetici";
+      return normalizeUserRole(user?.role) === "helper" ? "Yardımcı üye" : "Üye";
+    }
     function daysLeftFromCreated(createdAtMs, lifetimeMs){
       const created = Number(createdAtMs || 0);
       const life = Number(lifetimeMs || 0);
@@ -1833,7 +1842,7 @@
       document.getElementById("viewTasks").classList.toggle("hidden", view !== "tasks");
       document.getElementById("viewAdmin").classList.toggle("hidden", view !== "admin");
       document.getElementById("viewHelp").classList.toggle("hidden", view !== "help");
-      renderAll();
+      scheduleRender();
     }
     function listingImages(item){
       const images = Array.isArray(item?.images) ? item.images.filter(Boolean) : [];
@@ -1907,10 +1916,12 @@
       const snap = await getDoc(ref);
       const existing = snap.exists() ? (snap.data() || {}) : {};
       const nextIsAdmin = Boolean(existing.isAdmin || isAdmin);
+      const nextRole = existing.role ? normalizeUserRole(existing.role) : "member";
       const data = {
         uid: user.uid,
         displayName,
         isAdmin: nextIsAdmin,
+        role: nextIsAdmin ? "member" : nextRole,
         email: user.email || null,
         lastSeenAt: serverTimestamp(),
         updatedAt: serverTimestamp()
@@ -1929,10 +1940,11 @@
           ...data,
           avatarUrl: existing.avatarUrl || null,
           avatarDataUrl: existing.avatarDataUrl || null,
-          taskState: existing.taskState || defaultTaskState()
+          taskState: existing.taskState || defaultTaskState(),
+          coinBalance: Number(existing.coinBalance || 0)
         });
       }
-      return { uid:user.uid, displayName, isAdmin: nextIsAdmin };
+      return { uid:user.uid, displayName, isAdmin: nextIsAdmin, role: nextRole };
     }
     async function logAction(action, detail){
       try{
@@ -2621,14 +2633,14 @@
       const initials = (p.displayName || "?").trim().slice(0,2).toUpperCase();
       refs.profileNameText.textContent = p.displayName || "-";
       refs.profileEmailText.textContent = p.email || "E-posta görünmüyor";
-      refs.profileRolePill.textContent = state.isAdmin ? "Yönetici" : "Üye";
+      refs.profileRolePill.textContent = userRoleLabel(p);
       refs.profilePhotoPill.textContent = avatar ? "PP yüklü" : "PP yok";
       refs.profileAvatarBox.innerHTML = avatar
         ? `<img src="${escapeHtml(avatar)}" alt="Profil fotoğrafı">`
         : `<span class="avatar-fallback">${escapeHtml(initials)}</span>`;
       refs.profileBox.innerHTML = `
         <div class="item"><div class="item-head"><strong>İsim</strong></div><span>${escapeHtml(p.displayName || "")}</span></div>
-        <div class="item"><div class="item-head"><strong>Rol</strong></div><span>${state.isAdmin ? "Yönetici" : "Üye"}</span></div>
+        <div class="item"><div class="item-head"><strong>Rol</strong></div><span>${escapeHtml(userRoleLabel(p))}</span></div>
         <div class="item"><div class="item-head"><strong>Kullanıcı ID</strong></div><span>${escapeHtml(p.uid || "")}</span></div>
         <div class="item"><div class="item-head"><strong>PP durumu</strong></div><span>${avatar ? "Yüklü" : "Yok"}</span></div>
         <div class="item"><div class="item-head"><strong>Son aktif</strong></div><span>${escapeHtml(formatLastSeen(p.lastSeenAt))}</span></div>
@@ -2821,7 +2833,7 @@
       hideModal(refs.modalCoinPackages);
       await logAction('Coin satın alım isteği', `${buyerName} → ${pkg.label}`);
       alert('Coin satın alım isteği gönderildi.');
-      renderAll();
+      scheduleRender();
     }
     function buyCoinPackage(id){
       const pkg = COIN_PACKAGES.find(x => x.id === id);
@@ -2894,7 +2906,7 @@
         });
         stopAdWatch('Coin eklendi.');
         if (result?.rewardCoins > 0) await logAction('Reklam ödülü', `${state.profile?.displayName || 'user'} +1 Coin`);
-        renderAll();
+        scheduleRender();
         alert('Reklam tamamlandı. 1 Coin eklendi.');
       }catch(err){
         stopAdWatch('Ödül alınamadı.');
@@ -2979,6 +2991,7 @@
         user?.displayName || "",
         user?.email || "",
         user?.uid || "",
+        userRoleLabel(user),
         String(user?.coinBalance || 0)
       ].join(" ").toLowerCase();
     }
@@ -2986,7 +2999,7 @@
     function renderAdminUsers(){
       if (!refs.adminUsers) return;
       if (!state.users.length && state.isAdmin && state.view === "admin"){
-        ensureAdminUsersLoaded().then(() => renderAll()).catch(()=>{});
+        ensureAdminUsersLoaded().then(() => scheduleRender()).catch(()=>{});
       }
       const q = String(refs.adminUserSearch?.value || "").trim().toLowerCase();
       const items = sortDescByDate([...(state.users || [])], "updatedAt")
@@ -2995,14 +3008,20 @@
       refs.adminUsers.innerHTML = items.map(user => {
         const coin = Number(user.coinBalance || 0);
         const name = user.displayName || "Bilinmeyen";
+        const role = user.isAdmin ? "admin" : normalizeUserRole(user.role);
+        const roleLabel = user.isAdmin ? "Yönetici" : (role === "helper" ? "Yardımcı üye" : "Üye");
         return `
           <div class="item">
             <div class="item-head">
               <strong>${escapeHtml(name)}</strong>
-              <span>${escapeHtml(formatCoin(coin))}${user.isAdmin ? " • Yönetici" : ""}</span>
+              <span>${escapeHtml(formatCoin(coin))} • ${escapeHtml(roleLabel)}</span>
             </div>
             <div class="tiny">${escapeHtml(user.email || "E-posta yok")} • ${escapeHtml(user.uid || "")}</div>
             <div class="item-actions">
+              <select class="input" style="max-width:180px" onchange="window.__setUserRole('${user.uid}', this.value)" ${user.isAdmin ? "disabled" : ""}>
+                <option value="member" ${role === "member" ? "selected" : ""}>Üye</option>
+                <option value="helper" ${role === "helper" ? "selected" : ""}>Yardımcı üye</option>
+              </select>
               <button class="btn warn" type="button" onclick="window.__decreaseUserCoin('${user.uid}')">Coin azalt</button>
               <button class="btn bad" type="button" onclick="window.__deleteUserAccount('${user.uid}')">Hesabı sil</button>
             </div>
@@ -3027,6 +3046,28 @@
       `).join("") || `<div class="feed-item">Kayıt yok.</div>`;
     }
 
+    async function setUserRole(userId, role){
+      const user = (state.users || []).find(u => u.uid === userId);
+      if (!user) return alert("Kullanıcı bulunamadı.");
+      if (user.isAdmin) return alert("Yönetici rolü buradan değiştirilemez.");
+      const nextRole = normalizeUserRole(role);
+      if (!confirm(`${user.displayName || "Kullanıcı"} rolü ${nextRole === "helper" ? "Yardımcı üye" : "Üye"} olarak güncellensin mi?`)) return;
+      try{
+        const ref = doc(db, "users", userId);
+        await updateDoc(ref, { role: nextRole, updatedAt: serverTimestamp() });
+        const updated = { ...user, role: nextRole };
+        state.users = (state.users || []).map(u => u.uid === userId ? updated : u);
+        cacheUserDoc(updated);
+        if (state.profile?.uid === userId){
+          state.profile = { ...(state.profile || {}), role: nextRole };
+        }
+        await logAction("Rol değiştirildi", `${state.profile.displayName} → ${user.displayName || userId} (${userRoleLabel(updated)})`);
+        await ensureAdminUsersLoaded();
+        scheduleRender();
+      }catch(err){
+        alert("Rol değiştirilemedi: " + firebaseErrorMessage(err));
+      }
+    }
     async function decreaseUserCoin(userId){
       const user = (state.users || []).find(u => u.uid === userId);
       if (!user) return alert("Kullanıcı bulunamadı.");
@@ -3038,7 +3079,7 @@
         const next = await saveCoinDelta(userId, -amount);
         await logAction("Coin azaltıldı", `${state.profile.displayName} → ${user.displayName || userId} (-${amount})`);
         await ensureAdminUsersLoaded();
-        renderAll();
+        scheduleRender();
         alert(`Yeni bakiye: ${formatCoin(next)}`);
       }catch(err){
         alert("Coin düşürülemedi: " + firebaseErrorMessage(err));
@@ -3085,7 +3126,7 @@
         if (state.userCache) delete state.userCache[userId];
         await logAction("Hesap silindi", `${state.profile.displayName} → ${user.displayName || userId}`);
         await ensureAdminUsersLoaded();
-        renderAll();
+        scheduleRender();
         alert("Hesap silindi.");
       }catch(err){
         alert("Hesap silinemedi: " + firebaseErrorMessage(err));
@@ -3107,6 +3148,15 @@
       refs.conversationList.innerHTML = filtered.map(renderConversationItem).join("") || `<div class="people-list-empty">Henüz konuşma yok.</div>`;
       renderConversation();
     }
+    let renderQueued = false;
+    function scheduleRender(){
+      if (renderQueued) return;
+      renderQueued = true;
+      requestAnimationFrame(() => {
+        renderQueued = false;
+        renderAll();
+      });
+    }
     function renderAll(){
       updateTimeGateUI();
       if (!state.user) return;
@@ -3121,8 +3171,14 @@
       if (state.view === "shop") renderShop();
       if (state.view === "buyrequests") renderBuyRequests();
       if (state.view === "myads") renderMyAds();
-      if (state.view === "messages") renderConversations();
-      if (state.view === "profile") { renderProfile(); renderPromoManager().catch(()=>{}); }
+      if (state.view === "messages") {
+        renderConversations();
+        renderConversation();
+      }
+      if (state.view === "profile") {
+        renderProfile();
+        renderPromoManager().catch(()=>{});
+      }
       if (state.view === "tasks") renderTasks();
       if (state.view === "admin") {
         renderAdminUsers();
@@ -3130,8 +3186,6 @@
         renderAdminLog();
       }
       if (state.view === "help") renderHelp();
-      if (state.view !== "messages") renderConversation();
-      if (state.view !== "profile") renderProfile();
     }
     function showModal(modal){
       modal?.classList.add('show');
@@ -3228,7 +3282,7 @@
         state.promoUnlocked = true;
         refs.promoRedeemInput.value = '';
         await renderPromoManager();
-        renderAll();
+        scheduleRender();
         return;
       }
       const code = state.promoCodes.find(x => String(x.code || '').trim().toLowerCase() === raw.toLowerCase());
@@ -3263,7 +3317,7 @@
         });
         refs.promoRedeemInput.value = '';
         await logAction('Promosyon kullanıldı', `${state.profile.displayName} → ${raw}`);
-        renderAll();
+        scheduleRender();
         alert(`Kod tamam. ${reward} Coin eklendi.`);
       }catch(err){
         alert('Kod kullanılamadı: ' + firebaseErrorMessage(err));
@@ -3285,7 +3339,7 @@
       if (!confirm(`"${code.code}" silinsin mi?`)) return;
       await deleteDoc(doc(db, 'promoCodes', id));
       await logAction('Promosyon silindi', code.code || id);
-      renderAll();
+      scheduleRender();
     }
     async function addOrUpdatePromo(e){
       e.preventDefault();
@@ -3312,7 +3366,7 @@
       }, editId);
       clearPromoForm();
       await logAction(editId ? 'Promosyon düzenlendi' : 'Promosyon eklendi', code);
-      renderAll();
+      scheduleRender();
     }
     async function manualPurchaseFromModal(){
       const listingId = state.pendingPurchaseListingId;
@@ -3427,7 +3481,7 @@
       state.currentConversationId = conv.id || state.currentConversationId;
       if (conv.id) state.currentConversationCache = { ...(state.currentConversationCache || {}), id: conv.id, purchaseOrder: baseOrder };
       setView('messages');
-      await renderAll();
+      await scheduleRender();
     }
     async function approveCoinOrder(convId, side){
       const convRef = doc(db, 'conversations', convId);
@@ -3472,7 +3526,7 @@
           purchaseOrder: updatedOrder
         };
         if (state.currentConversationId === convId) {
-          renderAll();
+          scheduleRender();
         }
         await logAction('Coin siparişi onayı', `${state.profile.displayName} → ${convId}`);
       }catch(err){
@@ -3508,7 +3562,7 @@ Sorun: ${body}`;
         });
         state.currentConversationId = existing.id;
         setView('messages');
-        renderAll();
+        scheduleRender();
         return;
       }
       const ref = await addDoc(collection(db, 'conversations'), {
@@ -3528,7 +3582,7 @@ Sorun: ${body}`;
       state.currentConversationId = ref.id;
       setView('messages');
       await logAction('Yardım mesajı', `${state.profile.displayName} → Alper`);
-      renderAll();
+      scheduleRender();
     }
     function renderHelp(){
       refs.viewHelp?.classList.remove('hidden');
@@ -3807,7 +3861,7 @@ Sorun: ${body}`;
         const snap = await getDoc(doc(db, "users", state.user.uid));
         if (snap.exists()){
           const data = snap.data() || {};
-          state.profile = { uid: state.user.uid, ...data, taskState: normalizeTaskState(data.taskState) };
+          state.profile = { uid: state.user.uid, ...data, role: normalizeUserRole(data.role), taskState: normalizeTaskState(data.taskState) };
           state.isAdmin = !!data.isAdmin;
           cacheUserDoc(state.profile);
         }
@@ -3830,6 +3884,7 @@ Sorun: ${body}`;
         avatarDataUrl: null,
         email: state.user.email || state.profile?.email || null,
         isAdmin: !!state.profile?.isAdmin,
+        role: normalizeUserRole(state.profile?.role),
         updatedAt: serverTimestamp()
       };
       try{
@@ -3843,6 +3898,7 @@ Sorun: ${body}`;
             avatarDataUrl: null,
             email: state.user.email || state.profile?.email || null,
             isAdmin: !!state.profile?.isAdmin,
+            role: normalizeUserRole(state.profile?.role),
             updatedAt: serverTimestamp()
           };
           await updateDoc(ref, fallbackPayload);
@@ -3867,7 +3923,7 @@ Sorun: ${body}`;
       clearListeners();
       const u1 = onSnapshot(collection(db, "listings"), snap => {
         state.listings = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-        renderAll();
+        scheduleRender();
       });
       const u2 = onSnapshot(doc(db, "users", state.user.uid), snap => {
         if (snap.exists()){
@@ -3877,12 +3933,12 @@ Sorun: ${body}`;
           cacheUserDoc(state.profile);
           setAppScreen();
           refs.adminMenu.classList.toggle("hidden", !state.isAdmin);
-          renderAll();
+          scheduleRender();
         }
       });
       const uBuy = onSnapshot(query(collection(db, "buyRequests"), orderBy("createdAtMs", "desc")), snap => {
         state.buyRequests = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-        renderAll();
+        scheduleRender();
       });
       const u3 = onSnapshot(query(collection(db, "conversations"), where("members", "array-contains", state.user.uid)), snap => {
         state.conversations = snap.docs.map(d => ({ id:d.id, ...d.data() }));
@@ -3890,15 +3946,15 @@ Sorun: ${body}`;
           const selected = state.conversations.find(c => c.id === state.currentConversationId);
           if (selected) state.currentConversationCache = selected;
         }
-        prefetchConversationPeers(state.conversations).then(() => renderAll()).catch(() => renderAll());
-        renderAll();
+        prefetchConversationPeers(state.conversations).then(() => scheduleRender()).catch(() => scheduleRender());
+        scheduleRender();
       });
       state.unsubscribers.push(u1, u2, uBuy, u3);
       if (state.view === "admin") {
-        ensureAdminLogsLoaded().then(() => renderAll()).catch(()=>{});
-        ensureAdminUsersLoaded().then(() => renderAll()).catch(()=>{});
+        ensureAdminLogsLoaded().then(() => scheduleRender()).catch(()=>{});
+        ensureAdminUsersLoaded().then(() => scheduleRender()).catch(()=>{});
       }
-      if (state.promoUnlocked) ensurePromoCodesLoaded().then(() => renderAll()).catch(()=>{});
+      if (state.promoUnlocked) ensurePromoCodesLoaded().then(() => scheduleRender()).catch(()=>{});
     }
     function toggleBuyRequestFields(){
       if (!refs.buyRequestType) return;
@@ -3967,7 +4023,7 @@ Sorun: ${body}`;
         await logAction("Alım isteği eklendi", `${state.profile.displayName} → ${name}`);
       }
       hideModal(refs.modalBuyRequest);
-      renderAll();
+      scheduleRender();
     }
     async function removeBuyRequest(id){
       const item = state.buyRequests.find(x => x.id === id);
@@ -3976,7 +4032,7 @@ Sorun: ${body}`;
       if (!confirm(`"${item.name || 'Alım isteği'}" silinsin mi?`)) return;
       await deleteDoc(doc(db, "buyRequests", id));
       await logAction("Alım isteği silindi", `${state.profile?.displayName || "user"} → ${item.name || id}`);
-      renderAll();
+      scheduleRender();
     }
     async function messageBuyRequest(id){
       const item = state.buyRequests.find(x => x.id === id);
@@ -4018,7 +4074,7 @@ Sorun: ${body}`;
       state.currentConversationCache = conv;
       setView("messages");
       await markConversationRead(conv.id);
-      renderAll();
+      scheduleRender();
     }
     async function openConversation(listingId){
       if (!state.user) return;
@@ -4070,7 +4126,7 @@ Sorun: ${body}`;
       setView("messages");
       await touchActivity();
       await markConversationRead(conv.id);
-      renderAll();
+      scheduleRender();
     }
     async function sendMessage(payloadText){
       const isEvent = payloadText && typeof payloadText === "object" && typeof payloadText.type === "string";
@@ -4116,7 +4172,7 @@ Sorun: ${body}`;
       refs.messageInput.value = "";
       await touchActivity();
       await logAction("Mesaj", `${state.profile.displayName}: ${text}`);
-      renderAll();
+      scheduleRender();
     }
     async function buyListing(listingId){
       if (!state.user) return;
@@ -4221,7 +4277,7 @@ Sorun: ${body}`;
       state.currentListingId = listingId;
       setView("messages");
       await markConversationRead(conv.id);
-      renderAll();
+      scheduleRender();
     }
     async function addListing(e){
       e.preventDefault();
@@ -4377,7 +4433,7 @@ Sorun: ${body}`;
       state.currentConversationCache = state.conversations.find(c => c.id === id) || state.currentConversationCache;
       setView("messages");
       await markConversationRead(id);
-      renderAll();
+      scheduleRender();
     }
     async function deleteConversation(){
       if (!state.currentConversationId) return;
@@ -4387,7 +4443,7 @@ Sorun: ${body}`;
       await logAction("Sohbet silindi", state.currentConversationId);
       state.currentConversationId = null;
       state.currentConversationCache = null;
-      renderAll();
+      scheduleRender();
     }
     async function openSellerProfile(userId, listingId){
       const userSnap = await getDoc(doc(db, "users", userId));
@@ -4454,7 +4510,7 @@ Sorun: ${body}`;
           pendingAvatarDataUrl: null
         });
         await touchActivity();
-        renderAll();
+        scheduleRender();
       }catch(err){
         alert("PP silinemedi: " + firebaseErrorMessage(err));
       }
@@ -4526,7 +4582,7 @@ Sorun: ${body}`;
         if (state.profile) state.profile.pendingAvatarDataUrl = null;
         refs.modalProfileEdit.classList.remove("show");
         await touchActivity();
-        renderAll();
+        scheduleRender();
       }catch(err){
         alert("Profil kaydedilemedi: " + firebaseErrorMessage(err));
       }
@@ -4610,7 +4666,7 @@ Sorun: ${body}`;
       renderProfile();
     };
     refs.btnLogout.onclick = async () => { await signOut(auth); };
-    refs.btnRefresh.onclick = async () => { await cleanupExpired(); renderAll(); };
+    refs.btnRefresh.onclick = async () => { await cleanupExpired(); scheduleRender(); };
     refs.btnSendMessage.onclick = () => sendMessage();
     refs.btnDeleteConversation.onclick = deleteConversation;
     if (refs.btnOpenBuyRequest) refs.btnOpenBuyRequest.onclick = openBuyRequestModal;
@@ -4704,7 +4760,7 @@ Sorun: ${body}`;
     refs.helpForm.onsubmit = async (e) => { e.preventDefault(); await openHelpConversation(); };
     refs.btnMessageSeller.onclick = messageSeller;
     refs.adminUserSearch?.addEventListener("input", () => {
-      if (state.view === "admin") renderAll();
+      if (state.view === "admin") scheduleRender();
     });
     document.querySelectorAll(".menu button").forEach(btn => {
       btn.onclick = () => setView(btn.dataset.view);
@@ -4715,6 +4771,7 @@ Sorun: ${body}`;
     window.__toggleListing = toggleListing;
     window.__editListing = editListing;
     window.__selectForAdmin = selectForAdmin;
+    window.__setUserRole = setUserRole;
     window.__decreaseUserCoin = decreaseUserCoin;
     window.__deleteUserAccount = deleteUserAccount;
     window.__openSeller = openSellerProfile;
@@ -4754,7 +4811,7 @@ Sorun: ${body}`;
         setView("shop");
         await cleanupExpired();
       }else{
-        renderAll();
+        scheduleRender();
       }
     }
     onAuthStateChanged(auth, async (user) => {
