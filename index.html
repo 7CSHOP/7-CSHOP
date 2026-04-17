@@ -2324,7 +2324,7 @@
           <div class="expiry-line">${escapeHtml(daysText)}</div>
           <div class="request-actions">
             <button class="btn" type="button" onclick="window.__messageBuyRequest('${item.id}')">Mesaj at</button>
-            ${mine ? `<button class="btn bad" type="button" onclick="window.__removeBuyRequest('${item.id}')">Sil</button>` : ''}
+            ${(mine || state.isAdmin) ? `<button class="btn bad" type="button" onclick="window.__removeBuyRequest('${item.id}')">Sil</button>` : ''}
           </div>
         </div>
       `;
