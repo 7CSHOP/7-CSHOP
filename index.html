@@ -1027,11 +1027,34 @@
                       <div class="hr"></div>
                       <div class="section-title">
                         <div>
-                          <h3>Coin / TL paketleri</h3>
+                          <h3>Coin paketleri</h3>
+
+
                           <p>Paket ekle, düzenle, sil</p>
                         </div>
                       </div>
-                      <div class="notice">Buradaki paketler aynı kart yapısıyla ana coin ekranında da görünür. Aynı koleksiyon kullanıldığı için Firestore şişmez.</div>
+                      <div class="coin-rate-box" style="margin:10px 0 12px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
+                        <div class="field" style="margin:0">
+                          <label>TL → coin oranı</label>
+                          <input id="coinRateInput" class="input" type="number" min="1" step="1" placeholder="Örn: 5" />
+                          <div class="hint">1 Coin kaç TL olsun? 6 yazarsan 6 TL = 1 Coin olur.</div>
+                        </div>
+                        <button id="btnSaveCoinRate" class="btn secondary" type="button">Oranı kaydet</button>
+                      </div>
+                      <div class="coin-rate-box" style="margin:0 0 12px;display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end">
+                        <div class="field" style="margin:0">
+                          <label>Reklam ödülü coin</label>
+                          <input id="adRewardCoinsInput" class="input" type="number" min="1" step="1" placeholder="Örn: 2" />
+                          <div class="hint">Reklam bittiğinde kaç coin verileceği.</div>
+                        </div>
+                        <div class="field" style="margin:0">
+                          <label>Kaç günde bir reklam</label>
+                          <input id="adCooldownDaysInput" class="input" type="number" min="1" step="1" placeholder="Örn: 7" />
+                          <div class="hint">Ödülün tekrar alınabilmesi için bekleme günü.</div>
+                        </div>
+                        <button id="btnSaveAdSettings" class="btn secondary" type="button">Reklam ayarını kaydet</button>
+                      </div>
+                      <div class="notice">Buradaki paketler yalnızca senin eklediklerinle görünür.</div>
                       <form id="coinPackageForm" class="form" style="margin-top:12px">
                         <input id="coinPackageId" type="hidden" />
                         <div class="two">
@@ -1189,7 +1212,7 @@
               <label>Coin fiyatı</label>
               <input id="adCoinPrice" class="input" type="number" min="0" placeholder="Örn: 250" />
               <button id="btnConvertTlToCoin" class="btn secondary" type="button" style="margin-top:10px">TL'yi coine çevir</button>
-              <div class="hint">5 TL = 1 Coin. Yeni fiyat 500 TL ise coin alanı 100 olur.</div>
+              <div id="coinRateHint" class="hint">5 TL = 1 Coin. Yeni fiyat 500 TL ise coin alanı 100 olur.</div>
             </div>
           </div>
           <div class="two">
@@ -1444,7 +1467,7 @@
       <div class="modal-body">
         <div class="coin-hub-hero">
           <div class="coin-hub-title">Coin almak için bir yöntem seç</div>
-          <div class="coin-hub-sub">TL paketleri ana ekrandaki kartlarla aynı yapıdadır. İndirimli paket, TL açıklaması ve coin miktarı birlikte görünür.</div>
+          <div class="coin-hub-sub">Burada yalnızca eklenen coin paketleri görünür. İndirimli paket, TL açıklaması ve coin miktarı birlikte görünür.</div>
           <div class="coin-choice-grid">
             <div class="coin-choice-card primary">
               <strong>TL ile coin al</strong>
@@ -1453,8 +1476,8 @@
             </div>
             <div class="coin-choice-card secondary">
               <strong>Reklam ile coin kazan</strong>
-              <div class="tiny">Haftada 1 reklam izleyip 2 coin al. Reklam akışı aynı kalır.</div>
-              <button id="btnOpenCoinAd" class="btn secondary" type="button">Haftada 1 reklam izleyip 2 coin al</button>
+              <div class="tiny" id="coinAdHubText">Reklam izleyip coin kazan.</div>
+              <button id="btnOpenCoinAd" class="btn secondary" type="button">Reklam ile coin kazan</button>
             </div>
           </div>
         </div>
@@ -1470,7 +1493,7 @@
       <div class="modal-body">
         <div class="coin-hub-hero">
           <div class="coin-hub-title">TL paketlerini seç</div>
-          <div class="coin-hub-sub">Seçtiğin paket TL ile coin alımıdır. İndirim, eski fiyat ve TL notu desteklenir.</div>
+          <div class="coin-hub-sub">Seçtiğin paket coin alımı içindir. İndirim, eski fiyat ve TL notu desteklenir.</div>
         </div>
         <div class="hr"></div>
         <div id="coinPackageGrid" class="coin-package-grid"></div>
@@ -1581,6 +1604,11 @@
       adminUsers: $("adminUsers"),
       adminListings: $("adminListings"),
       adminCoinPackages: $("adminCoinPackages"),
+      coinRateInput: $("coinRateInput"),
+      btnSaveCoinRate: $("btnSaveCoinRate"),
+      adRewardCoinsInput: $("adRewardCoinsInput"),
+      adCooldownDaysInput: $("adCooldownDaysInput"),
+      btnSaveAdSettings: $("btnSaveAdSettings"),
       coinPackageForm: $("coinPackageForm"),
       coinPackageId: $("coinPackageId"),
       coinPackageLabel: $("coinPackageLabel"),
@@ -1628,6 +1656,8 @@
       btnCloseCoinHub: $("btnCloseCoinHub"),
       btnOpenCoinPackages: $("btnOpenCoinPackages"),
       btnOpenCoinAd: $("btnOpenCoinAd"),
+      coinAdHubText: $("coinAdHubText"),
+      adNoteText: $("adNoteText"),
       modalCoinPackages: $("modalCoinPackages"),
       btnCloseCoinPackages: $("btnCloseCoinPackages"),
       coinPackageWrap: $("coinPackageWrap"),
@@ -1742,14 +1772,7 @@
       { brand: "Teknosa", headline: "Teknoloji önerileri", copy: "Telefon, kulaklık ve aksesuar odaklı sponsor alanı.", pill: "Sponsor • Teknoloji" },
       { brand: "LC Waikiki", headline: "Aile indirimi", copy: "Giyim ve sezon fırsatları için örnek reklam kartı.", pill: "Sponsor • Giyim" }
     ];
-    const DEFAULT_COIN_PACKAGES = [
-      { id: "p1", label: "30 TL 7 Coin", price: 30, coin: 7, tl: 30, description: "TL öde, coin anında gelsin.", featured: false, active: true },
-      { id: "p2", label: "50 TL 10 Coin", price: 50, coin: 10, tl: 50, description: "Küçük paket", featured: false, active: true },
-      { id: "p3", label: "100 TL 25 Coin", price: 100, coin: 25, tl: 100, description: "Önerilen deneme paketi", featured: true, active: true },
-      { id: "p4", label: "200 TL 55 Coin", price: 200, coin: 55, tl: 200, description: "Daha avantajlı", featured: false, active: true },
-      { id: "p5", label: "400 TL 120 Coin", price: 400, coin: 120, tl: 400, description: "Büyük kullanım paketi", featured: false, active: true },
-      { id: "p6", label: "800 TL 300 Coin", price: 800, coin: 300, tl: 800, description: "En yüksek paket", featured: false, active: true }
-    ];
+    const DEFAULT_COIN_PACKAGES = [];
     function slugify(name){
       return String(name).trim().toLowerCase()
         .replace(/[^a-z0-9ğüşöçıİı\s-]/gi,"")
@@ -2102,6 +2125,7 @@
     function defaultTaskState(){
       return {
         dailyAdDate: "",
+        adLastWatchAtMs: 0,
         sessionMs: 0,
         sessionRewarded: false,
         loginStreak: 0,
@@ -2406,7 +2430,7 @@
       const cachedReviews = state.reviewCache[item.id] || [];
       const summary = averageRating(cachedReviews);
       if (refs.detailRatingSummary){
-        refs.detailRatingSummary.textContent = summary.count ? `${summary.avg.toFixed(1)} / 5 • ${summary.count} yorum` : "Puan yok";
+        refs.detailRatingSummary.textContent = summary.count ? `${summary.avg.toFixed(1)} / COIN_RATE • ${summary.count} yorum` : "Puan yok";
       }
       const coinText = Number(item.coinPrice || 0) > 0 ? ` / ${formatCoin(item.coinPrice)}` : "";
       if (item.isDiscounted && item.oldPriceLabel && item.newPriceLabel){
@@ -2598,7 +2622,7 @@
         { key:"seven-login", title:"7 gün giriş", desc:"7 gün üst üste giriş yap", current: Math.min(p.loginStreak || 0, 7), target: 7 },
         { key:"one-hour", title:"1 saat aktif", desc:"Sitede 1 saat kal", current: p.sessionMs || 0, target: 60 * 60 * 1000 },
         { key:"twentyfour", title:"24 saat gezin", desc:"Toplam 24 saat gezin", current: p.browseMs || 0, target: 24 * 60 * 60 * 1000 },
-        { key:"ad", title:"Haftalık reklam", desc:"Bu hafta 1 reklam izle", current: p.dailyAdDate === weekKeyFromMs() ? 1 : 0, target: 1 }
+        { key:"ad", title:"Reklam", desc:"Belirlenen aralıkta reklam izle", current: p.adLastWatchAtMs ? 1 : 0, target: 1 }
       ];
     }
     function renderAchievements(){
@@ -2759,24 +2783,26 @@
       const browseTarget = 24 * 60 * 60 * 1000;
       const loginTarget = 7;
       const listingTarget = 15;
-      const adDone = p.dailyAdDate === weekKeyFromMs();
+      const adSettings = getSavedAdWatchSettings();
+      const adReadyAt = Number(p.adLastWatchAtMs || 0) + (Number(adSettings.cooldownDays || 7) * DAY);
+      const adDone = Number(p.adLastWatchAtMs || 0) > 0 && getRealNowMs() < adReadyAt;
       const sessionDone = !!p.sessionRewarded || p.sessionMs >= sessionTarget;
       const browseDone = !!p.browseRewarded || p.browseMs >= browseTarget;
       const loginDone = !!p.loginRewarded || p.loginStreak >= loginTarget;
       const listingDone = !!p.listingsRewarded || p.listingsCreated >= listingTarget;
       refs.taskSummary.innerHTML = `
         <div class="stat"><b>${formatCoin(currentCoinBalance())}</b><span>Coin</span></div>
-        <div class="stat"><b>${adDone ? '1/1' : '0/1'}</b><span>Haftalık reklam</span></div>
+        <div class="stat"><b>${adDone ? '1/1' : '0/1'}</b><span>Reklam</span></div>
         <div class="stat"><b>${Math.min(Math.floor((p.sessionMs || 0) / 60000), 60)}/60 dk</b><span>Oturum</span></div>
         <div class="stat"><b>${Math.min(p.loginStreak || 0, 7)}/7</b><span>Giriş serisi</span></div>
       `;
       refs.taskList.innerHTML = `
         <div class="task-card">
           <div class="task-head">
-            <strong>1 reklam izle</strong>
+            <strong>Reklam izle</strong>
             <span class="badge ${adDone ? 'ok' : 'wait'}">${adDone ? 'Tamam' : 'Bekliyor'}</span>
           </div>
-          <div class="task-meta">+ butonuna bas. 60 saniye sonunda 2 Coin verilir. Haftada yalnızca 1 kez ödül alınır.</div>
+          <div class="task-meta">+ butonuna bas. 60 saniye sonunda ${Math.max(1, Math.round(Number(adSettings.rewardCoins) || 2))} Coin verilir. ${Math.max(1, Math.round(Number(adSettings.cooldownDays) || 7))} günde bir alınır.</div>
           <div class="progress"><span class="progress-bar" style="width:${adDone ? 100 : 0}%"></span></div>
         </div>
         <div class="task-card">
@@ -3087,7 +3113,7 @@
           </div>
         </div>
         <div class="ad-count" id="adCountdown">${escapeHtml(String(remaining))}</div>
-        <div class="ad-note">Haftada yalnızca 1 kez ödül alınır.</div>
+        <div class="ad-note" id="adNoteText">Reklam ödülü ayarlara göre verilir.</div>
       `;
     }
 
@@ -3110,18 +3136,23 @@
       if (message && refs.adStatusText) refs.adStatusText.textContent = message;
     }
     async function finishAdWatch(){
-      const weekKey = weekKeyFromMs(getRealNowMs());
+      const settings = getSavedAdWatchSettings();
+      const now = getRealNowMs();
       try{
         const result = await mutateTaskState((taskState) => {
-          if (taskState.dailyAdDate === weekKey) return { rewardCoins: 0 };
-          taskState.dailyAdDate = weekKey;
-          taskState.updatedAtMs = getRealNowMs();
-          return { rewardCoins: 2 };
+          const lastAt = Number(taskState.adLastWatchAtMs || 0);
+          const cooldownMs = Math.max(1, Number(settings.cooldownDays || 7)) * DAY;
+          if (lastAt && now < lastAt + cooldownMs) return { rewardCoins: 0 };
+          taskState.adLastWatchAtMs = now;
+          taskState.dailyAdDate = dateKeyFromMs(now);
+          taskState.updatedAtMs = now;
+          return { rewardCoins: Math.max(1, Math.round(Number(settings.rewardCoins || 2))) };
         });
         stopAdWatch('Coin eklendi.');
-        if (result?.rewardCoins > 0) await logAction('Reklam ödülü', `${state.profile?.displayName || 'user'} +2 Coin`);
+        const rewarded = Math.max(1, Math.round(Number(settings.rewardCoins || 2)));
+        if (result?.rewardCoins > 0) await logAction('Reklam ödülü', `${state.profile?.displayName || 'user'} +${rewarded} Coin`);
         scheduleRender();
-        alert('Reklam tamamlandı. 2 Coin eklendi.');
+        alert(`Reklam tamamlandı. ${rewarded} Coin eklendi.`);
       }catch(err){
         stopAdWatch('Ödül alınamadı.');
         alert('Reklam ödülü verilemedi: ' + firebaseErrorMessage(err));
@@ -3130,8 +3161,11 @@
     function startAdWatch(){
       if (!state.user) return;
       const p = normalizeTaskState(state.profile?.taskState);
-      const today = dateKeyFromMs(getRealNowMs());
-      if (p.dailyAdDate === weekKeyFromMs()) return alert('Bu hafta reklam ödülünü zaten aldın.');
+      const settings = getSavedAdWatchSettings();
+      const cooldownMs = Math.max(1, Number(settings.cooldownDays || 7)) * DAY;
+      const now = getRealNowMs();
+      const lastAt = Number(p.adLastWatchAtMs || 0);
+      if (lastAt && now < lastAt + cooldownMs) return alert(`Bu reklam ödülü için ${Math.max(1, Number(settings.cooldownDays || 7))} gün beklemelisin.`);
       if (state.adWatch) return;
       if (refs.modalAd) showModal(refs.modalAd);
       let remaining = 60;
@@ -4757,6 +4791,61 @@ Sorun: ${body}`;
         renderProfile();
       }
     });
+    const COIN_RATE_STORAGE_KEY = "coinRateSetting";
+    const AD_REWARD_SETTINGS_KEY = "adRewardSettings";
+    function getSavedCoinRate(){
+      const stored = Number(localStorage.getItem(COIN_RATE_STORAGE_KEY));
+      return Number.isFinite(stored) && stored > 0 ? Math.max(1, Math.round(stored)) : 5;
+    }
+    function getSavedAdWatchSettings(){
+      let stored = {};
+      try{
+        stored = JSON.parse(localStorage.getItem(AD_REWARD_SETTINGS_KEY) || "{}");
+      }catch(_err){
+        stored = {};
+      }
+      const rewardCoins = Math.max(1, Math.round(Number(stored.rewardCoins) || 2));
+      const cooldownDays = Math.max(1, Math.round(Number(stored.cooldownDays) || 7));
+      return { rewardCoins, cooldownDays };
+    }
+    function updateCoinRateUI(){
+      const rate = Math.max(1, Math.round(Number(COIN_RATE) || 5));
+      if (refs.coinRateInput) refs.coinRateInput.value = String(rate);
+      if (refs.btnConvertTlToCoin) refs.btnConvertTlToCoin.textContent = `TL'yi coine çevir (1 Coin = ${rate} TL)`;
+      if (refs.coinRateHint) refs.coinRateHint.textContent = `${rate} TL = 1 Coin. Yeni fiyat 500 TL ise coin alanı ${Math.max(1, Math.round(500 / rate))} olur.`;
+      if (refs.btnSaveCoinRate) refs.btnSaveCoinRate.textContent = `Oranı kaydet (${rate})`;
+    }
+    function updateAdWatchUI(){
+      const settings = getSavedAdWatchSettings();
+      const reward = Math.max(1, Math.round(Number(settings.rewardCoins) || 2));
+      const cooldown = Math.max(1, Math.round(Number(settings.cooldownDays) || 7));
+      if (refs.adRewardCoinsInput) refs.adRewardCoinsInput.value = String(reward);
+      if (refs.adCooldownDaysInput) refs.adCooldownDaysInput.value = String(cooldown);
+      if (refs.btnSaveAdSettings) refs.btnSaveAdSettings.textContent = `Reklam ayarını kaydet (${reward} coin / ${cooldown} gün)`;
+      if (refs.btnOpenCoinAd) refs.btnOpenCoinAd.textContent = `Reklam ile ${reward} coin kazan`;
+      const hubText = refs.coinAdHubText;
+      if (hubText) hubText.textContent = `Reklam izleyip ${reward} coin kazan. ${cooldown} günde bir ödül alınır.`;
+      if (refs.adNoteText) refs.adNoteText.textContent = `Bu reklam ödülü ${cooldown} günde bir alınır ve ${reward} coin verir.`;
+    }
+    function saveCoinRateSetting(rate){
+      const next = Math.max(1, Math.round(Number(rate) || 0));
+      if (!next) return false;
+      COIN_RATE = next;
+      localStorage.setItem(COIN_RATE_STORAGE_KEY, String(next));
+      updateCoinRateUI();
+      scheduleRender();
+      return true;
+    }
+    function saveAdWatchSettings(settings){
+      const rewardCoins = Math.max(1, Math.round(Number(settings?.rewardCoins) || 0));
+      const cooldownDays = Math.max(1, Math.round(Number(settings?.cooldownDays) || 0));
+      if (!rewardCoins || !cooldownDays) return false;
+      const next = { rewardCoins, cooldownDays };
+      localStorage.setItem(AD_REWARD_SETTINGS_KEY, JSON.stringify(next));
+      updateAdWatchUI();
+      scheduleRender();
+      return true;
+    }
     function autoFormatPriceInput(input){
       if (!input) return;
       const formatted = normalizePriceLabel(input.value);
@@ -4773,7 +4862,8 @@ Sorun: ${body}`;
         alert("Önce yeni TL fiyatı yaz.");
         return;
       }
-      const coinValue = Math.max(1, Math.round(tlAmount / 5));
+      const rate = Math.max(1, Math.round(Number(COIN_RATE) || 5));
+      const coinValue = Math.max(1, Math.round(tlAmount / rate));
       if (refs.adCoinSale) refs.adCoinSale.checked = true;
       if (refs.adCoinPrice) refs.adCoinPrice.value = String(coinValue);
     }
@@ -4782,6 +4872,25 @@ Sorun: ${body}`;
       autoFormatPriceInput(refs.adNewPrice);
     });
     refs.btnConvertTlToCoin?.addEventListener("click", convertTlToCoin);
+    refs.btnSaveCoinRate?.addEventListener("click", () => {
+      const value = Number(refs.coinRateInput?.value || 0);
+      if (!value || value < 1) {
+        alert("Geçerli bir oran gir.");
+        return;
+      }
+      saveCoinRateSetting(value);
+      alert(`Dönüşüm oranı kaydedildi: 1 Coin = ${Math.max(1, Math.round(value))} TL`);
+    });
+    refs.btnSaveAdSettings?.addEventListener("click", () => {
+      const rewardCoins = Number(refs.adRewardCoinsInput?.value || 0);
+      const cooldownDays = Number(refs.adCooldownDaysInput?.value || 0);
+      if (!rewardCoins || rewardCoins < 1 || !cooldownDays || cooldownDays < 1) {
+        alert("Geçerli reklam ayarları gir.");
+        return;
+      }
+      saveAdWatchSettings({ rewardCoins, cooldownDays });
+      alert(`Reklam ayarları kaydedildi: ${Math.max(1, Math.round(rewardCoins))} coin / ${Math.max(1, Math.round(cooldownDays))} gün`);
+    });
     refs.profileForm.onsubmit = async (e) => {
       e.preventDefault();
       if (!state.user) return;
@@ -5105,6 +5214,10 @@ Sorun: ${body}`;
         stopAdWatch('Sekme gizlendi.');
       }
     });
-  </script>
+  
+let COIN_RATE = getSavedCoinRate();
+updateCoinRateUI();
+updateAdWatchUI();
+</script>
 </body>
 </html>
