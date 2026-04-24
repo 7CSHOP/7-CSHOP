@@ -3530,10 +3530,12 @@
       if (isManagerKey(raw)){
         state.promoUnlocked = true;
         refs.promoRedeemInput.value = '';
+        await ensurePromoCodesLoaded();
         await renderPromoManager();
         scheduleRender();
         return;
       }
+      if (!state.promoCodes.length) await ensurePromoCodesLoaded();
       const code = state.promoCodes.find(x => String(x.code || '').trim().toLowerCase() === raw.toLowerCase());
       if (!code) return alert('Kod bulunamadı.');
       if (code.active === false) return alert('Kod pasif.');
@@ -3566,6 +3568,7 @@
         });
         refs.promoRedeemInput.value = '';
         await logAction('Promosyon kullanıldı', `${state.profile.displayName} → ${raw}`);
+        await ensurePromoCodesLoaded();
         scheduleRender();
         alert(`Kod tamam. ${reward} Coin eklendi.`);
       }catch(err){
@@ -3588,6 +3591,7 @@
       if (!confirm(`"${code.code}" silinsin mi?`)) return;
       await deleteDoc(doc(db, 'promoCodes', id));
       await logAction('Promosyon silindi', code.code || id);
+      await ensurePromoCodesLoaded();
       scheduleRender();
     }
     async function addOrUpdatePromo(e){
@@ -3615,6 +3619,7 @@
       }, editId);
       clearPromoForm();
       await logAction(editId ? 'Promosyon düzenlendi' : 'Promosyon eklendi', code);
+      await ensurePromoCodesLoaded();
       scheduleRender();
     }
     async function manualPurchaseFromModal(){
