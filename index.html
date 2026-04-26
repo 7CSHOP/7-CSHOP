@@ -641,6 +641,139 @@
       font-weight:900;
     }
 
+    .reward-package-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,220px));
+      justify-content:center;
+      gap:12px;
+    }
+    .reward-package-card{
+      position:relative;
+      overflow:hidden;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.22);
+      padding:12px;
+      min-height:260px;
+      max-width:220px;
+      display:grid;
+      gap:10px;
+      text-align:center;
+      color:#fff;
+      box-shadow:0 16px 30px rgba(0,0,0,.12);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.20), transparent 35%),
+        linear-gradient(135deg, var(--pkg-bg, #7c3aed), color-mix(in srgb, var(--pkg-bg, #7c3aed) 82%, #000 18%));
+    }
+    .reward-package-card::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      box-shadow:0 0 0 1px rgba(255,255,255,.08) inset, 0 0 24px var(--pkg-glow, rgba(124,58,237,.42));
+      pointer-events:none;
+    }
+    .reward-package-top{
+      position:relative;
+      z-index:1;
+      display:grid;
+      gap:8px;
+      justify-items:center;
+      align-content:start;
+    }
+    .reward-package-title{
+      font-size:18px;
+      font-weight:950;
+      line-height:1.06;
+      text-align:center;
+      text-wrap:balance;
+    }
+    .reward-package-price{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      justify-content:center;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.18);
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.01em;
+    }
+    .reward-package-rewards{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:6px;
+      margin-top:auto;
+    }
+    .reward-package-reward{
+      padding:8px 10px;
+      border-radius:12px;
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.18);
+      font-size:12px;
+      font-weight:800;
+      line-height:1.3;
+      text-align:center;
+      backdrop-filter:blur(2px);
+    }
+    .reward-package-footer{
+      position:relative;
+      z-index:1;
+      display:grid;
+      gap:10px;
+    }
+    .reward-package-note{
+      font-size:12px;
+      line-height:1.45;
+      opacity:.92;
+    }
+    .reward-package-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .reward-package-actions .btn{min-width:unset;padding:10px 12px;font-size:13px}
+    .reward-package-card .badge.notify{
+      background:rgba(255,255,255,.2);
+      border:1px solid rgba(255,255,255,.18);
+      color:#fff;
+    }
+    .reward-package-admin-card{
+      border:1px solid var(--line);
+      border-radius:20px;
+      background:#fff;
+      padding:14px;
+      display:grid;
+      gap:10px;
+      box-shadow:0 8px 18px rgba(17,24,39,.04);
+    }
+    .reward-package-admin-preview{
+      min-height:100px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      padding:10px;
+      color:#fff;
+      background:linear-gradient(135deg, var(--pkg-bg, #7c3aed), color-mix(in srgb, var(--pkg-bg, #7c3aed) 82%, #000 18%));
+      box-shadow:0 0 22px var(--pkg-glow, rgba(124,58,237,.42));
+    }
+    .reward-package-admin-preview strong{
+      display:block;
+      font-size:18px;
+      line-height:1.1;
+    }
+    .reward-package-admin-preview span{
+      display:block;
+      font-size:12px;
+      opacity:.92;
+      margin-top:6px;
+    }
+
     @media (max-width:760px){
       .topbar-inner{align-items:stretch}
       .actions{width:100%}
@@ -789,6 +922,7 @@
                 <button data-view="buyrequests">Alım istekleri</button>
                 <button data-view="myads">İlanlarım</button>
                 <button data-view="messages">Mesajlar <span id="messagesBadge" class="badge notify hidden" style="margin-left:8px">0</span></button>
+                <button data-view="packages">Paketler</button>
                 <button data-view="profile">Profil</button>
                 <button data-view="tasks">Görevler</button>
                 <button data-view="help" id="helpMenu">Yardım</button>
@@ -893,6 +1027,13 @@
                     </div>
                   </div>
                 </div>
+              </div>
+              <div id="viewPackages" class="hidden">
+                <div class="notice">
+                  Paketler coin ile tek tuşla alınır, İade yoktur!
+                </div>
+                <div class="hr"></div>
+                <div id="rewardPackagesGrid" class="reward-package-grid"></div>
               </div>
               <div id="viewProfile" class="hidden">
                 <div class="admin-grid">
@@ -1118,6 +1259,65 @@
                       </form>
                       <div class="hr"></div>
                       <div id="adminCoinPackages" class="list"></div>
+                    </div>
+                  </div>
+                  <div class="panel" style="box-shadow:none">
+                    <div class="panel-inner">
+                      <div class="section-title">
+                        <div>
+                          <h3>Paketler</h3>
+                          <p>Neon arka planlı, coin ile alınan paketler</p>
+                        </div>
+                      </div>
+                      <div class="notice">Maksimum 4 ödül gir. Paket satın alınca coin düşer, paket silinir ve Alper hesabına sistem mesajı gider.</div>
+                      <form id="rewardPackageForm" class="form" style="margin-top:12px">
+                        <input id="rewardPackageId" type="hidden" />
+                        <div class="two">
+                          <div class="field">
+                            <label>Paket adı</label>
+                            <input id="rewardPackageTitle" class="input" maxlength="60" placeholder="Örn: Neon Hız Paketi" />
+                          </div>
+                          <div class="field">
+                            <label>Coin fiyatı</label>
+                            <input id="rewardPackageCoinPrice" class="input" type="number" min="1" placeholder="Örn: 50" />
+                          </div>
+                        </div>
+                        <div class="two">
+                          <div class="field">
+                            <label>Neon arka plan rengi</label>
+                            <input id="rewardPackageBgColor" class="input" type="color" value="#7c3aed" />
+                          </div>
+                          <div class="field">
+                            <label><input id="rewardPackageActive" type="checkbox" checked /> Aktif</label>
+                          </div>
+                        </div>
+                        <div class="two">
+                          <div class="field">
+                            <label>Ödül 1</label>
+                            <input id="rewardPackageReward1" class="input" maxlength="60" placeholder="Örn: 10 Coin Bonus" />
+                          </div>
+                          <div class="field">
+                            <label>Ödül 2</label>
+                            <input id="rewardPackageReward2" class="input" maxlength="60" placeholder="Örn: Premium rozet" />
+                          </div>
+                        </div>
+                        <div class="two">
+                          <div class="field">
+                            <label>Ödül 3</label>
+                            <input id="rewardPackageReward3" class="input" maxlength="60" placeholder="Örn: Özel renk" />
+                          </div>
+                          <div class="field">
+                            <label>Ödül 4</label>
+                            <input id="rewardPackageReward4" class="input" maxlength="60" placeholder="Örn: Hızlı destek" />
+                          </div>
+                        </div>
+                        <div class="row">
+                          <button class="btn" type="submit">Kaydet</button>
+                          <button id="rewardPackageReset" class="btn secondary" type="button">Temizle</button>
+                        </div>
+                      </form>
+                      <div class="hr"></div>
+                      <div id="adminRewardPackages" class="list"></div>
                     </div>
                   </div>
                   <div class="panel" style="box-shadow:none">
@@ -1626,6 +1826,8 @@
       adminUsers: $("adminUsers"),
       adminListings: $("adminListings"),
       adminCoinPackages: $("adminCoinPackages"),
+      adminRewardPackages: $("adminRewardPackages"),
+      rewardPackagesGrid: $("rewardPackagesGrid"),
       coinRateInput: $("coinRateInput"),
       btnSaveCoinRate: $("btnSaveCoinRate"),
       adRewardCoinsInput: $("adRewardCoinsInput"),
@@ -1633,6 +1835,17 @@
       btnSaveAdSettings: $("btnSaveAdSettings"),
       coinPackageForm: $("coinPackageForm"),
       coinPackageId: $("coinPackageId"),
+      rewardPackageForm: $("rewardPackageForm"),
+      rewardPackageId: $("rewardPackageId"),
+      rewardPackageTitle: $("rewardPackageTitle"),
+      rewardPackageCoinPrice: $("rewardPackageCoinPrice"),
+      rewardPackageBgColor: $("rewardPackageBgColor"),
+      rewardPackageReward1: $("rewardPackageReward1"),
+      rewardPackageReward2: $("rewardPackageReward2"),
+      rewardPackageReward3: $("rewardPackageReward3"),
+      rewardPackageReward4: $("rewardPackageReward4"),
+      rewardPackageActive: $("rewardPackageActive"),
+      rewardPackageReset: $("rewardPackageReset"),
       coinPackageLabel: $("coinPackageLabel"),
       coinPackageCoin: $("coinPackageCoin"),
       coinPackagePrice: $("coinPackagePrice"),
@@ -1767,6 +1980,7 @@
       promoUnlocked: false,
       promoCodes: [],
       coinPackages: [],
+      rewardPackages: [],
       unsubscribers: [],
       listingDraftImages: [],
       taskTicker: null,
@@ -1974,6 +2188,7 @@
         buyrequests:["Alım istekleri","Alım taleplerini görüntüle."],
         myads:["İlanlarım","Kendi ilanlarını düzenle, kapat, aç veya sil."],
         messages:["Mesajlar","İlan bazlı konuşmalar."],
+        packages:["Paketler","Coin ile alınan paketler."],
         profile:["Profil","Hesap özetin."],
         tasks:["Görevler","Günlük görev ilerlemeleri."],
         admin:["Yönetim","Tüm ilanlar ve son kayıtlar."],
@@ -1985,6 +2200,7 @@
       document.getElementById("viewBuyRequests").classList.toggle("hidden", view !== "buyrequests");
       document.getElementById("viewMyAds").classList.toggle("hidden", view !== "myads");
       document.getElementById("viewMessages").classList.toggle("hidden", view !== "messages");
+      document.getElementById("viewPackages").classList.toggle("hidden", view !== "packages");
       document.getElementById("viewProfile").classList.toggle("hidden", view !== "profile");
       document.getElementById("viewTasks").classList.toggle("hidden", view !== "tasks");
       document.getElementById("viewAdmin").classList.toggle("hidden", view !== "admin");
@@ -3149,6 +3365,228 @@
       return sendCoinPackageRequest(pkg);
     }
 
+    function normalizeRewardPackage(pkg, id){
+      const rewards = Array.isArray(pkg?.rewards) ? pkg.rewards : [];
+      return {
+        id: String(id || pkg?.id || ""),
+        title: String(pkg?.title || pkg?.label || "").trim(),
+        coinPrice: Math.max(0, Math.round(Number(pkg?.coinPrice || pkg?.price || 0))),
+        bgColor: String(pkg?.bgColor || "#7c3aed").trim() || "#7c3aed",
+        rewards: rewards.map(x => String(x || "").trim()).filter(Boolean).slice(0, 4),
+        active: pkg?.active !== false,
+        createdAtMs: Number(pkg?.createdAtMs || 0),
+        updatedAtMs: Number(pkg?.updatedAtMs || 0)
+      };
+    }
+    function getActiveRewardPackages(){
+      return (state.rewardPackages || [])
+        .map((pkg, index) => normalizeRewardPackage(pkg, pkg.id || `rp-${index}`))
+        .filter(pkg => pkg.active !== false)
+        .sort((a, b) => (Number(b.updatedAtMs || b.createdAtMs) - Number(a.updatedAtMs || a.createdAtMs)) || (Number(a.coinPrice) - Number(b.coinPrice)));
+    }
+    function renderRewardPackages(){
+      if (!refs.rewardPackagesGrid) return;
+      const items = getActiveRewardPackages();
+      refs.rewardPackagesGrid.innerHTML = items.map(pkg => {
+        const bg = pkg.bgColor || "#7c3aed";
+        const style = `--pkg-bg:${bg};--pkg-glow:${bg}88`;
+        const rewards = pkg.rewards.slice(0, 4);
+        return `
+          <div class="reward-package-card" style="${style}">
+            <div class="reward-package-top">
+              <div class="badge notify">Paket</div>
+              <div class="reward-package-title">${escapeHtml(pkg.title || "Başlıksız paket")}</div>
+              <div class="reward-package-price">${escapeHtml(formatCoin(pkg.coinPrice || 0))} ile alınır</div>
+            </div>
+            <div class="reward-package-rewards">
+              ${(rewards.length ? rewards : ["Ödül eklenmemiş"]).map(r => `<div class="reward-package-reward">${escapeHtml(r)}</div>`).join("")}
+            </div>
+            <div class="reward-package-footer">
+              <div class="reward-package-note">Satış fiyatı: <strong>${escapeHtml(formatCoin(pkg.coinPrice || 0))}</strong></div>
+              <div class="reward-package-actions">
+                <button class="btn good" type="button" onclick="window.__buyRewardPackage('${pkg.id}')">Coin ile al</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("") || `<div class="feed-item">Henüz paket yok.</div>`;
+    }
+    function renderAdminRewardPackages(){
+      if (!refs.adminRewardPackages) return;
+      const items = (state.rewardPackages || []).map((pkg, index) => normalizeRewardPackage(pkg, pkg.id || `rp-${index}`));
+      refs.adminRewardPackages.innerHTML = items.sort((a,b) => (Number(b.updatedAtMs || b.createdAtMs) - Number(a.updatedAtMs || a.createdAtMs))).map(pkg => {
+        const bg = pkg.bgColor || "#7c3aed";
+        const style = `--pkg-bg:${bg};--pkg-glow:${bg}88`;
+        const rewardLines = pkg.rewards.slice(0, 4);
+        return `
+          <div class="reward-package-admin-card">
+            <div class="reward-package-admin-preview" style="${style}">
+              <div>
+                <strong>${escapeHtml(pkg.title || "Başlıksız paket")}</strong>
+                <span>${escapeHtml(formatCoin(pkg.coinPrice || 0))} • ${rewardLines.length || 0} ödül</span>
+              </div>
+            </div>
+            <div class="tiny">${rewardLines.map(r => `• ${escapeHtml(r)}`).join("<br>") || "Ödül eklenmemiş"}</div>
+            <div class="row">
+              <span class="pill">${pkg.active ? "Aktif" : "Pasif"}</span>
+              <span class="pill">${escapeHtml(formatCoin(pkg.coinPrice || 0))}</span>
+            </div>
+            <div class="row">
+              <button class="btn secondary" type="button" onclick="window.__editRewardPackage('${pkg.id}')">Düzenle</button>
+              <button class="btn bad" type="button" onclick="window.__deleteRewardPackage('${pkg.id}')">Sil</button>
+            </div>
+          </div>
+        `;
+      }).join("") || `<div class="feed-item">Paket yok.</div>`;
+    }
+    function resetRewardPackageForm(){
+      refs.rewardPackageForm?.reset();
+      if (refs.rewardPackageId) refs.rewardPackageId.value = "";
+      if (refs.rewardPackageBgColor) refs.rewardPackageBgColor.value = "#7c3aed";
+      if (refs.rewardPackageActive) refs.rewardPackageActive.checked = true;
+    }
+    function fillRewardPackageForm(pkg){
+      if (!pkg) return;
+      if (refs.rewardPackageId) refs.rewardPackageId.value = pkg.id || "";
+      if (refs.rewardPackageTitle) refs.rewardPackageTitle.value = pkg.title || "";
+      if (refs.rewardPackageCoinPrice) refs.rewardPackageCoinPrice.value = pkg.coinPrice || "";
+      if (refs.rewardPackageBgColor) refs.rewardPackageBgColor.value = pkg.bgColor || "#7c3aed";
+      if (refs.rewardPackageReward1) refs.rewardPackageReward1.value = pkg.rewards?.[0] || "";
+      if (refs.rewardPackageReward2) refs.rewardPackageReward2.value = pkg.rewards?.[1] || "";
+      if (refs.rewardPackageReward3) refs.rewardPackageReward3.value = pkg.rewards?.[2] || "";
+      if (refs.rewardPackageReward4) refs.rewardPackageReward4.value = pkg.rewards?.[3] || "";
+      if (refs.rewardPackageActive) refs.rewardPackageActive.checked = pkg.active !== false;
+    }
+    async function saveRewardPackageFromForm(){
+      const id = String(refs.rewardPackageId?.value || "").trim();
+      const title = String(refs.rewardPackageTitle?.value || "").trim();
+      const coinPrice = Math.max(0, Math.round(Number(refs.rewardPackageCoinPrice?.value || 0)));
+      const bgColor = String(refs.rewardPackageBgColor?.value || "#7c3aed").trim() || "#7c3aed";
+      const rewards = [
+        refs.rewardPackageReward1?.value,
+        refs.rewardPackageReward2?.value,
+        refs.rewardPackageReward3?.value,
+        refs.rewardPackageReward4?.value
+      ].map(x => String(x || "").trim()).filter(Boolean).slice(0, 4);
+      const active = !!refs.rewardPackageActive?.checked;
+      if (!title) return alert("Paket adı gerekli.");
+      if (!coinPrice) return alert("Coin fiyatı gerekli.");
+      const payload = {
+        title,
+        coinPrice,
+        bgColor,
+        rewards,
+        active,
+        updatedAt: serverTimestamp(),
+        updatedAtMs: Date.now()
+      };
+      try{
+        if (id){
+          await updateDoc(doc(db, "rewardPackages", id), payload);
+          await logAction("Paket düzenlendi", `${state.profile.displayName} → ${title}`);
+        }else{
+          await addDoc(collection(db, "rewardPackages"), {
+            ...payload,
+            createdAt: serverTimestamp(),
+            createdAtMs: Date.now()
+          });
+          await logAction("Paket eklendi", `${state.profile.displayName} → ${title}`);
+        }
+        resetRewardPackageForm();
+        scheduleRender();
+      }catch(err){
+        alert("Paket kaydedilemedi: " + firebaseErrorMessage(err));
+      }
+    }
+    async function editRewardPackage(id){
+      const pkg = (state.rewardPackages || []).find(x => x.id === id);
+      if (!pkg) return alert("Paket bulunamadı.");
+      fillRewardPackageForm(normalizeRewardPackage(pkg, id));
+      refs.rewardPackageTitle?.focus();
+    }
+    async function deleteRewardPackage(id){
+      const pkg = (state.rewardPackages || []).find(x => x.id === id);
+      if (!pkg) return alert("Paket bulunamadı.");
+      if (!confirm(`"${pkg.title || id}" silinsin mi?`)) return;
+      try{
+        await deleteDoc(doc(db, "rewardPackages", id));
+        await logAction("Paket silindi", `${state.profile.displayName} → ${pkg.title || id}`);
+        scheduleRender();
+      }catch(err){
+        alert("Paket silinemedi: " + firebaseErrorMessage(err));
+      }
+    }
+    async function buyRewardPackage(id){
+      const item = getActiveRewardPackages().find(x => x.id === id);
+      if (!item) return alert("Paket bulunamadı.");
+      const admin = await findUserByDisplayName("Alper");
+      if (!admin) return alert("Alper hesabı bulunamadı.");
+      const buyerName = state.profile?.displayName || "Kullanıcı";
+      const coinPrice = Number(item.coinPrice || 0);
+      const buyerRef = doc(db, "users", state.user.uid);
+      const packageRef = doc(db, "rewardPackages", id);
+      try{
+        await runTransaction(db, async (tx) => {
+          const userSnap = await tx.get(buyerRef);
+          const packageSnap = await tx.get(packageRef);
+          if (!userSnap.exists()) throw new Error("Kullanıcı bulunamadı");
+          if (!packageSnap.exists()) throw new Error("Paket bulunamadı");
+          const data = packageSnap.data() || {};
+          if (data.active === false) throw new Error("Paket pasif");
+          const balance = Number(userSnap.data().coinBalance || 0);
+          if (balance < coinPrice) throw new Error("Yetersiz bakiye");
+          tx.update(buyerRef, {
+            coinBalance: balance - coinPrice,
+            updatedAt: serverTimestamp()
+          });
+          tx.delete(packageRef);
+        });
+        const rewardText = (item.rewards || []).slice(0, 4).join(" • ") || "Ödül yok";
+        const message = `Paket satın alındı
+Paket: ${item.title}
+Alan: ${buyerName}
+Coin: ${formatCoin(coinPrice)}
+Ödüller: ${rewardText}`;
+        const existing = state.conversations.find(c => (c.members || []).includes(state.user.uid) && (c.members || []).includes(admin.uid) && (c.listingId === 'reward-packages' || c.latestListingId === 'reward-packages'));
+        if (existing){
+          const convRef = doc(db, 'conversations', existing.id);
+          const snap = await getDoc(convRef);
+          const data = snap.data() || {};
+          const messages = Array.isArray(data.messages) ? data.messages : [];
+          const unreadBy = { ...(data.unreadBy || {}) };
+          unreadBy[admin.uid] = (Number(unreadBy[admin.uid]) || 0) + 1;
+          await updateDoc(convRef, {
+            listingId: 'reward-packages',
+            latestListingId: 'reward-packages',
+            latestListingName: item.title,
+            messages: [...messages, { uid: 'system', name: 'Sistem', text: message, type: 'system', createdAt: new Date(getRealNowMs()).toISOString() }],
+            lastMessage: message,
+            unreadBy,
+            updatedAt: serverTimestamp()
+          });
+        }else{
+          await addDoc(collection(db, 'conversations'), {
+            listingId: 'reward-packages',
+            latestListingId: 'reward-packages',
+            latestListingName: item.title,
+            members: [state.user.uid, admin.uid],
+            memberNames: Array.from(new Set([buyerName, admin.displayName].filter(Boolean))),
+            messages: [{ uid: 'system', name: 'Sistem', text: message, type: 'system', createdAt: new Date(getRealNowMs()).toISOString() }],
+            lastMessage: message,
+            unreadBy: { [admin.uid]: 1 },
+            readBy: { [state.user.uid]: getRealNowMs() },
+            createdAtMs: getRealNowMs(),
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          });
+        }
+        await logAction("Paket satın alındı", `${buyerName} → ${item.title} (${formatCoin(coinPrice)})`);
+        alert(`Paket satın alındı ve ${formatCoin(coinPrice)} coin düşüldü.`);
+        scheduleRender();
+      }catch(err){
+        alert("Satın alma tamamlanamadı: " + firebaseErrorMessage(err));
+      }
+    }
 
     function renderAdFrame(index = 0, remaining = 60){
       if (!refs.adFrame) return;
@@ -3503,11 +3941,14 @@
         renderProfile();
         renderPromoManager().catch(()=>{});
       }
+      if (state.view === "packages") renderRewardPackages();
+      if (state.view === "packages") renderRewardPackages();
       if (state.view === "tasks") renderTasks();
       if (state.view === "admin") {
         renderAdminUsers();
         renderAdminListings();
         renderAdminCoinPackages();
+        renderAdminRewardPackages();
         renderAdminLog();
       }
       if (state.view === "help") renderHelp();
@@ -4300,7 +4741,11 @@ Sorun: ${body}`;
         state.coinPackages = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         scheduleRender();
       });
-      state.unsubscribers.push(u1, u2, uBuy, u3, uCoins);
+      const uRewardPackages = onSnapshot(collection(db, "rewardPackages"), snap => {
+        state.rewardPackages = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        scheduleRender();
+      });
+      state.unsubscribers.push(u1, u2, uBuy, u3, uCoins, uRewardPackages);
       if (state.view === "admin") {
         ensureAdminLogsLoaded().then(() => scheduleRender()).catch(()=>{});
         ensureAdminUsersLoaded().then(() => scheduleRender()).catch(()=>{});
@@ -5191,6 +5636,11 @@ Sorun: ${body}`;
       saveCoinPackageFromForm();
     });
     refs.coinPackageReset?.addEventListener("click", () => resetCoinPackageForm());
+    refs.rewardPackageForm?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      saveRewardPackageFromForm();
+    });
+    refs.rewardPackageReset?.addEventListener("click", () => resetRewardPackageForm());
     refs.adminUserSearch?.addEventListener("input", () => {
       if (state.view === "admin") scheduleRender();
     });
@@ -5205,6 +5655,9 @@ Sorun: ${body}`;
     window.__selectForAdmin = selectForAdmin;
     window.__editCoinPackage = editCoinPackage;
     window.__deleteCoinPackage = deleteCoinPackage;
+    window.__editRewardPackage = editRewardPackage;
+    window.__deleteRewardPackage = deleteRewardPackage;
+    window.__buyRewardPackage = buyRewardPackage;
     window.__setUserRole = setUserRole;
     window.__decreaseUserCoin = decreaseUserCoin;
     window.__deleteUserAccount = deleteUserAccount;
