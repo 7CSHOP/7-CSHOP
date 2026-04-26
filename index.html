@@ -196,6 +196,8 @@
     .badge.mine{background:#dbeafe;color:#1d4ed8}
     .badge.closed{background:#e5e7eb;color:#4b5563}
     .badge.vip{background:#fef3c7;color:#92400e}
+    .badge.premium{background:#dbeafe;color:#1d4ed8}
+    .premium-star{color:#2563eb;font-weight:900}
     .badge.notify{background:#dc2626;color:#fff;min-width:24px;height:24px;padding:0 8px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font-size:12px;font-weight:900;line-height:1}
     .card h4{margin:0;font-size:18px}
     .card p{margin:0;color:#4b5563;line-height:1.55;font-size:14px}
@@ -205,6 +207,7 @@
       display:inline-flex;align-items:center;gap:8px;background:#f8fafc;border:1px solid var(--line);
       padding:8px 12px;border-radius:999px;font-size:12px;color:#374151
     }
+    .pill.premium{background:#dbeafe;border-color:#bfdbfe;color:#1d4ed8}
     .feed{display:grid;gap:12px}
     .feed-item{border:1px solid var(--line);border-radius:18px;padding:14px;background:#fff}
     .feed-item strong{display:block;margin-bottom:4px}
@@ -1864,6 +1867,7 @@
     }
     function normalizeUserRole(value){
       const v = String(value || "").trim().toLowerCase();
+      if (v === "premium" || v === "premium üye" || v === "premium uye" || v === "premium_member" || v === "prem") return "premium";
       if (v === "vip" || v === "vip üye" || v === "vip uye" || v === "vip_member" || v === "gold") return "vip";
       if (v === "yardımcı üye" || v === "yardimci uye" || v === "helper" || v === "assistant" || v === "assistant_member") return "helper";
       return "member";
@@ -1871,6 +1875,7 @@
     function userRoleLabel(user){
       if (user?.isAdmin) return "Yönetici";
       const role = normalizeUserRole(user?.role);
+      if (role === "premium") return "Premium 🔷";
       if (role === "vip") return "VIP ⭐";
       return role === "helper" ? "Yardımcı üye" : "Üye";
     }
@@ -1878,6 +1883,7 @@
     function userRoleBadge(user){
       if (user?.isAdmin) return `<span class="badge closed">Yönetici</span>`;
       const role = normalizeUserRole(user?.role);
+      if (role === "premium") return `<span class="badge premium">Premium 🔷</span>`;
       if (role === "vip") return `<span class="badge vip">VIP ★</span>`;
       if (role === "helper") return `<span class="badge wait">Yardımcı</span>`;
       return `<span class="badge mine">Üye</span>`;
@@ -2811,7 +2817,9 @@
       const initials = (p.displayName || "?").trim().slice(0,2).toUpperCase();
       refs.profileNameText.textContent = p.displayName || "-";
       refs.profileEmailText.textContent = p.email || "E-posta görünmüyor";
+      const profileRole = normalizeUserRole(p?.role);
       refs.profileRolePill.textContent = userRoleLabel(p);
+      refs.profileRolePill.className = `pill ${profileRole === "premium" ? "premium" : ""}`.trim();
       refs.profilePhotoPill.textContent = avatar ? "PP yüklü" : "PP yok";
       refs.profileAvatarBox.innerHTML = avatar
         ? `<img src="${escapeHtml(avatar)}" alt="Profil fotoğrafı">`
@@ -3330,6 +3338,7 @@
                 <option value="member" ${role === "member" ? "selected" : ""}>Üye</option>
                 <option value="helper" ${role === "helper" ? "selected" : ""}>Yardımcı üye</option>
                 <option value="vip" ${role === "vip" ? "selected" : ""}>VIP</option>
+                <option value="premium" ${role === "premium" ? "selected" : ""}>Premium</option>
               </select>
               <button class="btn warn" type="button" onclick="window.__decreaseUserCoin('${user.uid}')">Coin azalt</button>
               <button class="btn bad" type="button" onclick="window.__deleteUserAccount('${user.uid}')">Hesabı sil</button>
@@ -3363,7 +3372,8 @@
       if (!user) return alert("Kullanıcı bulunamadı.");
       if (user.isAdmin) return alert("Yönetici rolü buradan değiştirilemez.");
       const nextRole = normalizeUserRole(role);
-      if (!confirm(`${user.displayName || "Kullanıcı"} rolü ${nextRole === "helper" ? "Yardımcı üye" : nextRole === "vip" ? "VIP" : "Üye"} olarak güncellensin mi?`)) return;
+      const roleText = nextRole === "premium" ? "Premium" : nextRole === "helper" ? "Yardımcı üye" : nextRole === "vip" ? "VIP" : "Üye";
+      if (!confirm(`${user.displayName || "Kullanıcı"} rolü ${roleText} olarak güncellensin mi?`)) return;
       try{
         const ref = doc(db, "users", userId);
         await updateDoc(ref, { role: nextRole, updatedAt: serverTimestamp() });
