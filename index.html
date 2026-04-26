@@ -1982,6 +1982,7 @@
       coinPackages: [],
       rewardPackages: [],
       unsubscribers: [],
+      globalSettings: { coinRate: null, adRewardSettings: null },
       listingDraftImages: [],
       taskTicker: null,
       adWatch: null,
@@ -4724,6 +4725,16 @@ Sorun: ${body}`;
           scheduleRender();
         }
       });
+      const uSettings = onSnapshot(doc(db, GLOBAL_SETTINGS_COLLECTION, GLOBAL_SETTINGS_DOC_ID), snap => {
+        if (snap.exists()) {
+          const data = snap.data() || {};
+          state.globalSettings = {
+            coinRate: normalizeCoinRateValue(data.coinRate ?? data.coinRateValue ?? data.tlToCoinRate),
+            adRewardSettings: normalizeAdWatchSettingsValue(data.adRewardSettings || data)
+          };
+          applyGlobalSettingsSnapshot(data);
+        }
+      });
       const uBuy = onSnapshot(query(collection(db, "buyRequests"), orderBy("createdAtMs", "desc")), snap => {
         state.buyRequests = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         scheduleRender();
@@ -4745,7 +4756,7 @@ Sorun: ${body}`;
         state.rewardPackages = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         scheduleRender();
       });
-      state.unsubscribers.push(u1, u2, uBuy, u3, uCoins, uRewardPackages);
+      state.unsubscribers.push(u1, u2, uSettings, uBuy, u3, uCoins, uRewardPackages);
       if (state.view === "admin") {
         ensureAdminLogsLoaded().then(() => scheduleRender()).catch(()=>{});
         ensureAdminUsersLoaded().then(() => scheduleRender()).catch(()=>{});
@@ -5337,6 +5348,8 @@ Sorun: ${body}`;
     });
     const COIN_RATE_STORAGE_KEY = "coinRateSetting";
     const AD_REWARD_SETTINGS_KEY = "adRewardSettings";
+    const GLOBAL_SETTINGS_COLLECTION = "appSettings";
+    const GLOBAL_SETTINGS_DOC_ID = "global";
     function getSavedCoinRate(){
       const stored = Number(localStorage.getItem(COIN_RATE_STORAGE_KEY));
       return Number.isFinite(stored) && stored > 0 ? Math.max(1, Math.round(stored)) : 5;
@@ -5351,6 +5364,36 @@ Sorun: ${body}`;
       const rewardCoins = Math.max(1, Math.round(Number(stored.rewardCoins) || 2));
       const cooldownDays = Math.max(1, Math.round(Number(stored.cooldownDays) || 7));
       return { rewardCoins, cooldownDays };
+    }
+    function normalizeCoinRateValue(value){
+      const rate = Number(value);
+      return Number.isFinite(rate) && rate > 0 ? Math.max(1, Math.round(rate)) : null;
+    }
+    function normalizeAdWatchSettingsValue(value){
+      const rewardCoins = Number(value?.rewardCoins ?? value?.adRewardCoins ?? value?.adReward ?? value?.rewardCoin);
+      const cooldownDays = Number(value?.cooldownDays ?? value?.adCooldownDays ?? value?.cooldown ?? value?.dayCooldown);
+      const normalizedReward = Number.isFinite(rewardCoins) && rewardCoins > 0 ? Math.max(1, Math.round(rewardCoins)) : null;
+      const normalizedCooldown = Number.isFinite(cooldownDays) && cooldownDays > 0 ? Math.max(1, Math.round(cooldownDays)) : null;
+      return { rewardCoins: normalizedReward, cooldownDays: normalizedCooldown };
+    }
+    function applyGlobalSettingsSnapshot(data = {}){
+      const nextRate = normalizeCoinRateValue(data?.coinRate ?? data?.coinRateValue ?? data?.tlToCoinRate);
+      const nextAd = normalizeAdWatchSettingsValue(data?.adRewardSettings || data);
+      if (nextRate){
+        COIN_RATE = nextRate;
+        localStorage.setItem(COIN_RATE_STORAGE_KEY, String(nextRate));
+      }
+      if (nextAd.rewardCoins || nextAd.cooldownDays){
+        const current = getSavedAdWatchSettings();
+        const merged = {
+          rewardCoins: nextAd.rewardCoins || current.rewardCoins,
+          cooldownDays: nextAd.cooldownDays || current.cooldownDays
+        };
+        localStorage.setItem(AD_REWARD_SETTINGS_KEY, JSON.stringify(merged));
+      }
+      updateCoinRateUI();
+      updateAdWatchUI();
+      scheduleRender();
     }
     function updateCoinRateUI(){
       const rate = Math.max(1, Math.round(Number(COIN_RATE) || 5));
@@ -5371,16 +5414,25 @@ Sorun: ${body}`;
       if (hubText) hubText.textContent = `Reklam izleyip ${reward} coin kazan. ${cooldown} günde bir ödül alınır.`;
       if (refs.adNoteText) refs.adNoteText.textContent = `Bu reklam ödülü ${cooldown} günde bir alınır ve ${reward} coin verir.`;
     }
-    function saveCoinRateSetting(rate){
+    async function saveCoinRateSetting(rate){
       const next = Math.max(1, Math.round(Number(rate) || 0));
       if (!next) return false;
       COIN_RATE = next;
       localStorage.setItem(COIN_RATE_STORAGE_KEY, String(next));
       updateCoinRateUI();
       scheduleRender();
+      try{
+        await setDoc(doc(db, GLOBAL_SETTINGS_COLLECTION, GLOBAL_SETTINGS_DOC_ID), {
+          coinRate: next,
+          updatedAt: serverTimestamp(),
+          updatedAtMs: Date.now()
+        }, { merge: true });
+      }catch(err){
+        console.warn("Coin oranı Firestore'a yazılamadı:", err);
+      }
       return true;
     }
-    function saveAdWatchSettings(settings){
+    async function saveAdWatchSettings(settings){
       const rewardCoins = Math.max(1, Math.round(Number(settings?.rewardCoins) || 0));
       const cooldownDays = Math.max(1, Math.round(Number(settings?.cooldownDays) || 0));
       if (!rewardCoins || !cooldownDays) return false;
@@ -5388,6 +5440,17 @@ Sorun: ${body}`;
       localStorage.setItem(AD_REWARD_SETTINGS_KEY, JSON.stringify(next));
       updateAdWatchUI();
       scheduleRender();
+      try{
+        await setDoc(doc(db, GLOBAL_SETTINGS_COLLECTION, GLOBAL_SETTINGS_DOC_ID), {
+          adRewardSettings: next,
+          adRewardCoins: rewardCoins,
+          adCooldownDays: cooldownDays,
+          updatedAt: serverTimestamp(),
+          updatedAtMs: Date.now()
+        }, { merge: true });
+      }catch(err){
+        console.warn("Reklam ayarları Firestore'a yazılamadı:", err);
+      }
       return true;
     }
     function autoFormatPriceInput(input){
@@ -5416,24 +5479,24 @@ Sorun: ${body}`;
       autoFormatPriceInput(refs.adNewPrice);
     });
     refs.btnConvertTlToCoin?.addEventListener("click", convertTlToCoin);
-    refs.btnSaveCoinRate?.addEventListener("click", () => {
+    refs.btnSaveCoinRate?.addEventListener("click", async () => {
       const value = Number(refs.coinRateInput?.value || 0);
       if (!value || value < 1) {
         alert("Geçerli bir oran gir.");
         return;
       }
-      saveCoinRateSetting(value);
-      alert(`Dönüşüm oranı kaydedildi: 1 Coin = ${Math.max(1, Math.round(value))} TL`);
+      const ok = await saveCoinRateSetting(value);
+      if (ok) alert(`Dönüşüm oranı kaydedildi: 1 Coin = ${Math.max(1, Math.round(value))} TL`);
     });
-    refs.btnSaveAdSettings?.addEventListener("click", () => {
+    refs.btnSaveAdSettings?.addEventListener("click", async () => {
       const rewardCoins = Number(refs.adRewardCoinsInput?.value || 0);
       const cooldownDays = Number(refs.adCooldownDaysInput?.value || 0);
       if (!rewardCoins || rewardCoins < 1 || !cooldownDays || cooldownDays < 1) {
         alert("Geçerli reklam ayarları gir.");
         return;
       }
-      saveAdWatchSettings({ rewardCoins, cooldownDays });
-      alert(`Reklam ayarları kaydedildi: ${Math.max(1, Math.round(rewardCoins))} coin / ${Math.max(1, Math.round(cooldownDays))} gün`);
+      const ok = await saveAdWatchSettings({ rewardCoins, cooldownDays });
+      if (ok) alert(`Reklam ayarları kaydedildi: ${Math.max(1, Math.round(rewardCoins))} coin / ${Math.max(1, Math.round(cooldownDays))} gün`);
     });
     refs.profileForm.onsubmit = async (e) => {
       e.preventDefault();
