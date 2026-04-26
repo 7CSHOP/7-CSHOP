@@ -196,6 +196,7 @@
     .badge.mine{background:#dbeafe;color:#1d4ed8}
     .badge.closed{background:#e5e7eb;color:#4b5563}
     .badge.vip{background:#fef3c7;color:#92400e}
+    .badge.coin-success{background:#dcfce7;color:#166534}
     .badge.premium{background:#dbeafe;color:#1d4ed8}
     .premium-star{color:#2563eb;font-weight:900}
     .badge.notify{background:#dc2626;color:#fff;min-width:24px;height:24px;padding:0 8px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font-size:12px;font-weight:900;line-height:1}
@@ -2104,6 +2105,15 @@
       return `<span class="badge mine">Üye</span>`;
     }
 
+    function successfulCoinPurchaseCount(user){
+      return Math.max(0, Number(user?.successfulCoinPurchases || 0));
+    }
+
+    function successfulPurchaseSummary(user){
+      const count = successfulCoinPurchaseCount(user);
+      return `${count} başarılı alışveriş`;
+    }
+
     function listingOwnerRoleText(item){
       return userRoleLabel(getUserById(item?.ownerId) || { role: item?.ownerRole });
     }
@@ -2292,6 +2302,7 @@
           avatarUrl: user.photoURL || null,
           avatarDataUrl: null,
           coinBalance: 0,
+          successfulCoinPurchases: 0,
           taskState: defaultTaskState(),
           lastSeenAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
@@ -2668,7 +2679,9 @@
                     <button class="profile-link" onclick="window.__openSeller('${item.ownerId}','${item.id}')">${owner}</button>
                   </strong>
                   <small>${isMine ? "Bu ilan sana ait." : "Profiline tıkla, mesajlaş."}</small>
-                  <div style="margin-top:6px">${userRoleBadge(getUserById(item.ownerId) || { role: item.ownerRole })}</div>
+                  <div style="margin-top:6px;display:grid;gap:6px;justify-items:start">
+                    ${userRoleBadge(getUserById(item.ownerId) || { role: item.ownerRole })}
+                  </div>
                 </div>
               </div>
               <button class="btn secondary" onclick="window.__openSeller('${item.ownerId}','${item.id}')">Profil</button>
@@ -3044,6 +3057,7 @@
       refs.profileBox.innerHTML = `
         <div class="item"><div class="item-head"><strong>İsim</strong></div><span>${escapeHtml(p.displayName || "")}</span></div>
         <div class="item"><div class="item-head"><strong>Rol</strong></div><span>${escapeHtml(userRoleLabel(p))}</span></div>
+        <div class="item"><div class="item-head"><strong>Başarılı alışveriş sayısı</strong></div><span>${successfulCoinPurchaseCount(p)}</span></div>
         <div class="item"><div class="item-head"><strong>Kullanıcı ID</strong></div><span>${escapeHtml(p.uid || "")}</span></div>
         <div class="item"><div class="item-head"><strong>PP durumu</strong></div><span>${avatar ? "Yüklü" : "Yok"}</span></div>
         <div class="item"><div class="item-head"><strong>Son aktif</strong></div><span>${escapeHtml(formatLastSeen(p.lastSeenAt))}</span></div>
@@ -4281,7 +4295,12 @@ Coin: ${formatCoin(coinPrice)}
             if (!buyerSnap.exists() || !sellerSnap.exists()) throw new Error('Kullanıcı yok');
             const buyerCoins = Number(buyerSnap.data().coinBalance || 0);
             if (buyerCoins < price) throw new Error('Yetersiz bakiye');
-            tx.update(buyerRef, { coinBalance: buyerCoins - price, updatedAt: serverTimestamp() });
+            const buyerPurchases = Number(buyerSnap.data().successfulCoinPurchases || 0);
+            tx.update(buyerRef, {
+              coinBalance: buyerCoins - price,
+              successfulCoinPurchases: buyerPurchases + 1,
+              updatedAt: serverTimestamp()
+            });
             const sellerCoins = Number(sellerSnap.data().coinBalance || 0);
             tx.update(sellerRef, { coinBalance: sellerCoins + price, updatedAt: serverTimestamp() });
             next.transferredAt = Date.now();
@@ -4297,6 +4316,17 @@ Coin: ${formatCoin(coinPrice)}
           id: convId,
           purchaseOrder: updatedOrder
         };
+        if (updatedOrder?.transferredAt && state.user?.uid && state.profile?.uid === state.user.uid){
+          const currentCount = Number(state.profile?.successfulCoinPurchases || 0);
+          const currentBalance = Number(state.profile?.coinBalance || 0);
+          const coinPrice = Number(updatedOrder?.coinPrice || 0);
+          state.profile = {
+            ...state.profile,
+            successfulCoinPurchases: currentCount + 1,
+            coinBalance: Math.max(0, currentBalance - coinPrice)
+          };
+          cacheUserDoc(state.profile);
+        }
         if (state.currentConversationId === convId) {
           scheduleRender();
         }
@@ -4653,7 +4683,7 @@ Sorun: ${body}`;
         };
         if (!nextProfile.role) nextProfile.role = "member";
         const prev = state.profile || {};
-        const changed = ["displayName", "avatarUrl", "avatarDataUrl", "photoURL", "role", "isAdmin", "email"].some(key => String(prev[key] ?? "") !== String(nextProfile[key] ?? ""));
+        const changed = ["displayName", "avatarUrl", "avatarDataUrl", "photoURL", "role", "isAdmin", "email", "coinBalance", "successfulCoinPurchases"].some(key => String(prev[key] ?? "") !== String(nextProfile[key] ?? ""));
         state.profile = { ...prev, ...nextProfile };
         state.isAdmin = !!nextProfile.isAdmin;
         cacheUserDoc(state.profile);
@@ -5272,6 +5302,7 @@ Sorun: ${body}`;
         <div class="item"><div class="item-head"><strong>Toplam ilan</strong></div><span>${sellerAds.length}</span></div>
         <div class="item"><div class="item-head"><strong>Açık ilan</strong></div><span>${openCount}</span></div>
         <div class="item"><div class="item-head"><strong>Kapalı ilan</strong></div><span>${closedCount}</span></div>
+        <div class="item"><div class="item-head"><strong>Başarılı alışveriş sayısı</strong></div><span>${successfulCoinPurchaseCount(seller)}</span></div>
       `;
       refs.sellerRecentAds.innerHTML = sortDescByDate(sellerAds).slice(0, 5).map(x => `
         <div class="item">
