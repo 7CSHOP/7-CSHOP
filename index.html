@@ -1754,6 +1754,7 @@
       deleteDoc,
       runTransaction
     } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
     const firebaseConfig = {
       apiKey: "AIzaSyBeIGkhnS59kFgzYLWvrO1rL6oyfqqSF-U",
       authDomain: "c-shop-3b43a.firebaseapp.com",
@@ -1767,6 +1768,117 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
     await setPersistence(auth, browserSessionPersistence);
+
+    const coinBridgeConfigNew = {
+      apiKey: "AIzaSyA8RyrZnjwSnQWkIckn4yAjEy2GIfNsO_8",
+      authDomain: "coin-shop-44e39.firebaseapp.com",
+      databaseURL: "https://coin-shop-44e39-default-rtdb.firebaseio.com",
+      projectId: "coin-shop-44e39",
+      storageBucket: "coin-shop-44e39.firebasestorage.app",
+      messagingSenderId: "133359760519",
+      appId: "1:133359760519:web:33f698cd7d72bcb3ebb422"
+    };
+    const coinBridgeConfigOld = {
+      apiKey: "AIzaSyBeIGkhnS59kFgzYLWvrO1rL6oyfqqSF-U",
+      authDomain: "c-shop-3b43a.firebaseapp.com",
+      databaseURL: "https://c-shop-3b43a-default-rtdb.firebaseio.com",
+      projectId: "c-shop-3b43a",
+      storageBucket: "c-shop-3b43a.firebasestorage.app",
+      messagingSenderId: "1026954337566",
+      appId: "1:1026954337566:web:ebe164f83133f9a09f7d0f"
+    };
+    const coinBridgeAppNew = initializeApp(coinBridgeConfigNew, "coinBridgeNew");
+    const coinBridgeAppOld = initializeApp(coinBridgeConfigOld, "coinBridgeOld");
+    const coinBridgeDbNew = getDatabase(coinBridgeAppNew);
+    const coinBridgeDbOld = getDatabase(coinBridgeAppOld);
+
+    function getCoinBridgeKey(userRecord = state.profile, authUser = state.user){
+      return String(
+        userRecord?.displayName ||
+        authUser?.displayName ||
+        authUser?.email ||
+        authUser?.uid ||
+        ""
+      ).trim();
+    }
+    function normalizeCoinRecord(snap){
+      if (!snap?.exists()) return null;
+      const data = snap.val() || {};
+      return {
+        coin: Math.max(0, Number(data.coin) || 0),
+        updatedAtMs: Number(data.updatedAtMs || 0)
+      };
+    }
+    async function readLinkedCoinBalance(key = getCoinBridgeKey()){
+      if (!key) return null;
+      const [oldSnap, newSnap] = await Promise.all([
+        get(ref(coinBridgeDbOld, `users/${key}`)),
+        get(ref(coinBridgeDbNew, `users/${key}`))
+      ]);
+      const sources = [normalizeCoinRecord(oldSnap), normalizeCoinRecord(newSnap)].filter(Boolean);
+      if (!sources.length) return null;
+      sources.sort((a, b) => (b.updatedAtMs - a.updatedAtMs) || (b.coin - a.coin));
+      return sources[0].coin;
+    }
+    async function writeLinkedCoinBalance(key, amount, updatedAtMs = Date.now()){
+      const safe = Math.max(0, Math.round(Number(amount) || 0));
+      if (!key) return safe;
+      const payload = { coin: safe, updatedAtMs };
+      await Promise.all([
+        set(ref(coinBridgeDbNew, `users/${key}`), payload),
+        set(ref(coinBridgeDbOld, `users/${key}`), payload)
+      ]);
+      return safe;
+    }
+    async function syncCoinBalanceEverywhere(amount, opts = {}){
+      const safe = Math.max(0, Math.round(Number(amount) || 0));
+      const uid = String(opts.uid || state.user?.uid || "").trim();
+      const key = String(opts.key || getCoinBridgeKey()).trim();
+      const updatedAtMs = Number(opts.updatedAtMs || Date.now());
+      if (uid){
+        await setDoc(doc(db, "users", uid), {
+          coinBalance: safe,
+          coinUpdatedAtMs: updatedAtMs,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+      }
+      if (key) await writeLinkedCoinBalance(key, safe, updatedAtMs);
+      if (state.user && uid && state.user.uid === uid){
+        state.profile = { ...(state.profile || {}), coinBalance: safe, coinUpdatedAtMs: updatedAtMs };
+        cacheUserDoc(state.profile);
+        if (refs.coinBadge) refs.coinBadge.textContent = formatCoin(safe);
+      }
+      return safe;
+    }
+    async function resolveCoinBalance(uid = state.user?.uid, key = getCoinBridgeKey()){
+      const candidates = [];
+      if (uid){
+        try{
+          const snap = await getDoc(doc(db, "users", uid));
+          if (snap.exists()){
+            const data = snap.data() || {};
+            candidates.push({
+              coin: Math.max(0, Number(data.coinBalance || 0)),
+              updatedAtMs: Number(data.coinUpdatedAtMs || 0)
+            });
+          }
+        }catch{}
+      }
+      if (key){
+        const [oldSnap, newSnap] = await Promise.all([
+          get(ref(coinBridgeDbOld, `users/${key}`)),
+          get(ref(coinBridgeDbNew, `users/${key}`))
+        ]);
+        for (const snap of [oldSnap, newSnap]){
+          const rec = normalizeCoinRecord(snap);
+          if (rec) candidates.push(rec);
+        }
+      }
+      if (!candidates.length) return null;
+      candidates.sort((a, b) => (b.updatedAtMs - a.updatedAtMs) || (b.coin - a.coin));
+      return candidates[0].coin;
+    }
+
     const $ = (id) => document.getElementById(id);
     const refs = {
       authScreen: $("authScreen"),
@@ -2302,6 +2414,7 @@
           avatarUrl: user.photoURL || null,
           avatarDataUrl: null,
           coinBalance: 0,
+          coinUpdatedAtMs: 0,
           successfulCoinPurchases: 0,
           taskState: defaultTaskState(),
           lastSeenAt: serverTimestamp(),
@@ -3142,7 +3255,7 @@
     async function mutateTaskState(mutator){
       if (!state.user) return null;
       const ref = doc(db, 'users', state.user.uid);
-      return runTransaction(db, async (tx) => {
+      const result = await runTransaction(db, async (tx) => {
         const snap = await tx.get(ref);
         if (!snap.exists()) throw new Error('Kullanıcı bulunamadı');
         const data = snap.data() || {};
@@ -3152,11 +3265,18 @@
         const coinBalance = Number(data.coinBalance || 0) + rewardCoins;
         tx.update(ref, {
           coinBalance,
+          coinUpdatedAtMs: Date.now(),
           taskState,
           updatedAt: serverTimestamp()
         });
         return { rewardCoins, taskState, coinBalance };
       });
+      await syncCoinBalanceEverywhere(result?.coinBalance ?? currentCoinBalance(), {
+        uid: state.user.uid,
+        key: getCoinBridgeKey(),
+        updatedAtMs: Date.now()
+      }).catch(() => {});
+      return result;
     }
     async function syncLoginTask(){
       const today = dateKeyFromMs(getRealNowMs());
@@ -3540,6 +3660,7 @@
       const coinPrice = Number(item.coinPrice || 0);
       const buyerRef = doc(db, "users", state.user.uid);
       const packageRef = doc(db, "rewardPackages", id);
+      let nextBalance = null;
       try{
         await runTransaction(db, async (tx) => {
           const userSnap = await tx.get(buyerRef);
@@ -3550,12 +3671,17 @@
           if (data.active === false) throw new Error("Paket pasif");
           const balance = Number(userSnap.data().coinBalance || 0);
           if (balance < coinPrice) throw new Error("Yetersiz bakiye");
+          nextBalance = balance - coinPrice;
           tx.update(buyerRef, {
-            coinBalance: balance - coinPrice,
+            coinBalance: nextBalance,
+            coinUpdatedAtMs: Date.now(),
             updatedAt: serverTimestamp()
           });
           tx.delete(packageRef);
         });
+        if (nextBalance !== null) {
+          await syncCoinBalanceEverywhere(nextBalance, { uid: state.user.uid, key: getCoinBridgeKey(), updatedAtMs: Date.now() }).catch(()=>{});
+        }
         const rewardText = (item.rewards || []).slice(0, 4).join(" • ") || "Ödül yok";
         const message = `Paket satın alındı
 Paket: ${item.title}
@@ -3851,7 +3977,7 @@ Coin: ${formatCoin(coinPrice)}
       if (!amount) return;
       if (!confirm(`${user.displayName || "Kullanıcı"} hesabından ${amount} Coin düşülsün mü?`)) return;
       try{
-        const next = await saveCoinDelta(userId, -amount);
+        const next = await saveCoinDelta(userId, -amount, user.displayName || userId);
         await logAction("Coin azaltıldı", `${state.profile.displayName} → ${user.displayName || userId} (-${amount})`);
         await ensureAdminUsersLoaded();
         scheduleRender();
@@ -4015,17 +4141,19 @@ Coin: ${formatCoin(coinPrice)}
       }catch{}
       return null;
     }
-    async function saveCoinDelta(userId, delta){
-      return runTransaction(db, async (tx) => {
+    async function saveCoinDelta(userId, delta, bridgeKey = ''){
+      const next = await runTransaction(db, async (tx) => {
         const ref = doc(db, 'users', userId);
         const snap = await tx.get(ref);
         if (!snap.exists()) throw new Error('Kullanıcı bulunamadı');
         const current = Number(snap.data().coinBalance || 0);
         const next = current + Number(delta || 0);
         if (next < 0) throw new Error('Yetersiz Coin');
-        tx.update(ref, { coinBalance: next, updatedAt: serverTimestamp() });
+        tx.update(ref, { coinBalance: next, coinUpdatedAtMs: Date.now(), updatedAt: serverTimestamp() });
         return next;
       });
+      await syncCoinBalanceEverywhere(next, { uid: userId, key: bridgeKey || '', updatedAtMs: Date.now() }).catch(() => {});
+      return next;
     }
     async function savePromoCodeDoc(data, editId = ''){
       const payload = {
@@ -4298,11 +4426,12 @@ Coin: ${formatCoin(coinPrice)}
             const buyerPurchases = Number(buyerSnap.data().successfulCoinPurchases || 0);
             tx.update(buyerRef, {
               coinBalance: buyerCoins - price,
+              coinUpdatedAtMs: Date.now(),
               successfulCoinPurchases: buyerPurchases + 1,
               updatedAt: serverTimestamp()
             });
             const sellerCoins = Number(sellerSnap.data().coinBalance || 0);
-            tx.update(sellerRef, { coinBalance: sellerCoins + price, updatedAt: serverTimestamp() });
+            tx.update(sellerRef, { coinBalance: sellerCoins + price, coinUpdatedAtMs: Date.now(), updatedAt: serverTimestamp() });
             next.transferredAt = Date.now();
           }
           tx.update(convRef, {
@@ -4316,16 +4445,41 @@ Coin: ${formatCoin(coinPrice)}
           id: convId,
           purchaseOrder: updatedOrder
         };
-        if (updatedOrder?.transferredAt && state.user?.uid && state.profile?.uid === state.user.uid){
-          const currentCount = Number(state.profile?.successfulCoinPurchases || 0);
-          const currentBalance = Number(state.profile?.coinBalance || 0);
-          const coinPrice = Number(updatedOrder?.coinPrice || 0);
-          state.profile = {
-            ...state.profile,
-            successfulCoinPurchases: currentCount + 1,
-            coinBalance: Math.max(0, currentBalance - coinPrice)
-          };
-          cacheUserDoc(state.profile);
+        if (updatedOrder?.transferredAt){
+          try{
+            const [buyerDoc, sellerDoc] = await Promise.all([
+              getDoc(doc(db, 'users', updatedOrder.buyerId)),
+              getDoc(doc(db, 'users', updatedOrder.sellerId))
+            ]);
+            if (buyerDoc.exists()) {
+              const buyerData = buyerDoc.data() || {};
+              await syncCoinBalanceEverywhere(Number(buyerData.coinBalance || 0), {
+                uid: updatedOrder.buyerId,
+                key: String(buyerData.displayName || '').trim(),
+                updatedAtMs: Number(buyerData.coinUpdatedAtMs || Date.now())
+              }).catch(()=>{});
+            }
+            if (sellerDoc.exists()) {
+              const sellerData = sellerDoc.data() || {};
+              await syncCoinBalanceEverywhere(Number(sellerData.coinBalance || 0), {
+                uid: updatedOrder.sellerId,
+                key: String(sellerData.displayName || '').trim(),
+                updatedAtMs: Number(sellerData.coinUpdatedAtMs || Date.now())
+              }).catch(()=>{});
+            }
+          }catch{}
+          if (state.user?.uid && state.profile?.uid === state.user.uid){
+            const currentCount = Number(state.profile?.successfulCoinPurchases || 0);
+            const currentBalance = Number(state.profile?.coinBalance || 0);
+            const coinPrice = Number(updatedOrder?.coinPrice || 0);
+            state.profile = {
+              ...state.profile,
+              successfulCoinPurchases: currentCount + 1,
+              coinBalance: Math.max(0, currentBalance - coinPrice),
+              coinUpdatedAtMs: Date.now()
+            };
+            cacheUserDoc(state.profile);
+          }
         }
         if (state.currentConversationId === convId) {
           scheduleRender();
@@ -5589,6 +5743,10 @@ Sorun: ${body}`;
         state.profile = await ensureUserDoc(cred.user, displayName, isAdminAccount);
         cacheUserDoc(state.profile);
         state.isAdmin = !!state.profile.isAdmin;
+        const syncedCoin = await resolveCoinBalance(cred.user.uid, getCoinBridgeKey(state.profile, cred.user));
+        if (syncedCoin !== null) {
+          await syncCoinBalanceEverywhere(syncedCoin, { uid: cred.user.uid, key: getCoinBridgeKey(state.profile, cred.user), updatedAtMs: Date.now() }).catch(()=>{});
+        }
         setAppScreen();
         await loadLiveData();
         setView("shop");
@@ -5614,6 +5772,10 @@ Sorun: ${body}`;
         state.profile = await ensureUserDoc(cred.user, displayName, isAdminAccount);
         cacheUserDoc(state.profile);
         state.isAdmin = !!state.profile.isAdmin;
+        const syncedCoin = await resolveCoinBalance(cred.user.uid, getCoinBridgeKey(state.profile, cred.user));
+        if (syncedCoin !== null) {
+          await syncCoinBalanceEverywhere(syncedCoin, { uid: cred.user.uid, key: getCoinBridgeKey(state.profile, cred.user), updatedAtMs: Date.now() }).catch(()=>{});
+        }
         setAppScreen();
         await loadLiveData();
         setView("shop");
@@ -5776,6 +5938,10 @@ Sorun: ${body}`;
       state.profile = await ensureUserDoc(state.user, dn, normalizeName(dn) === normalizeName(ADMIN_BOOTSTRAP_NAME));
       cacheUserDoc(state.profile);
       state.isAdmin = !!state.profile.isAdmin;
+      const syncedCoin = await resolveCoinBalance(state.user.uid, getCoinBridgeKey(state.profile, state.user));
+      if (syncedCoin !== null) {
+        await syncCoinBalanceEverywhere(syncedCoin, { uid: state.user.uid, key: getCoinBridgeKey(state.profile, state.user), updatedAtMs: Date.now() }).catch(()=>{});
+      }
       if (refs.coinBadge) refs.coinBadge.classList.remove('hidden');
       setAppScreen();
       if (!state.liveDataReady){
