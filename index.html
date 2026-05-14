@@ -1754,7 +1754,6 @@
       deleteDoc,
       runTransaction
     } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
-    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
     const firebaseConfig = {
       apiKey: "AIzaSyBeIGkhnS59kFgzYLWvrO1rL6oyfqqSF-U",
       authDomain: "c-shop-3b43a.firebaseapp.com",
@@ -1769,117 +1768,48 @@
     const db = getFirestore(app);
     await setPersistence(auth, browserSessionPersistence);
 
-    const coinBridgeConfigNew = {
-      apiKey: "AIzaSyA8RyrZnjwSnQWkIckn4yAjEy2GIfNsO_8",
-      authDomain: "coin-shop-44e39.firebaseapp.com",
-      databaseURL: "https://coin-shop-44e39-default-rtdb.firebaseio.com",
-      projectId: "coin-shop-44e39",
-      storageBucket: "coin-shop-44e39.firebasestorage.app",
-      messagingSenderId: "133359760519",
-      appId: "1:133359760519:web:33f698cd7d72bcb3ebb422"
-    };
-    const coinBridgeConfigOld = {
-      apiKey: "AIzaSyBeIGkhnS59kFgzYLWvrO1rL6oyfqqSF-U",
-      authDomain: "c-shop-3b43a.firebaseapp.com",
-      databaseURL: "https://c-shop-3b43a-default-rtdb.firebaseio.com",
-      projectId: "c-shop-3b43a",
-      storageBucket: "c-shop-3b43a.firebasestorage.app",
-      messagingSenderId: "1026954337566",
-      appId: "1:1026954337566:web:ebe164f83133f9a09f7d0f"
-    };
-    const coinBridgeAppNew = initializeApp(coinBridgeConfigNew, "coinBridgeNew");
-    const coinBridgeAppOld = initializeApp(coinBridgeConfigOld, "coinBridgeOld");
-    const coinBridgeDbNew = getDatabase(coinBridgeAppNew);
-    const coinBridgeDbOld = getDatabase(coinBridgeAppOld);
 
-    function getCoinBridgeKey(userRecord = state.profile, authUser = state.user){
-      return String(
-        userRecord?.displayName ||
-        authUser?.displayName ||
-        authUser?.email ||
-        authUser?.uid ||
-        ""
-      ).trim();
-    }
-    function normalizeCoinRecord(snap){
-      if (!snap?.exists()) return null;
-      const data = snap.val() || {};
-      return {
-        coin: Math.max(0, Number(data.coin) || 0),
-        updatedAtMs: Number(data.updatedAtMs || 0)
-      };
-    }
-    async function readLinkedCoinBalance(key = getCoinBridgeKey()){
-      if (!key) return null;
-      const [oldSnap, newSnap] = await Promise.all([
-        get(ref(coinBridgeDbOld, `users/${key}`)),
-        get(ref(coinBridgeDbNew, `users/${key}`))
-      ]);
-      const sources = [normalizeCoinRecord(oldSnap), normalizeCoinRecord(newSnap)].filter(Boolean);
-      if (!sources.length) return null;
-      sources.sort((a, b) => (b.updatedAtMs - a.updatedAtMs) || (b.coin - a.coin));
-      return sources[0].coin;
-    }
-    async function writeLinkedCoinBalance(key, amount, updatedAtMs = Date.now()){
-      const safe = Math.max(0, Math.round(Number(amount) || 0));
-      if (!key) return safe;
-      const payload = { coin: safe, updatedAtMs };
-      await Promise.all([
-        set(ref(coinBridgeDbNew, `users/${key}`), payload),
-        set(ref(coinBridgeDbOld, `users/${key}`), payload)
-      ]);
-      return safe;
-    }
-    async function syncCoinBalanceEverywhere(amount, opts = {}){
-      const safe = Math.max(0, Math.round(Number(amount) || 0));
-      const uid = String(opts.uid || state.user?.uid || "").trim();
-      const key = String(opts.key || getCoinBridgeKey()).trim();
-      const updatedAtMs = Number(opts.updatedAtMs || Date.now());
-      if (uid){
-        await setDoc(doc(db, "users", uid), {
-          coinBalance: safe,
-          coinUpdatedAtMs: updatedAtMs,
-          updatedAt: serverTimestamp()
-        }, { merge: true });
-      }
-      if (key) await writeLinkedCoinBalance(key, safe, updatedAtMs);
-      if (state.user && uid && state.user.uid === uid){
-        state.profile = { ...(state.profile || {}), coinBalance: safe, coinUpdatedAtMs: updatedAtMs };
-        cacheUserDoc(state.profile);
-        if (refs.coinBadge) refs.coinBadge.textContent = formatCoin(safe);
-      }
-      return safe;
-    }
-    async function resolveCoinBalance(uid = state.user?.uid, key = getCoinBridgeKey()){
-      const candidates = [];
-      if (uid){
-        try{
-          const snap = await getDoc(doc(db, "users", uid));
-          if (snap.exists()){
-            const data = snap.data() || {};
-            candidates.push({
-              coin: Math.max(0, Number(data.coinBalance || 0)),
-              updatedAtMs: Number(data.coinUpdatedAtMs || 0)
-            });
-          }
-        }catch{}
-      }
-      if (key){
-        const [oldSnap, newSnap] = await Promise.all([
-          get(ref(coinBridgeDbOld, `users/${key}`)),
-          get(ref(coinBridgeDbNew, `users/${key}`))
-        ]);
-        for (const snap of [oldSnap, newSnap]){
-          const rec = normalizeCoinRecord(snap);
-          if (rec) candidates.push(rec);
-        }
-      }
-      if (!candidates.length) return null;
-      candidates.sort((a, b) => (b.updatedAtMs - a.updatedAtMs) || (b.coin - a.coin));
-      return candidates[0].coin;
-    }
+function getCoinBridgeKey(userRecord = state.profile, authUser = state.user){
+  return String(
+    userRecord?.displayName ||
+    authUser?.displayName ||
+    authUser?.email ||
+    authUser?.uid ||
+    ""
+  ).trim();
+}
+async function syncCoinBalanceEverywhere(amount, opts = {}){
+  const safe = Math.max(0, Math.round(Number(amount) || 0));
+  const uid = String(opts.uid || state.user?.uid || "").trim();
+  const updatedAtMs = Number(opts.updatedAtMs || Date.now());
+  if (uid){
+    await setDoc(doc(db, "users", uid), {
+      coinBalance: safe,
+      coinUpdatedAtMs: updatedAtMs,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+  }
+  if (state.user && uid && state.user.uid === uid){
+    state.profile = { ...(state.profile || {}), coinBalance: safe, coinUpdatedAtMs: updatedAtMs };
+    cacheUserDoc(state.profile);
+    if (refs.coinBadge) refs.coinBadge.textContent = formatCoin(safe);
+  }
+  return safe;
+}
+async function resolveCoinBalance(uid = state.user?.uid){
+  if (!uid) return null;
+  try{
+    const snap = await getDoc(doc(db, "users", uid));
+    if (!snap.exists()) return null;
+    const data = snap.data() || {};
+    return Math.max(0, Number(data.coinBalance || 0));
+  }catch{
+    return null;
+  }
+}
 
-    const $ = (id) => document.getElementById(id);
+const $ = (id) => document.getElementById(id);
+
     const refs = {
       authScreen: $("authScreen"),
       appScreen: $("appScreen"),
